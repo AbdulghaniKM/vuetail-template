@@ -21,6 +21,7 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.32.0",
     "@iconify/vue": "^4.3.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
@@ -32,6 +33,7 @@
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "typescript": "~5.7.2",
+    "typescript-eslint": "^8.38.0",
     "vite": "^6.2.0",
     "vue-tsc": "^2.2.4"
   }
