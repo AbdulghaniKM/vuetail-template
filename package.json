@@ -22,7 +22,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
-    "@iconify/vue": "^4.3.0",
+    "@iconify/json": "^2.2.408",
+    "@iconify/tailwind4": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "@vitejs/plugin-vue": "^5.2.1",
