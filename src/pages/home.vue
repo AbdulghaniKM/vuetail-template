@@ -16,7 +16,19 @@
 </template>
 
 <script setup lang="ts">
+  import { onMounted } from 'vue';
   import AppButton from '../components/AppButton.vue';
   import { useCounterStore } from '../stores/counter';
+  import { useSeo } from '../utils';
   const context = useCounterStore();
+
+  onMounted(() => {
+    useSeo({
+      title: 'Home',
+      metaTags: {
+        description: 'Home page',
+        keywords: 'home, page',
+      },
+    });
+  });
 </script>

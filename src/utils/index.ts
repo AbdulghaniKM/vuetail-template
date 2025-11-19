@@ -1,5 +1,7 @@
 import { useRouter } from 'vue-router';
 
+export * from './seo';
+
 export const useRedirect = () => {
   const router = useRouter();
 
