@@ -17,7 +17,7 @@ export default tseslint.config(
   {
     files: ['**/*.ts', '**/*.js'],
     rules: {
-      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-console': 'warn',
       'no-debugger': 'warn',
