@@ -1,2 +1,95 @@
 @import 'tailwindcss';
 @plugin "@iconify/tailwind4";
+
+/* Tailwind Theme Definitions */
+/* Colors from app.config.ts - Tailwind v4 @theme with CSS variable references */
+/* Default values are set here, but will be overridden by theme system CSS variables */
+@theme {
+  --color-primary: #3b82f6;
+  --color-secondary: #8b5cf6;
+  --color-accent: #f59e0b;
+  --color-background: #ffffff;
+  --color-surface: #f9fafb;
+  --color-text: #111827;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Font variables */
+  --font-primary: var(--font-primary);
+  --font-secondary: var(--font-secondary);
+  --font-mono: var(--font-mono);
+}
+
+/* CSS Variables - These will be dynamically updated by the theme system */
+/* The @theme block above provides defaults, but these variables allow runtime updates */
+:root {
+  --color-primary: #3b82f6;
+  --color-secondary: #8b5cf6;
+  --color-accent: #f59e0b;
+  --color-background: #ffffff;
+  --color-surface: #f9fafb;
+  --color-text: #111827;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+}
+
+/* Font Family Registration */
+/* Use this section to register local fonts */
+/* Example:
+@font-face {
+  font-family: 'CustomFont';
+  src: url('/fonts/custom-font.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-custom: 'CustomFont', sans-serif;
+}
+*/
+
+/* Default font families - will be overridden by app.config.ts */
+:root {
+  --font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'Courier New', Courier, monospace;
+}
+
+/* Theme CSS variables will be injected automatically by the config system */
+/* Colors are available as CSS variables: --color-primary, --color-secondary, etc. */
+/* Use them in your components like: color: var(--color-primary); */
+
+/* Base theme-aware styles */
+:root {
+  color-scheme: light dark;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+}
+
+/* Smooth theme transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+body {
+  font-family: var(--font-primary);
+}
