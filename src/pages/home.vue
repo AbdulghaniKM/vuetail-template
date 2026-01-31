@@ -4,12 +4,23 @@
     <section class="from-primary/10 via-secondary/10 to-accent/10 bg-gradient-to-br py-20">
       <div class="container mx-auto px-4">
         <div class="mx-auto max-w-3xl text-center">
-          <h1 class="text-text mb-6 text-5xl font-bold md:text-6xl">
+          <AppText
+            variant="h1"
+            :responsiveSize="{ sm: '4xl', md: '5xl', lg: '6xl' }"
+            align="center"
+            class="mb-6"
+          >
             {{ appTitle }}
-          </h1>
-          <p class="text-text-secondary mb-8 text-xl">
+          </AppText>
+          <AppText
+            variant="p"
+            size="xl"
+            color="text-secondary"
+            align="center"
+            class="mb-8"
+          >
             {{ appDescription }}
-          </p>
+          </AppText>
           <div class="flex flex-wrap justify-center gap-4">
             <button
               @click="showToast('success', 'Welcome to the showcase!')"
@@ -31,7 +42,7 @@
     <!-- Features Grid -->
     <section id="features" class="py-16">
       <div class="container mx-auto px-4">
-        <h2 class="text-text mb-12 text-center text-4xl font-bold">Features</h2>
+        <AppText variant="h2" align="center" class="mb-12">Features</AppText>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
             v-for="feature in features"
@@ -45,15 +56,208 @@
       </div>
     </section>
 
+    <!-- AppText Component Showcase -->
+    <section class="py-16">
+      <div class="container mx-auto px-4">
+        <AppText variant="h2" align="center" class="mb-12">AppText Component Showcase</AppText>
+
+        <div class="mx-auto max-w-4xl space-y-8">
+          <!-- Variants -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Typography Variants</AppText>
+            <div class="space-y-3">
+              <AppText variant="h1">Heading 1 - Bold & Large</AppText>
+              <AppText variant="h2" color="primary">Heading 2 - Primary Color</AppText>
+              <AppText variant="h3" color="secondary">Heading 3 - Secondary Color</AppText>
+              <AppText variant="h4">Heading 4 - Semibold</AppText>
+              <AppText variant="h5">Heading 5 - Medium Weight</AppText>
+              <AppText variant="h6">Heading 6 - Base Size</AppText>
+              <AppText variant="p">Paragraph text with relaxed line height for better readability.</AppText>
+              <AppText variant="label">Label Text - Small & Medium</AppText>
+              <AppText variant="caption" color="text-secondary">Caption text - Extra small</AppText>
+              <AppText variant="overline">Overline Text</AppText>
+            </div>
+          </div>
+
+          <!-- Colors -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Color Variants</AppText>
+            <div class="flex flex-wrap gap-3">
+              <AppText color="primary" weight="semibold">Primary</AppText>
+              <AppText color="secondary" weight="semibold">Secondary</AppText>
+              <AppText color="accent" weight="semibold">Accent</AppText>
+              <AppText color="success" weight="semibold">Success</AppText>
+              <AppText color="warning" weight="semibold">Warning</AppText>
+              <AppText color="error" weight="semibold">Error</AppText>
+              <AppText color="info" weight="semibold">Info</AppText>
+              <AppText color="text-secondary">Text Secondary</AppText>
+            </div>
+          </div>
+
+          <!-- Sizes -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Size Variants</AppText>
+            <div class="space-y-2">
+              <AppText size="xs">Extra Small Text (xs)</AppText>
+              <AppText size="sm">Small Text (sm)</AppText>
+              <AppText size="base">Base Text (base)</AppText>
+              <AppText size="lg">Large Text (lg)</AppText>
+              <AppText size="xl">Extra Large Text (xl)</AppText>
+              <AppText size="2xl">2XL Text (2xl)</AppText>
+              <AppText size="3xl">3XL Text (3xl)</AppText>
+              <AppText size="4xl">4XL Text (4xl)</AppText>
+            </div>
+          </div>
+
+          <!-- Weights -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Font Weights</AppText>
+            <div class="space-y-2">
+              <AppText weight="light">Light Weight (300)</AppText>
+              <AppText weight="normal">Normal Weight (400)</AppText>
+              <AppText weight="medium">Medium Weight (500)</AppText>
+              <AppText weight="semibold">Semibold Weight (600)</AppText>
+              <AppText weight="bold">Bold Weight (700)</AppText>
+            </div>
+          </div>
+
+          <!-- Truncation -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Truncation & Line Clamp</AppText>
+            <div class="space-y-4">
+              <div>
+                <AppText variant="label" class="mb-2">Single Line Truncate:</AppText>
+                <AppText :truncate="true" class="max-w-md">
+                  This is a very long text that will be truncated with an ellipsis when it exceeds the container width. Only one line will be shown.
+                </AppText>
+              </div>
+              <div>
+                <AppText variant="label" class="mb-2">Line Clamp (3 lines):</AppText>
+                <AppText :lineClamp="3" class="max-w-md">
+                  This is a longer paragraph that demonstrates the line clamp feature. When text exceeds three lines, it will be truncated with an ellipsis. This is useful for card layouts, previews, and content that needs to maintain a consistent height across multiple items.
+                </AppText>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gradient Text -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Gradient Text</AppText>
+            <div class="space-y-3">
+              <AppText
+                size="3xl"
+                weight="bold"
+                :gradient="true"
+                gradientFrom="primary"
+                gradientTo="secondary"
+              >
+                Primary to Secondary Gradient
+              </AppText>
+              <AppText
+                size="2xl"
+                weight="bold"
+                :gradient="true"
+                gradientFrom="accent"
+                gradientVia="warning"
+                gradientTo="error"
+              >
+                Multi-Color Gradient with Via
+              </AppText>
+            </div>
+          </div>
+
+          <!-- Text Transforms & Decorations -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Transforms & Decorations</AppText>
+            <div class="space-y-2">
+              <AppText transform="uppercase">Uppercase Text</AppText>
+              <AppText transform="lowercase">LOWERCASE TEXT</AppText>
+              <AppText transform="capitalize">capitalize each word</AppText>
+              <AppText decoration="underline">Underlined Text</AppText>
+              <AppText decoration="underline" decorationStyle="wavy" color="error">Wavy Underline</AppText>
+              <AppText decoration="line-through" color="text-secondary">Strikethrough Text</AppText>
+            </div>
+          </div>
+
+          <!-- Alignment & Spacing -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Alignment & Spacing</AppText>
+            <div class="space-y-3">
+              <AppText align="left">Left Aligned Text</AppText>
+              <AppText align="center">Center Aligned Text</AppText>
+              <AppText align="right">Right Aligned Text</AppText>
+              <AppText tracking="widest" transform="uppercase">Wide Letter Spacing</AppText>
+              <AppText tracking="tighter">Tight Letter Spacing</AppText>
+            </div>
+          </div>
+
+          <!-- Font Families -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Font Families</AppText>
+            <div class="space-y-2">
+              <AppText font="primary">Primary Font (IBM Plex Sans)</AppText>
+              <AppText font="secondary">Secondary Font (Georgia)</AppText>
+              <AppText font="mono">Monospace Font (Fira Code)</AppText>
+            </div>
+          </div>
+
+          <!-- Responsive Sizing -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Responsive Sizing</AppText>
+            <AppText
+              :responsiveSize="{ sm: 'base', md: 'lg', lg: 'xl', xl: '2xl' }"
+              align="center"
+              color="primary"
+              weight="semibold"
+            >
+              Resize your browser to see this text grow!
+            </AppText>
+          </div>
+
+          <!-- Max Width -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Max Width Control</AppText>
+            <div class="space-y-4">
+              <AppText maxWidth="xs" class="mx-auto">
+                Extra small max width for very narrow content.
+              </AppText>
+              <AppText maxWidth="md" class="mx-auto">
+                Medium max width is perfect for readable paragraphs. This ensures optimal line length for comfortable reading, typically 60-80 characters per line.
+              </AppText>
+            </div>
+          </div>
+
+          <!-- Text Wrapping -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <AppText variant="h3" class="mb-4">Text Wrapping</AppText>
+            <div class="space-y-4">
+              <div>
+                <AppText variant="label" class="mb-2">Balance (for headlines):</AppText>
+                <AppText size="2xl" weight="bold" wrap="balance" maxWidth="md">
+                  This Headline Uses Text Balance For Better Visual Appearance
+                </AppText>
+              </div>
+              <div>
+                <AppText variant="label" class="mb-2">Pretty (for paragraphs):</AppText>
+                <AppText wrap="pretty" maxWidth="lg">
+                  This paragraph uses text-wrap: pretty which prevents orphans and improves the overall text layout. It's particularly useful for body text where you want to avoid awkward line breaks.
+                </AppText>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Theme & Color Customization -->
     <section class="bg-surface py-16">
       <div class="container mx-auto px-4">
-        <h2 class="text-text mb-12 text-center text-4xl font-bold">Theme & Color Customization</h2>
+        <AppText variant="h2" align="center" class="mb-12">Theme & Color Customization</AppText>
 
         <!-- Theme Switcher -->
         <div class="mx-auto mb-12 max-w-2xl">
           <div class="bg-background border-border mb-6 rounded-lg border p-6">
-            <h3 class="text-text mb-4 text-xl font-semibold">Current Theme: {{ theme }}</h3>
+            <AppText variant="h3" class="mb-4">Current Theme: {{ theme }}</AppText>
             <div class="flex gap-3">
               <button
                 @click="setTheme('light')"
@@ -93,23 +297,23 @@
 
           <!-- Color Palette Display -->
           <div class="bg-background border-border mb-6 rounded-lg border p-6">
-            <h3 class="text-text mb-4 text-xl font-semibold">Color Palette</h3>
+            <AppText variant="h3" class="mb-4">Color Palette</AppText>
             <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div class="bg-primary rounded-lg p-4 text-center text-white">
-                <div class="mb-1 font-semibold">Primary</div>
-                <div class="text-xs opacity-90">{{ currentColors.primary }}</div>
+                <AppText weight="semibold" class="mb-1">Primary</AppText>
+                <AppText size="xs" class="opacity-90">{{ currentColors.primary }}</AppText>
               </div>
               <div class="bg-secondary rounded-lg p-4 text-center text-white">
-                <div class="mb-1 font-semibold">Secondary</div>
-                <div class="text-xs opacity-90">{{ currentColors.secondary }}</div>
+                <AppText weight="semibold" class="mb-1">Secondary</AppText>
+                <AppText size="xs" class="opacity-90">{{ currentColors.secondary }}</AppText>
               </div>
               <div class="bg-accent rounded-lg p-4 text-center text-white">
-                <div class="mb-1 font-semibold">Accent</div>
-                <div class="text-xs opacity-90">{{ currentColors.accent }}</div>
+                <AppText weight="semibold" class="mb-1">Accent</AppText>
+                <AppText size="xs" class="opacity-90">{{ currentColors.accent }}</AppText>
               </div>
               <div class="bg-success rounded-lg p-4 text-center text-white">
-                <div class="mb-1 font-semibold">Success</div>
-                <div class="text-xs opacity-90">{{ currentColors.success }}</div>
+                <AppText weight="semibold" class="mb-1">Success</AppText>
+                <AppText size="xs" class="opacity-90">{{ currentColors.success }}</AppText>
               </div>
             </div>
           </div>
@@ -117,7 +321,7 @@
           <!-- Color Customizer -->
           <div class="bg-background border-border rounded-lg border p-6">
             <div class="mb-4 flex items-center justify-between">
-              <h3 class="text-text text-xl font-semibold">Customize Colors</h3>
+              <AppText variant="h3">Customize Colors</AppText>
               <button
                 @click="resetColors"
                 class="bg-surface border-border hover:bg-surface/80 text-text rounded-lg border px-3 py-1 text-sm transition-colors"
@@ -127,7 +331,7 @@
             </div>
             <div class="space-y-4">
               <div class="flex items-center gap-4">
-                <label class="text-text-secondary w-24 text-sm">Primary:</label>
+                <AppText variant="label" color="text-secondary" class="w-24">Primary:</AppText>
                 <input
                   type="color"
                   :value="currentColors.primary"
@@ -143,7 +347,7 @@
                 />
               </div>
               <div class="flex items-center gap-4">
-                <label class="text-text-secondary w-24 text-sm">Secondary:</label>
+                <AppText variant="label" color="text-secondary" class="w-24">Secondary:</AppText>
                 <input
                   type="color"
                   :value="currentColors.secondary"
@@ -159,7 +363,7 @@
                 />
               </div>
               <div class="flex items-center gap-4">
-                <label class="text-text-secondary w-24 text-sm">Accent:</label>
+                <AppText variant="label" color="text-secondary" class="w-24">Accent:</AppText>
                 <input
                   type="color"
                   :value="currentColors.accent"
@@ -175,7 +379,7 @@
                 />
               </div>
               <div class="flex items-center gap-4">
-                <label class="text-text-secondary w-24 text-sm">Success:</label>
+                <AppText variant="label" color="text-secondary" class="w-24">Success:</AppText>
                 <input
                   type="color"
                   :value="currentColors.success"
@@ -468,6 +672,7 @@
   import AppSpinner from '../components/AppSpinner.vue';
   import AppTable from '../components/AppTable.vue';
   import FeatureCard from '../components/FeatureCard.vue';
+  import AppText from '../components/AppText.vue';
   import { useAppConfig } from '../composables/useAppConfig';
   import { useColorCustomizer } from '../composables/useColorCustomizer';
   import { useDateFormat } from '../composables/useDateFormat';
