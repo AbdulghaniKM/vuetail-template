@@ -1,5 +1,6 @@
 import api from '../plugins/axios';
 import axios, { type AxiosProgressEvent, type AxiosRequestConfig, CancelTokenSource } from 'axios';
+import { API_PATHS } from '../config/api-paths';
 
 export interface UploadOptions {
   endpoint?: string;
@@ -58,7 +59,7 @@ export const uploadFile = async (
   options: UploadOptions = {}
 ): Promise<UploadResult> => {
   const {
-    endpoint = '/upload',
+    endpoint = API_PATHS.UPLOAD,
     fieldName = 'file',
     maxSize,
     allowedTypes,
@@ -122,7 +123,7 @@ export class UploadController {
     options: UploadOptions = {}
   ): Promise<UploadResult> {
     const {
-      endpoint = '/upload',
+      endpoint = API_PATHS.UPLOAD,
       fieldName = 'file',
       maxSize,
       allowedTypes,
