@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-  import AppIcon from './AppIcon.vue';
+  import AppIcon from './global/AppIcon.vue';
 
   defineProps<{
     title: string;

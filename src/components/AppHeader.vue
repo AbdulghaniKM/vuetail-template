@@ -68,7 +68,7 @@
   import { ref } from 'vue';
   import { useAppConfig } from '../composables/useAppConfig';
   import { useTheme } from '../composables/useTheme';
-  import AppIcon from './AppIcon.vue';
+  import AppIcon from './global/AppIcon.vue';
 
   const { appName } = useAppConfig();
   const { theme, mode, setTheme } = useTheme();

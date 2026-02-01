@@ -546,6 +546,94 @@
       </div>
     </section>
 
+    <!-- AppForm Showcase -->
+    <section class="py-16">
+      <div class="container mx-auto px-4">
+        <h2 class="text-text mb-12 text-center text-4xl font-bold">Form Builder</h2>
+
+        <div class="mx-auto max-w-4xl space-y-8">
+          <!-- Basic Form Example -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <h3 class="text-text mb-4 text-2xl font-semibold">Basic Contact Form</h3>
+            <p class="text-text-secondary mb-6">
+              Simple form with validation using Zod schema
+            </p>
+            <AppForm
+              v-model="contactForm"
+              :fields="contactFields"
+              :schema="contactSchema"
+              @submitted="handleContactSubmit"
+            />
+          </div>
+
+          <!-- Multi-Column Form Example -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <h3 class="text-text mb-4 text-2xl font-semibold">User Registration Form</h3>
+            <p class="text-text-secondary mb-6">
+              Multi-column layout with various field types
+            </p>
+            <AppForm
+              v-model="registrationForm"
+              :fields="registrationFields"
+              :schema="registrationSchema"
+              @submitted="handleRegistrationSubmit"
+            >
+              <template #actions>
+                <button
+                  type="button"
+                  @click="resetRegistrationForm"
+                  class="rounded-lg border border-border bg-surface px-6 py-2.5 font-semibold text-text transition-all hover:bg-surface/80"
+                >
+                  Reset
+                </button>
+                <button
+                  type="submit"
+                  class="rounded-lg bg-primary px-6 py-2.5 font-semibold text-white transition-all hover:bg-primary/90"
+                >
+                  Register
+                </button>
+              </template>
+            </AppForm>
+          </div>
+
+          <!-- Advanced Form with API Integration -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <h3 class="text-text mb-4 text-2xl font-semibold">Profile Update Form</h3>
+            <p class="text-text-secondary mb-6">
+              Form with custom styling and readonly fields
+            </p>
+            <AppForm
+              v-model="profileForm"
+              :fields="profileFields"
+              :schema="profileSchema"
+              container-class="space-y-6"
+              @submitted="handleProfileSubmit"
+            />
+          </div>
+
+          <!-- Form with Custom Row Classes -->
+          <div class="bg-surface border-border rounded-lg border p-6">
+            <h3 class="text-text mb-4 text-2xl font-semibold">Feedback Form</h3>
+            <p class="text-text-secondary mb-6">
+              Custom layout with textarea and select fields
+            </p>
+            <AppForm
+              v-model="feedbackForm"
+              :fields="feedbackFields"
+              :schema="feedbackSchema"
+              @submitted="handleFeedbackSubmit"
+            />
+          </div>
+
+          <!-- Form Submission Results -->
+          <div v-if="lastSubmission" class="bg-success/10 border-success rounded-lg border p-6">
+            <h3 class="text-success mb-4 text-xl font-semibold">Last Form Submission</h3>
+            <pre class="text-text-secondary overflow-x-auto rounded bg-background p-4 text-sm">{{ JSON.stringify(lastSubmission, null, 2) }}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Utilities Showcase -->
     <section class="bg-surface py-16">
       <div class="container mx-auto px-4">
@@ -667,12 +755,14 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref } from 'vue';
-  import AppIcon from '../components/AppIcon.vue';
-  import AppImageModal from '../components/AppImageModal.vue';
-  import AppSpinner from '../components/AppSpinner.vue';
-  import AppTable from '../components/AppTable.vue';
+  import { z } from 'zod';
+  import AppIcon from '../components/global/AppIcon.vue';
+  import AppImageModal from '../components/global/AppImageModal.vue';
+  import AppSpinner from '../components/global/AppSpinner.vue';
+  import AppTable from '../components/global/AppTable.vue';
+  import AppForm from '../components/global/Fields/AppForm.vue';
   import FeatureCard from '../components/FeatureCard.vue';
-  import AppText from '../components/AppText.vue';
+  import AppText from '../components/global/AppText.vue';
   import { useAppConfig } from '../composables/useAppConfig';
   import { useColorCustomizer } from '../composables/useColorCustomizer';
   import { useDateFormat } from '../composables/useDateFormat';
@@ -804,6 +894,193 @@
 
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // ===== AppForm Examples =====
+
+  // Contact Form
+  const contactForm = ref({
+    name: '',
+    email: '',
+    message: '',
+  });
+
+  const contactFields = [
+    [{ key: 'name', type: 'text' as const, label: 'Full Name', placeholder: 'Enter your name' }],
+    [{ key: 'email', type: 'email' as const, label: 'Email Address', placeholder: 'your@email.com' }],
+    [{ key: 'message', type: 'textarea' as const, label: 'Message', placeholder: 'Your message...', rows: 4 }],
+  ];
+
+  const contactSchema = z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    message: z.string().min(10, 'Message must be at least 10 characters'),
+  });
+
+  // Registration Form
+  const registrationForm = ref({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    country: '',
+    bio: '',
+  });
+
+  const registrationFields = [
+    [
+      { key: 'firstName', type: 'text' as const, label: 'First Name', placeholder: 'John' },
+      { key: 'lastName', type: 'text' as const, label: 'Last Name', placeholder: 'Doe' },
+    ],
+    [
+      { key: 'email', type: 'email' as const, label: 'Email', placeholder: 'john@example.com' },
+      { key: 'phone', type: 'phone' as const, label: 'Phone Number', placeholder: '+1234567890' },
+    ],
+    [
+      { key: 'password', type: 'password' as const, label: 'Password', placeholder: '••••••••' },
+      { key: 'confirmPassword', type: 'password' as const, label: 'Confirm Password', placeholder: '••••••••' },
+    ],
+    [
+      {
+        key: 'country',
+        type: 'select' as const,
+        label: 'Country',
+        placeholder: 'Select your country',
+        items: [
+          { label: 'United States', value: 'us' },
+          { label: 'United Kingdom', value: 'uk' },
+          { label: 'Canada', value: 'ca' },
+          { label: 'Australia', value: 'au' },
+          { label: 'Germany', value: 'de' },
+        ],
+      },
+    ],
+    [{ key: 'bio', type: 'textarea' as const, label: 'Bio', placeholder: 'Tell us about yourself...', rows: 3 }],
+  ];
+
+  const registrationSchema = z.object({
+    firstName: z.string().min(2, 'First name must be at least 2 characters'),
+    lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string().min(8, 'Password must be at least 8 characters'),
+    country: z.string().min(1, 'Please select a country'),
+    bio: z.string().optional(),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
+  const resetRegistrationForm = () => {
+    registrationForm.value = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+      country: '',
+      bio: '',
+    };
+  };
+
+  // Profile Form
+  const profileForm = ref({
+    userId: 'USR-12345',
+    username: 'johndoe',
+    displayName: '',
+    email: '',
+    phone: '',
+    website: '',
+    bio: '',
+  });
+
+  const profileFields = [
+    [
+      { key: 'userId', type: 'text' as const, label: 'User ID', readonly: true, customClass: 'md:col-span-1' },
+      { key: 'username', type: 'text' as const, label: 'Username', readonly: true, customClass: 'md:col-span-1' },
+    ],
+    [{ key: 'displayName', type: 'text' as const, label: 'Display Name', placeholder: 'John Doe' }],
+    [
+      { key: 'email', type: 'email' as const, label: 'Email', placeholder: 'john@example.com' },
+      { key: 'phone', type: 'phone' as const, label: 'Phone', placeholder: '+1234567890' },
+    ],
+    [{ key: 'website', type: 'text' as const, label: 'Website', placeholder: 'https://example.com' }],
+    [{ key: 'bio', type: 'textarea' as const, label: 'Biography', placeholder: 'Write something about yourself...', rows: 4 }],
+  ];
+
+  const profileSchema = z.object({
+    userId: z.string(),
+    username: z.string(),
+    displayName: z.string().min(2, 'Display name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+    website: z.string().url('Invalid URL').optional().or(z.literal('')),
+    bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
+  });
+
+  // Feedback Form
+  const feedbackForm = ref({
+    rating: '',
+    category: '',
+    subject: '',
+    feedback: '',
+  });
+
+  const feedbackFields = [
+    [
+      {
+        key: 'rating',
+        type: 'select' as const,
+        label: 'Rating',
+        placeholder: 'How would you rate us?',
+        items: ['⭐ 1 - Poor', '⭐⭐ 2 - Fair', '⭐⭐⭐ 3 - Good', '⭐⭐⭐⭐ 4 - Very Good', '⭐⭐⭐⭐⭐ 5 - Excellent'],
+        customClass: 'md:col-span-1',
+      },
+      {
+        key: 'category',
+        type: 'select' as const,
+        label: 'Category',
+        placeholder: 'Select category',
+        items: ['Bug Report', 'Feature Request', 'General Feedback', 'Complaint', 'Compliment'],
+        customClass: 'md:col-span-1',
+      },
+    ],
+    [{ key: 'subject', type: 'text' as const, label: 'Subject', placeholder: 'Brief summary of your feedback' }],
+    [{ key: 'feedback', type: 'textarea' as const, label: 'Feedback', placeholder: 'Share your thoughts...', rows: 5 }],
+  ];
+
+  const feedbackSchema = z.object({
+    rating: z.string().min(1, 'Please select a rating'),
+    category: z.string().min(1, 'Please select a category'),
+    subject: z.string().min(5, 'Subject must be at least 5 characters'),
+    feedback: z.string().min(20, 'Feedback must be at least 20 characters'),
+  });
+
+  // Form submission handlers
+  const lastSubmission = ref<any>(null);
+
+  const handleContactSubmit = (data: any) => {
+    lastSubmission.value = { form: 'Contact Form', data };
+    showToast('success', 'Contact form submitted successfully!');
+  };
+
+  const handleRegistrationSubmit = (data: any) => {
+    lastSubmission.value = { form: 'Registration Form', data };
+    showToast('success', 'Registration completed successfully!');
+  };
+
+  const handleProfileSubmit = (data: any) => {
+    lastSubmission.value = { form: 'Profile Form', data };
+    showToast('success', 'Profile updated successfully!');
+  };
+
+  const handleFeedbackSubmit = (data: any) => {
+    lastSubmission.value = { form: 'Feedback Form', data };
+    showToast('success', 'Thank you for your feedback!');
   };
 
   onMounted(() => {
