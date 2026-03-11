@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col gap-2 w-full">
-    <label v-if="label" :for="id" class="text-sm font-medium text-text">
+  <div class="flex flex-col gap-1.5 w-full">
+    <span v-if="label" class="text-sm font-medium text-text">
       {{ label }}
-    </label>
+    </span>
     <textarea
       :id="id"
       :value="modelValue"
@@ -12,9 +12,9 @@
       :rows="rows"
       @input="handleInput"
       class="w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-text placeholder:text-text/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 transition-all resize-y"
-      :class="[customClass, { 'border-red-500 focus:border-red-500 focus:ring-red-500/20': error }]"
+      :class="[customClass, { 'border-error focus:border-error focus:ring-error/20': error }]"
     />
-    <span v-if="error" class="text-sm text-red-500">{{ error }}</span>
+    <span class="block min-h-[1.25rem] text-sm text-error" :class="{ invisible: !error }">{{ error }}</span>
   </div>
 </template>
 

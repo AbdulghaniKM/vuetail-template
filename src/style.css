@@ -13,6 +13,10 @@
   --color-text: #111827;
   --color-text-secondary: #6b7280;
   --color-border: #e5e7eb;
+  --color-muted: #f3f4f6;
+  --color-link: #3b82f6;
+  --color-link-hover: #2563eb;
+  --color-emphasis: #1e40af;
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
@@ -22,23 +26,6 @@
   --font-primary: var(--font-primary);
   --font-secondary: var(--font-secondary);
   --font-mono: var(--font-mono);
-}
-
-/* CSS Variables - These will be dynamically updated by the theme system */
-/* The @theme block above provides defaults, but these variables allow runtime updates */
-:root {
-  --color-primary: #3b82f6;
-  --color-secondary: #8b5cf6;
-  --color-accent: #f59e0b;
-  --color-background: #ffffff;
-  --color-surface: #f9fafb;
-  --color-text: #111827;
-  --color-text-secondary: #6b7280;
-  --color-border: #e5e7eb;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
 }
 
 /* Font Family Registration */
@@ -92,4 +79,44 @@
 
 body {
   font-family: var(--font-primary);
+}
+
+/* Custom scrollbar - theme-aware, slim & smooth */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 9999px;
+  border: 0.125rem solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: var(--color-secondary);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+button {
+  cursor: pointer;
 }

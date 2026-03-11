@@ -1,21 +1,22 @@
 <template>
-  <form @submit.prevent="handleSubmit" :class="containerClass" novalidate>
-    <!-- Render rows -->
+  <form @submit.prevent="handleSubmit" class="flex min-h-0 flex-col" :class="containerClass" novalidate>
+    <!-- Scrollable fields area -->
+    <div class="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-thin" :class="fieldGap">
     <div
       v-for="(row, rowIndex) in fields"
       :key="rowIndex"
-      class="grid gap-4"
-      :class="rowClass || getDefaultRowClass(row)"
+      class="grid"
+      :class="[rowClass || getDefaultRowClass(row), fieldGap]"
     >
       <!-- Render fields in row -->
       <div
         v-for="(field, fieldIndex) in row"
-        :key="fieldIndex"
+        :key="field.key ?? fieldIndex"
         :class="field.customClass"
       >
         <!-- Input Field -->
         <InputField
-          v-if="field.type === 'text' || field.type === 'password' || field.type === 'email' || field.type === 'number'"
+          v-if="field.type === 'text' || field.type === 'password' || field.type === 'email' || field.type === 'number' || field.type === 'datetime-local'"
           v-model="modelValue[field.key]"
           :label="field.label"
           :type="field.type"
@@ -44,6 +45,7 @@
           :placeholder="field.placeholder"
           :readonly="field.readonly"
           :error="errors[field.key]"
+          :searchable="field.searchable ?? true"
         />
 
         <!-- Phone Input -->
@@ -55,11 +57,27 @@
           :readonly="field.readonly"
           :error="errors[field.key]"
         />
+
+        <!-- DatePicker -->
+        <DatePicker
+          v-else-if="field.type === 'date' || field.type === 'datetime'"
+          v-model="modelValue[field.key]"
+          :label="field.label"
+          :mode="field.type === 'datetime' ? 'datetime' : 'date'"
+          :placeholder="field.placeholder"
+          :readonly="field.readonly"
+          :error="errors[field.key]"
+          :min="field.min"
+          :max="field.max"
+        />
       </div>
     </div>
 
+    <slot name="before-actions" :errors="errors" />
+    </div>
+
     <!-- Submit Button -->
-    <div class="mt-6 flex justify-end gap-4">
+    <div class="mt-4 flex shrink-0 justify-end gap-4">
       <slot name="actions">
         <button
           type="submit"
@@ -74,27 +92,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { ref } from 'vue';
 import { z, type ZodType } from 'zod';
 import axios from 'axios';
+import { useFormValidation } from '../../../composables/useFormValidation';
 import InputField from './InputField.vue';
 import Textarea from './Textarea.vue';
 import Select from './Select.vue';
 import PhoneInput from './PhoneInput.vue';
+import DatePicker from './DatePicker.vue';
 import type { SelectItem } from './Select.vue';
+import type { FormField, FormFieldRow } from '../../../types/form';
 
-export interface FormField {
-  key: string;
-  type?: 'text' | 'select' | 'phone' | 'password' | 'textarea' | 'email' | 'number';
-  label?: string;
-  placeholder?: string;
-  items?: string[] | SelectItem[];
-  customClass?: string;
-  readonly?: boolean;
-  rows?: number;
-}
-
-export type FormFieldRow = FormField[];
+export type { FormField, FormFieldRow };
 
 interface Props {
   modelValue: Record<string, any>;
@@ -104,12 +114,14 @@ interface Props {
   method?: 'POST' | 'PUT';
   containerClass?: string;
   rowClass?: string;
+  fieldGap?: string;
   successMessage?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   method: 'POST',
   containerClass: 'space-y-4',
+  fieldGap: 'gap-4',
   successMessage: 'Form submitted successfully!',
 });
 
@@ -122,23 +134,7 @@ const emit = defineEmits<{
 const errors = ref<Record<string, string>>({});
 const isSubmitting = ref(false);
 
-// Watch each field individually to clear its error when the user types
-const fieldKeys = computed(() =>
-  props.fields.flat().map((f) => f.key)
-);
-
-watch(
-  () => fieldKeys.value.map((key: string) => props.modelValue[key]),
-  (newVals: any[], oldVals: any[]) => {
-    if (!oldVals) return;
-    fieldKeys.value.forEach((key: string, i: number) => {
-      if (newVals[i] !== oldVals[i] && errors.value[key]) {
-        delete errors.value[key];
-      }
-    });
-  },
-  { flush: 'post' }
-);
+useFormValidation(props.modelValue, props.schema, errors);
 
 const getDefaultRowClass = (row: FormField[]) => {
   const fieldCount = row.length;
@@ -191,18 +187,8 @@ const handleSubmit = async () => {
     });
 
     emit('submitted', response.data);
-
-    // Show success message if toast is available
-    if (window && (window as any).showToast) {
-      (window as any).showToast('success', props.successMessage);
-    }
   } catch (error: any) {
     emit('error', error);
-
-    // Show error message if toast is available
-    if (window && (window as any).showToast) {
-      (window as any).showToast('error', error.response?.data?.message || 'An error occurred');
-    }
   } finally {
     isSubmitting.value = false;
   }

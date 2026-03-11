@@ -1,8 +1,8 @@
 import type { ThemeConfig, ColorPalette } from '../config/types';
 
+export type { ColorPalette };
+
 export const generateTailwindTheme = (theme: ThemeConfig): string => {
-  // Generate Tailwind v4 @theme block that references CSS variables
-  // This allows using bg-primary, text-primary, etc. directly
   const colorMap: Record<string, string> = {
     primary: 'primary',
     secondary: 'secondary',
@@ -12,6 +12,10 @@ export const generateTailwindTheme = (theme: ThemeConfig): string => {
     text: 'text',
     textSecondary: 'text-secondary',
     border: 'border',
+    muted: 'muted',
+    link: 'link',
+    linkHover: 'link-hover',
+    emphasis: 'emphasis',
     success: 'success',
     warning: 'warning',
     error: 'error',
@@ -20,27 +24,25 @@ export const generateTailwindTheme = (theme: ThemeConfig): string => {
 
   const themeVars = Object.entries(colorMap)
     .map(([configKey, tailwindName]) => {
-      // Check if color exists in palette (some are optional)
       const hasColor =
         configKey === 'textSecondary'
           ? theme.light.textSecondary !== undefined
           : theme.light[configKey as keyof ColorPalette] !== undefined;
 
       if (hasColor) {
-        return `  --color-${tailwindName}: var(--color-${configKey});`;
+        return `  --color-${tailwindName}: var(--color-${tailwindName});`;
       }
       return null;
     })
     .filter((line): line is string => line !== null)
     .join('\n');
 
-  // Return the @theme block - Tailwind v4 will process this
   return `@theme {\n${themeVars}\n}`;
 };
 
 export const generateCSSVariables = (theme: ThemeConfig): string => {
-  const lightVars = generateColorVariables(theme.light, 'light');
-  const darkVars = generateColorVariables(theme.dark, 'dark');
+  const lightVars = generateColorVariables(theme.light);
+  const darkVars = generateColorVariables(theme.dark);
 
   return `
     :root {
@@ -59,37 +61,17 @@ export const generateCSSVariables = (theme: ThemeConfig): string => {
   `;
 };
 
-const generateColorVariables = (palette: ColorPalette, theme: string): string => {
-  const vars: string[] = [];
+const camelToKebab = (str: string): string =>
+  str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 
-  Object.entries(palette).forEach(([key, value]) => {
-    if (value) {
-      const varName = `--color-${key}`;
-      vars.push(`  ${varName}: ${value};`);
-    }
-  });
-
-  // Generate semantic color aliases
-  vars.push(`  --color-primary: ${palette.primary};`);
-  vars.push(`  --color-secondary: ${palette.secondary};`);
-  vars.push(`  --color-accent: ${palette.accent};`);
-  vars.push(`  --color-background: ${palette.background};`);
-  vars.push(`  --color-surface: ${palette.surface};`);
-  vars.push(`  --color-text: ${palette.text};`);
-  vars.push(`  --color-text-secondary: ${palette.textSecondary};`);
-  vars.push(`  --color-border: ${palette.border};`);
-
-  if (palette.success) vars.push(`  --color-success: ${palette.success};`);
-  if (palette.warning) vars.push(`  --color-warning: ${palette.warning};`);
-  if (palette.error) vars.push(`  --color-error: ${palette.error};`);
-  if (palette.info) vars.push(`  --color-info: ${palette.info};`);
-
-  return vars.join('\n');
+const generateColorVariables = (palette: ColorPalette): string => {
+  return Object.entries(palette)
+    .filter(([, value]) => value)
+    .map(([key, value]) => `  --color-${camelToKebab(key)}: ${value};`)
+    .join('\n');
 };
 
 export const applyTheme = (theme: ThemeConfig): void => {
-  // Apply CSS variables - these update the :root and [data-theme] selectors
-  // Tailwind classes will use these CSS variables via the @theme block
   const styleId = 'app-theme-variables';
   let styleElement = document.getElementById(styleId) as HTMLStyleElement;
 
@@ -140,6 +122,5 @@ export const setTheme = (theme: 'light' | 'dark' | 'system'): void => {
 };
 
 export const getColorValue = (colorKey: keyof ColorPalette, theme: 'light' | 'dark'): string => {
-  // This will be used with the composable to get reactive color values
   return `var(--color-${colorKey})`;
 };

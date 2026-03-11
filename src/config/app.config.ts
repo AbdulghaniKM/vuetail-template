@@ -22,6 +22,10 @@ export const appConfig: AppConfig = {
       text: '#111827', // gray-900
       textSecondary: '#6b7280', // gray-500
       border: '#e5e7eb', // gray-200
+      muted: '#f3f4f6', // gray-100
+      link: '#3b82f6', // blue-500
+      linkHover: '#2563eb', // blue-600
+      emphasis: '#1e40af', // blue-800
       success: '#10b981', // emerald-500
       warning: '#f59e0b', // amber-500
       error: '#ef4444', // red-500
@@ -36,6 +40,10 @@ export const appConfig: AppConfig = {
       text: '#f9fafb', // gray-50
       textSecondary: '#9ca3af', // gray-400
       border: '#374151', // gray-700
+      muted: '#1f2937', // gray-800
+      link: '#60a5fa', // blue-400
+      linkHover: '#93bbfd', // blue-300
+      emphasis: '#60a5fa', // blue-400
       success: '#34d399', // emerald-400
       warning: '#fbbf24', // amber-400
       error: '#f87171', // red-400

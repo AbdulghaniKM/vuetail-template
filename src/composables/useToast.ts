@@ -1,5 +1,12 @@
 import { ref } from 'vue';
-import type { Toast } from '../components/AppToast.vue';
+
+export interface Toast {
+  id: string
+  type: 'success' | 'error' | 'warning' | 'info'
+  message: string
+  title?: string
+  duration?: number
+}
 
 const toasts = ref<Toast[]>([]);
 

@@ -7,6 +7,14 @@ export interface ColorPalette {
   text: string;
   textSecondary: string;
   border: string;
+  /** Muted backgrounds (disabled, subtle sections) */
+  muted?: string;
+  /** Hyperlinks */
+  link?: string;
+  /** Link hover state */
+  linkHover?: string;
+  /** Emphasized/highlighted text */
+  emphasis?: string;
   success?: string;
   warning?: string;
   error?: string;
