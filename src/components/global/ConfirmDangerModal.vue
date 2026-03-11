@@ -20,18 +20,18 @@
           :label="cancelLabel"
           full-width
           size="md"
-          class="flex-1 px-4 py-2.5 text-sm active:scale-[0.98]"
+          class="flex-1"
           @click="emit('close')"
         />
-        <AppButton
+        <button
+          type="button"
           :disabled="loading"
-          :icon="loading ? '' : 'icon-[heroicons-outline--check]'"
-          :label="loading ? loadingLabel : confirmLabel"
-          full-width
-          size="md"
-          class="flex-1 !bg-error !text-white hover:!bg-error/90 !shadow-sm hover:!shadow-md px-4 py-2.5 text-sm font-semibold active:scale-[0.98]"
+          class="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-error px-4 text-sm font-semibold text-white shadow-sm transition-all hover:bg-error/90 hover:shadow-md active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
           @click="emit('confirm')"
-        />
+        >
+          <AppIcon v-if="!loading" name="icon-[heroicons-outline--check]" :size="1.125" />
+          {{ loading ? loadingLabel : confirmLabel }}
+        </button>
       </div>
     </div>
   </AppModal>

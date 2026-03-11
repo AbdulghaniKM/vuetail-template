@@ -27,7 +27,6 @@
               icon="icon-[heroicons-outline--rocket-launch]"
               label="Get Started"
               size="lg"
-              class="!bg-primary !text-white hover:!bg-primary/90 px-6 py-3 font-semibold"
               @click="showToast('success', 'Welcome to the showcase!')"
             />
             <AppButton
@@ -35,7 +34,6 @@
               icon="icon-[heroicons-outline--arrow-down]"
               label="Explore Features"
               size="lg"
-              class="px-6 py-3 font-semibold"
               @click="scrollToFeatures"
             />
           </div>
@@ -82,10 +80,10 @@
           <div class="bg-background border-border rounded-lg border p-6">
             <AppText variant="h3" class="mb-4">Button Sizes</AppText>
             <div class="flex flex-wrap items-center gap-3">
-              <AppButton variant="primary" label="Extra Small" size="xs" class="!bg-primary !text-white" />
-              <AppButton variant="primary" label="Small" size="sm" class="!bg-primary !text-white" />
-              <AppButton variant="primary" label="Medium" size="md" class="!bg-primary !text-white" />
-              <AppButton variant="primary" label="Large" size="lg" class="!bg-primary !text-white" />
+              <AppButton variant="primary" label="Extra Small" size="xs" />
+              <AppButton variant="primary" label="Small" size="sm" />
+              <AppButton variant="primary" label="Medium" size="md" />
+              <AppButton variant="primary" label="Large" size="lg" />
             </div>
           </div>
 
@@ -107,7 +105,7 @@
             <AppText variant="h3" class="mb-4">Disabled & Full Width</AppText>
             <div class="space-y-3">
               <div class="flex gap-3">
-                <AppButton variant="primary" label="Disabled" disabled class="!bg-primary !text-white" />
+                <AppButton variant="primary" label="Disabled" disabled />
                 <AppButton variant="outline" label="Disabled Outline" disabled />
               </div>
               <AppButton variant="outline" label="Full Width Button" icon="icon-[heroicons-outline--arrow-right]" full-width />
@@ -152,7 +150,7 @@
             <AppText variant="h3" class="mb-4">AppModal</AppText>
             <AppText variant="p" color="text-secondary" class="mb-4">Animated modal with spring physics, backdrop blur, and accent gradient bar.</AppText>
             <div class="flex flex-wrap gap-3">
-              <AppButton variant="primary" label="Small Modal" class="!bg-primary !text-white" @click="demoModalSize = 'sm'; demoModalOpen = true" />
+              <AppButton variant="primary" label="Small Modal" @click="demoModalSize = 'sm'; demoModalOpen = true" />
               <AppButton variant="outline" label="Medium Modal" @click="demoModalSize = 'md'; demoModalOpen = true" />
               <AppButton variant="outline" label="Large Modal" @click="demoModalSize = 'lg'; demoModalOpen = true" />
               <AppButton variant="outline" label="With Footer" @click="demoModalFooter = true; demoModalSize = 'md'; demoModalOpen = true" />
@@ -167,14 +165,12 @@
                 variant="danger"
                 icon="icon-[heroicons-outline--trash]"
                 label="Delete Item"
-                class="!bg-error/10 !text-error hover:!bg-error/20"
                 @click="dangerModalOpen = true"
               />
               <AppButton
                 variant="danger"
                 icon="icon-[heroicons-outline--exclamation-triangle]"
                 label="With Loading"
-                class="!bg-error/10 !text-error hover:!bg-error/20"
                 @click="dangerLoadingModalOpen = true"
               />
             </div>
@@ -279,21 +275,21 @@
                 :variant="theme === 'light' ? 'primary' : 'outline'"
                 label="Light"
                 icon="icon-[heroicons-outline--sun]"
-                :class="theme === 'light' ? '!bg-primary !text-white' : ''"
+                :class="theme === 'light' ? 'bg-primary text-white' : ''"
                 @click="setTheme('light')"
               />
               <AppButton
                 :variant="theme === 'dark' ? 'primary' : 'outline'"
                 label="Dark"
                 icon="icon-[heroicons-outline--moon]"
-                :class="theme === 'dark' ? '!bg-primary !text-white' : ''"
+                :class="theme === 'dark' ? 'bg-primary text-white' : ''"
                 @click="setTheme('dark')"
               />
               <AppButton
                 :variant="mode === 'system' ? 'primary' : 'outline'"
                 label="System"
                 icon="icon-[heroicons-outline--computer-desktop]"
-                :class="mode === 'system' ? '!bg-primary !text-white' : ''"
+                :class="mode === 'system' ? 'bg-primary text-white' : ''"
                 @click="setTheme('system')"
               />
             </div>
@@ -382,7 +378,6 @@
                 variant="primary"
                 icon="icon-[heroicons-outline--plus]"
                 label="Add Product"
-                class="!bg-primary !text-white hover:!bg-primary/90"
                 @click="showToast('info', 'Add product clicked!')"
               />
             </template>
@@ -670,30 +665,34 @@
             <AppText variant="h3" class="mb-4">Toast Notifications</AppText>
             <div class="bg-surface border-border rounded-lg border p-6">
               <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
-                <AppButton
-                  label="Success"
-                  icon="icon-[heroicons-outline--check-circle]"
-                  class="!bg-success !text-white hover:!bg-success/90"
+                <button
+                  class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-success px-4 text-sm font-medium text-white transition-colors hover:bg-success/90 active:scale-[0.97]"
                   @click="showToast('success', 'Operation completed successfully!')"
-                />
-                <AppButton
-                  label="Error"
-                  icon="icon-[heroicons-outline--x-circle]"
-                  class="!bg-error !text-white hover:!bg-error/90"
+                >
+                  <AppIcon name="icon-[heroicons-outline--check-circle]" :size="1.125" />
+                  Success
+                </button>
+                <button
+                  class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-error px-4 text-sm font-medium text-white transition-colors hover:bg-error/90 active:scale-[0.97]"
                   @click="showToast('error', 'Something went wrong!')"
-                />
-                <AppButton
-                  label="Warning"
-                  icon="icon-[heroicons-outline--exclamation-triangle]"
-                  class="!bg-warning !text-white hover:!bg-warning/90"
+                >
+                  <AppIcon name="icon-[heroicons-outline--x-circle]" :size="1.125" />
+                  Error
+                </button>
+                <button
+                  class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-warning px-4 text-sm font-medium text-white transition-colors hover:bg-warning/90 active:scale-[0.97]"
                   @click="showToast('warning', 'Please check your input')"
-                />
-                <AppButton
-                  label="Info"
-                  icon="icon-[heroicons-outline--information-circle]"
-                  class="!bg-info !text-white hover:!bg-info/90"
+                >
+                  <AppIcon name="icon-[heroicons-outline--exclamation-triangle]" :size="1.125" />
+                  Warning
+                </button>
+                <button
+                  class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-info px-4 text-sm font-medium text-white transition-colors hover:bg-info/90 active:scale-[0.97]"
                   @click="showToast('info', 'Here is some information')"
-                />
+                >
+                  <AppIcon name="icon-[heroicons-outline--information-circle]" :size="1.125" />
+                  Info
+                </button>
               </div>
             </div>
           </div>
@@ -761,7 +760,7 @@
       <template v-if="demoModalFooter" #footer>
         <div class="flex justify-end gap-2">
           <AppButton variant="outline" label="Cancel" @click="demoModalOpen = false; demoModalFooter = false" />
-          <AppButton variant="primary" label="Confirm" class="!bg-primary !text-white" @click="demoModalOpen = false; demoModalFooter = false; showToast('success', 'Confirmed!')" />
+          <AppButton variant="primary" label="Confirm" @click="demoModalOpen = false; demoModalFooter = false; showToast('success', 'Confirmed!')" />
         </div>
       </template>
     </AppModal>
