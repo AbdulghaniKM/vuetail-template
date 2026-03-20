@@ -30,7 +30,11 @@ export const isProd = (): boolean => {
 };
 
 export const getApiUrl = (): string => {
-  return getEnv('VITE_API_URL', 'http://localhost:3000');
+  const url = getEnv('VITE_API_URL');
+  if (!url && isProd()) {
+    console.error('[env] VITE_API_URL is not set — API calls will fail in production.');
+  }
+  return url || '/api';
 };
 
 export const getAppUrl = (): string => {

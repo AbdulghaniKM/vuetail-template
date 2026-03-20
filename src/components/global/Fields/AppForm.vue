@@ -94,7 +94,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { z, type ZodType } from 'zod';
-import axios from 'axios';
+import api from '../../../plugins/axios';
 import { useFormValidation } from '../../../composables/useFormValidation';
 import InputField from './InputField.vue';
 import Textarea from './Textarea.vue';
@@ -180,7 +180,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    const response = await axios({
+    const response = await api({
       method: props.method,
       url: props.endPoint,
       data: props.modelValue,

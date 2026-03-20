@@ -403,8 +403,14 @@ function loadColumnVisibility(): Record<string, boolean> {
   try {
     const raw = localStorage.getItem(STORAGE_PREFIX + props.columnsVisibilityKey)
     if (!raw) return {}
-    const parsed = JSON.parse(raw) as Record<string, boolean>
-    return typeof parsed === 'object' ? parsed : {}
+    const parsed = JSON.parse(raw)
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+    // Only keep entries whose values are booleans to prevent injection
+    const safe: Record<string, boolean> = Object.create(null)
+    for (const [key, value] of Object.entries(parsed)) {
+      if (typeof value === 'boolean') safe[key] = value
+    }
+    return safe
   } catch {
     return {}
   }
