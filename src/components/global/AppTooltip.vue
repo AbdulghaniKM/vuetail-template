@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useMediaQuery } from '@vueuse/core'
+import { useBreakpoint } from '../../composables/useBreakpoint'
 
 const props = withDefaults(
   defineProps<{
@@ -48,7 +48,7 @@ const props = withDefaults(
   }
 )
 
-const disableOnMobile = useMediaQuery('(max-width: 767px)')
+const { isMobile: disableOnMobile } = useBreakpoint()
 const show = ref(false)
 let timeoutId: ReturnType<typeof setTimeout> | null = null
 

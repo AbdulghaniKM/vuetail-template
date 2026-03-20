@@ -8,6 +8,7 @@
     max-width="sm"
     hide-close
     @close="emit('close')"
+    @confirm="emit('confirm')"
   >
     <template #default>
       <!-- intentionally empty — description in header is enough -->

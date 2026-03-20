@@ -2,7 +2,7 @@
   <AppTooltip v-if="tooltip" :content="tooltip" :placement="tooltipPlacement">
     <button
       :type="type"
-      class="btn-base"
+      class="btn-base inline-flex cursor-pointer items-center justify-center font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50"
       :class="[sizeClass, variantClass, gapClass, roundedClass, fullWidth && 'w-full']"
       :disabled="disabled || loading"
       :aria-busy="loading || undefined"
@@ -18,7 +18,7 @@
   <button
     v-else
     :type="type"
-    class="btn-base"
+    class="btn-base inline-flex cursor-pointer items-center justify-center font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50"
     :class="[sizeClass, variantClass, gapClass, roundedClass, fullWidth && 'w-full']"
     :disabled="disabled || loading"
     :aria-busy="loading || undefined"
@@ -104,14 +104,6 @@ const spinnerSize = computed(() => ({ xs: 'xs', sm: 'xs', md: 'sm', lg: 'sm' } a
 </script>
 
 <style scoped>
-@reference "tailwindcss";
-
-.btn-base {
-  @apply inline-flex cursor-pointer items-center justify-center font-medium transition-all duration-150;
-  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 focus-visible:ring-offset-background;
-  @apply disabled:pointer-events-none disabled:opacity-50;
-}
-
 .btn-base:not(:disabled):active {
   transform: scale(0.97);
 }

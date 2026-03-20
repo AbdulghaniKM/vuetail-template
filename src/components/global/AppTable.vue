@@ -275,12 +275,12 @@
         />
         <template v-if="!serverPaginated">
           <button
-            v-for="page in visiblePages"
+            v-for="page in clientVisiblePages"
             :key="page"
             type="button"
             class="flex size-8 items-center justify-center rounded-lg text-sm font-medium transition-colors"
             :class="
-              page === currentPageRef
+              page === clientPage
                 ? 'bg-primary text-white'
                 : 'text-text-secondary hover:bg-muted hover:text-text'
             "
@@ -311,7 +311,9 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { onClickOutside, useDebounceFn } from '@vueuse/core'
+import { onClickOutside } from '@vueuse/core'
+import { usePagination } from '../../composables/usePagination'
+import { useDebounce } from '../../composables/useDebounce'
 
 import AppSpinner from './AppSpinner.vue'
 import AppButton from './AppButton.vue'
@@ -384,8 +386,6 @@ const searchInputRef = ref<HTMLInputElement | null>(null)
 const searchQuery = ref('')
 const sortKey = ref<string | null>(null)
 const sortOrder = ref<'asc' | 'desc'>('asc')
-const currentPageRef = ref(1)
-
 // Column toggle
 const showColumnMenu = ref(false)
 const columnToggleRef = ref<HTMLElement | null>(null)
@@ -541,13 +541,35 @@ const filteredData = computed(() => {
   return result
 })
 
-const clientTotalPages = computed(() => props.paginated ? Math.ceil(filteredData.value.length / props.itemsPerPage) : 1)
-const clientStartIndex = computed(() => props.paginated ? (currentPageRef.value - 1) * props.itemsPerPage : 0)
-const clientEndIndex = computed(() => props.paginated ? Math.min(clientStartIndex.value + props.itemsPerPage, filteredData.value.length) : filteredData.value.length)
-const clientPaginatedData = computed(() => props.paginated ? filteredData.value.slice(clientStartIndex.value, clientEndIndex.value) : filteredData.value)
-const displayData = computed(() => props.serverPaginated ? props.data : clientPaginatedData.value)
+// ── Client-side pagination (via usePagination) ─────────────────────
+const clientTotal = computed(() => filteredData.value.length)
 
-// ── Pagination ──────────────────────────────────────────────────────
+const {
+  page: clientPage,
+  totalPages: clientTotalPages,
+  isFirst: clientIsFirst,
+  isLast: clientIsLast,
+  range: clientRange,
+  visiblePages: clientVisiblePages,
+  goTo: clientGoTo,
+  next: clientNext,
+  prev: clientPrev,
+  first: clientFirst,
+  paginate: clientPaginate,
+} = usePagination({
+  total: clientTotal,
+  pageSize: computed(() => props.itemsPerPage),
+})
+
+const clientPaginatedData = computed(() =>
+  props.paginated ? clientPaginate(filteredData.value) : filteredData.value
+)
+
+const displayData = computed(() =>
+  props.serverPaginated ? props.data : clientPaginatedData.value
+)
+
+// ── Pagination display (unified client + server) ────────────────────
 const showPagination = computed(() => {
   if (props.serverPaginated) return props.totalCount > 0
   return props.paginated && clientTotalPages.value > 1
@@ -555,39 +577,33 @@ const showPagination = computed(() => {
 
 const paginationStart = computed(() => {
   if (props.serverPaginated) return props.totalCount === 0 ? 0 : (props.pageNumber - 1) * props.pageSize + 1
-  return props.totalCount === 0 ? 0 : clientStartIndex.value + 1
+  return clientRange.value.start
 })
 
 const paginationEnd = computed(() => {
   if (props.serverPaginated) return Math.min(props.pageNumber * props.pageSize, props.totalCount)
-  return clientEndIndex.value
+  return clientRange.value.end
 })
 
-const paginationTotal = computed(() => props.serverPaginated ? props.totalCount : filteredData.value.length)
+const paginationTotal = computed(() =>
+  props.serverPaginated ? props.totalCount : clientTotal.value
+)
 
-const canGoPrev = computed(() => props.serverPaginated ? props.pageNumber > 1 : currentPageRef.value > 1)
-const canGoNext = computed(() => props.serverPaginated ? props.pageNumber < props.totalPages : currentPageRef.value < clientTotalPages.value)
+const canGoPrev = computed(() =>
+  props.serverPaginated ? props.pageNumber > 1 : !clientIsFirst.value
+)
 
-const visiblePages = computed(() => {
-  const pages: number[] = []
-  const max = 5
-  const total = clientTotalPages.value
-  let start = Math.max(1, currentPageRef.value - Math.floor(max / 2))
-  let end = Math.min(total, start + max - 1)
-  if (end - start < max - 1) start = Math.max(1, end - max + 1)
-  for (let i = start; i <= end; i++) pages.push(i)
-  return pages
-})
+const canGoNext = computed(() =>
+  props.serverPaginated ? props.pageNumber < props.totalPages : !clientIsLast.value
+)
 
-const goToPage = (page: number) => {
-  if (page >= 1 && page <= clientTotalPages.value) currentPageRef.value = page
-}
+const goToPage = (p: number) => clientGoTo(p)
 
 const goToPrev = () => {
   if (props.serverPaginated) {
     if (props.pageNumber > 1) emit('pageChange', { pageNumber: props.pageNumber - 1, pageSize: props.pageSize })
   } else {
-    if (currentPageRef.value > 1) currentPageRef.value--
+    clientPrev()
   }
 }
 
@@ -595,7 +611,7 @@ const goToNext = () => {
   if (props.serverPaginated) {
     if (props.pageNumber < props.totalPages) emit('pageChange', { pageNumber: props.pageNumber + 1, pageSize: props.pageSize })
   } else {
-    if (currentPageRef.value < clientTotalPages.value) currentPageRef.value++
+    clientNext()
   }
 }
 
@@ -605,12 +621,12 @@ function selectPageSize(size: number) {
 }
 
 // ── Watchers ────────────────────────────────────────────────────────
-watch(() => props.data, () => { currentPageRef.value = 1 })
-watch(searchQuery, () => { currentPageRef.value = 1 })
+watch(() => props.data, () => { clientFirst() })
+watch(searchQuery, () => { clientFirst() })
 
-const emitSearch = useDebounceFn((q: string) => emit('search', q), 500)
-watch(searchQuery, (q) => {
-  if (props.serverPaginated) emitSearch(q ?? '')
+const debouncedSearch = useDebounce(searchQuery, 500)
+watch(debouncedSearch, (q) => {
+  if (props.serverPaginated) emit('search', q ?? '')
 })
 </script>
 

@@ -1,6 +1,7 @@
 import api from '../plugins/axios';
 import axios, { type AxiosProgressEvent, type AxiosRequestConfig, CancelTokenSource } from 'axios';
 import { API_PATHS } from '../config/api-paths';
+import { formatFileSize, getFileExtension } from '../utils/file';
 
 export interface UploadOptions {
   endpoint?: string;
@@ -29,16 +30,15 @@ export const validateFile = (
   const { maxSize, allowedTypes } = options;
 
   if (maxSize && file.size > maxSize) {
-    const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(2);
     return {
       valid: false,
-      error: `File size exceeds maximum allowed size of ${maxSizeMB}MB`,
+      error: `File size exceeds maximum allowed size of ${formatFileSize(maxSize)}`,
     };
   }
 
   if (allowedTypes && allowedTypes.length > 0) {
     const fileType = file.type || '';
-    const fileExtension = file.name.split('.').pop()?.toLowerCase() || '';
+    const fileExtension = getFileExtension(file.name);
     const isAllowed =
       allowedTypes.some((type) => fileType.includes(type)) ||
       allowedTypes.some((type) => type.includes(fileExtension));

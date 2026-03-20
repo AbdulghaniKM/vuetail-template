@@ -1,5 +1,5 @@
 import { appConfig } from './app.config';
-import { applyTheme, setTheme, getCurrentTheme } from '../utils/theme';
+import { applyTheme, applyThemeToDOM, getSystemTheme } from '../utils/theme';
 import { useSeo } from '../utils/seo';
 import { registerFontFamily, loadFont } from '../utils/fonts';
 import type { AppConfig } from './types';
@@ -11,9 +11,11 @@ export const initializeConfig = (): void => {
   // Apply theme
   applyTheme(appConfig.theme);
 
-  // Set initial theme
-  const initialTheme = getCurrentTheme(appConfig.theme.defaultTheme);
-  setTheme(initialTheme);
+  // Set initial theme from storage or config default
+  const stored = typeof window !== 'undefined' ? localStorage.getItem('app-theme') : null;
+  const initialMode = stored === 'light' || stored === 'dark' ? stored : (appConfig.theme.defaultTheme || 'system');
+  const resolvedTheme = initialMode === 'system' ? getSystemTheme() : initialMode;
+  applyThemeToDOM(resolvedTheme);
 
   // Apply SEO defaults
   if (appConfig.seo) {

@@ -1,17 +1,26 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import {
-  getCurrentTheme,
-  setTheme as setThemeUtil,
+  applyThemeToDOM,
   getSystemTheme,
   getColorValue,
   type ColorPalette,
 } from '../utils/theme';
+import { useLocalStorage } from './useLocalStorage';
 import { appConfig } from '../config/app.config';
 
 type ThemeMode = 'light' | 'dark' | 'system';
 
-const currentTheme = ref<'light' | 'dark'>(getCurrentTheme(appConfig.theme.defaultTheme));
-const themeMode = ref<ThemeMode>(appConfig.theme.defaultTheme || 'system');
+// Persisted theme mode via useLocalStorage
+const storedMode = useLocalStorage<ThemeMode | null>('app-theme', null);
+
+const resolveTheme = (mode: ThemeMode | null): 'light' | 'dark' => {
+  if (mode === 'light' || mode === 'dark') return mode;
+  return getSystemTheme();
+};
+
+const defaultMode: ThemeMode = storedMode.value ?? appConfig.theme.defaultTheme ?? 'system';
+const currentTheme = ref<'light' | 'dark'>(resolveTheme(defaultMode));
+const themeMode = ref<ThemeMode>(defaultMode);
 
 export const useTheme = () => {
   const isDark = computed(() => currentTheme.value === 'dark');
@@ -23,16 +32,18 @@ export const useTheme = () => {
     setTheme(newTheme);
   };
 
-  const setTheme = (theme: 'light' | 'dark' | 'system') => {
+  const setTheme = (theme: ThemeMode) => {
     themeMode.value = theme;
 
     if (theme === 'system') {
       currentTheme.value = getSystemTheme();
-      setThemeUtil('system');
+      storedMode.value = null; // remove from storage
     } else {
       currentTheme.value = theme;
-      setThemeUtil(theme);
+      storedMode.value = theme; // persist to storage
     }
+
+    applyThemeToDOM(theme);
   };
 
   const getColor = (colorKey: keyof ColorPalette): string => {
@@ -45,26 +56,26 @@ export const useTheme = () => {
 
   // Watch for system theme changes
   onMounted(() => {
+    // Apply initial theme to DOM
+    applyThemeToDOM(themeMode.value);
+
     if (themeMode.value === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const handleChange = (e: MediaQueryListEvent) => {
         if (themeMode.value === 'system') {
           currentTheme.value = e.matches ? 'dark' : 'light';
-          setThemeUtil('system');
+          applyThemeToDOM('system');
         }
       };
 
-      // Modern browsers
       if (mediaQuery.addEventListener) {
         mediaQuery.addEventListener('change', handleChange);
       } else {
-        // Fallback for older browsers
         mediaQuery.addListener(handleChange);
       }
     }
   });
 
-  // Watch for manual theme changes
   watch(
     () => themeMode.value,
     (newMode) => {

@@ -107,10 +107,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onUnmounted, ref } from 'vue'
+import { computed, watch, onUnmounted, ref, toRef } from 'vue'
 import { motion, AnimatePresence } from 'motion-v'
 import AppIcon from './AppIcon.vue'
 import AppSpinner from './AppSpinner.vue'
+import { useKeyboard } from '../../composables/useKeyboard'
 
 const props = withDefaults(
   defineProps<{
@@ -145,7 +146,7 @@ const props = withDefaults(
   }
 )
 
-const emit = defineEmits<{ close: [] }>()
+const emit = defineEmits<{ close: []; confirm: [] }>()
 const panelRef = ref<HTMLElement | null>(null)
 
 function handleClose() {
@@ -153,31 +154,42 @@ function handleClose() {
   emit('close')
 }
 
+function handleConfirm() {
+  if (props.loading) return
+  emit('confirm')
+}
+
 function handleBackdropClick() {
   if (!props.persistent) handleClose()
 }
 
-function handleKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape' && !props.persistent && !props.loading) handleClose()
-}
+// Keyboard shortcuts — only active while modal is open
+useKeyboard(
+  {
+    escape: () => {
+      if (!props.persistent && !props.loading) handleClose()
+    },
+    enter: (e: KeyboardEvent) => {
+      if (props.loading) return
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return
+      handleConfirm()
+    },
+  },
+  toRef(props, 'isOpen'),
+)
 
+// Body scroll lock
 watch(
   () => props.isOpen,
   (open) => {
-    if (open) {
-      document.body.style.overflow = 'hidden'
-      document.addEventListener('keydown', handleKeydown)
-    } else {
-      document.body.style.overflow = ''
-      document.removeEventListener('keydown', handleKeydown)
-    }
+    document.body.style.overflow = open ? 'hidden' : ''
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 onUnmounted(() => {
   document.body.style.overflow = ''
-  document.removeEventListener('keydown', handleKeydown)
 })
 
 const maxWidthClass = computed(() => {

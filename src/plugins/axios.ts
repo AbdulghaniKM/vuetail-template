@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getApiUrl } from '../config/env';
+import { getAuthToken, clearAuthSession } from '../composables/useAuth';
 
 const api = axios.create({
   baseURL: getApiUrl(),
@@ -12,28 +13,25 @@ const api = axios.create({
   xsrfHeaderName: 'X-XSRF-TOKEN',
 });
 
+// ── Request: attach auth token ──────────────────────────────────────
 api.interceptors.request.use(
   (config) => {
-    // Attach auth token if present (uncomment and adapt to your auth store)
-    // import { useAuthStore } from '../stores/auth';
-    // const authStore = useAuthStore();
-    // if (authStore.token) {
-    //   config.headers.Authorization = `Bearer ${authStore.token}`;
-    // }
+    const token = getAuthToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error),
 );
 
+// ── Response: handle 401 ────────────────────────────────────────────
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response) {
-      const { status } = error.response;
-      if (status === 401) {
-        // Token expired / unauthorized — redirect to login or refresh token
-        // window.location.href = '/login';
-      }
+    if (error.response?.status === 401) {
+      clearAuthSession();
+      // Optionally redirect: window.location.href = '/login';
     }
     return Promise.reject(error);
   },

@@ -84,40 +84,16 @@ export const applyTheme = (theme: ThemeConfig): void => {
   styleElement.textContent = generateCSSVariables(theme);
 };
 
-export const getThemeFromStorage = (): 'light' | 'dark' | null => {
-  if (typeof window === 'undefined') return null;
-  const stored = localStorage.getItem('app-theme');
-  return stored === 'light' || stored === 'dark' ? stored : null;
-};
-
-export const saveThemeToStorage = (theme: 'light' | 'dark'): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem('app-theme', theme);
-};
-
 export const getSystemTheme = (): 'light' | 'dark' => {
   if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
-export const getCurrentTheme = (defaultTheme: 'light' | 'dark' | 'system' = 'system'): 'light' | 'dark' => {
-  const stored = getThemeFromStorage();
-  if (stored) return stored;
-
-  if (defaultTheme === 'system') {
-    return getSystemTheme();
-  }
-
-  return defaultTheme;
-};
-
-export const setTheme = (theme: 'light' | 'dark' | 'system'): void => {
+export const applyThemeToDOM = (theme: 'light' | 'dark' | 'system'): void => {
   if (theme === 'system') {
     document.documentElement.removeAttribute('data-theme');
-    localStorage.removeItem('app-theme');
   } else {
     document.documentElement.setAttribute('data-theme', theme);
-    saveThemeToStorage(theme);
   }
 };
 
