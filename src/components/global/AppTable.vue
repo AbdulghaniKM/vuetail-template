@@ -161,7 +161,7 @@
             @click="showPageSizeMenu = !showPageSizeMenu"
           >
             {{ pageSize }} / page
-            <AppIcon name="icon-[heroicons-outline--chevron-up-down]" :size="0.75" class="text-text-secondary" />
+            <AppIcon name="icon-[heroicons--chevron-up-down]" :size="0.75" class="text-text-secondary" />
           </button>
           <Transition
             enter-active-class="transition duration-100 ease-out"
@@ -543,26 +543,23 @@ const filteredData = computed(() => {
 
 // ── Client-side pagination (via usePagination) ─────────────────────
 const clientTotal = computed(() => filteredData.value.length)
+const clientItemsPerPage = computed(() => props.itemsPerPage)
 
-const {
-  page: clientPage,
-  totalPages: clientTotalPages,
-  isFirst: clientIsFirst,
-  isLast: clientIsLast,
-  range: clientRange,
-  visiblePages: clientVisiblePages,
-  goTo: clientGoTo,
-  next: clientNext,
-  prev: clientPrev,
-  first: clientFirst,
-  paginate: clientPaginate,
-} = usePagination({
+const clientPag = usePagination({
   total: clientTotal,
-  pageSize: computed(() => props.itemsPerPage),
+  pageSize: clientItemsPerPage,
 })
 
+// Expose individual refs for clean template access
+const clientPage = clientPag.page
+const clientTotalPages = clientPag.totalPages
+const clientIsFirst = clientPag.isFirst
+const clientIsLast = clientPag.isLast
+const clientRange = clientPag.range
+const clientVisiblePages = clientPag.visiblePages
+
 const clientPaginatedData = computed(() =>
-  props.paginated ? clientPaginate(filteredData.value) : filteredData.value
+  props.paginated ? clientPag.paginate(filteredData.value) : filteredData.value
 )
 
 const displayData = computed(() =>
@@ -597,13 +594,13 @@ const canGoNext = computed(() =>
   props.serverPaginated ? props.pageNumber < props.totalPages : !clientIsLast.value
 )
 
-const goToPage = (p: number) => clientGoTo(p)
+const goToPage = (p: number) => clientPag.goTo(p)
 
 const goToPrev = () => {
   if (props.serverPaginated) {
     if (props.pageNumber > 1) emit('pageChange', { pageNumber: props.pageNumber - 1, pageSize: props.pageSize })
   } else {
-    clientPrev()
+    clientPag.prev()
   }
 }
 
@@ -611,7 +608,7 @@ const goToNext = () => {
   if (props.serverPaginated) {
     if (props.pageNumber < props.totalPages) emit('pageChange', { pageNumber: props.pageNumber + 1, pageSize: props.pageSize })
   } else {
-    clientNext()
+    clientPag.next()
   }
 }
 
@@ -621,8 +618,8 @@ function selectPageSize(size: number) {
 }
 
 // ── Watchers ────────────────────────────────────────────────────────
-watch(() => props.data, () => { clientFirst() })
-watch(searchQuery, () => { clientFirst() })
+watch(() => props.data, () => { clientPag.first() })
+watch(searchQuery, () => { clientPag.first() })
 
 const debouncedSearch = useDebounce(searchQuery, 500)
 watch(debouncedSearch, (q) => {

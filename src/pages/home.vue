@@ -29,7 +29,7 @@
           </p>
 
           <div class="flex flex-wrap justify-center gap-3">
-            <AppButton variant="primary" icon="icon-[heroicons-outline--rocket-launch]" label="Get Started" size="lg" @click="scrollTo('getting-started')" />
+            <AppButton variant="primary" icon="icon-[heroicons--rocket-launch]" label="Get Started" size="lg" @click="scrollTo('getting-started')" />
             <AppButton variant="outline" icon="icon-[heroicons-outline--cube]" label="Explore Components" size="lg" @click="scrollTo('components')" />
           </div>
         </div>
