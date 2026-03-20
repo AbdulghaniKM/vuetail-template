@@ -1,29 +1,31 @@
 <template>
   <AppTooltip v-if="tooltip" :content="tooltip" :placement="tooltipPlacement">
     <button
-      type="button"
+      :type="type"
       class="inline-flex cursor-pointer items-center justify-center font-medium transition-all duration-150 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50"
       :class="[sizeClass, variantClass, gapClass, roundedClass, fullWidth && 'w-full']"
-      :disabled="disabled"
+      :disabled="disabled || loading"
       v-bind="$attrs"
     >
-      <AppIcon v-if="icon" :name="icon" :size="iconSize" class="shrink-0" />
+      <AppSpinner v-if="loading" :size="spinnerSize" class="shrink-0" />
+      <AppIcon v-else-if="icon" :name="icon" :size="iconSize" class="shrink-0" />
       <span v-if="!iconOnly && (label || $slots.default)" class="truncate">
-        <slot>{{ label }}</slot>
+        <slot>{{ loading && loadingLabel ? loadingLabel : label }}</slot>
       </span>
     </button>
   </AppTooltip>
   <button
     v-else
-    type="button"
+    :type="type"
     class="inline-flex cursor-pointer items-center justify-center font-medium transition-all duration-150 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50"
     :class="[sizeClass, variantClass, gapClass, roundedClass, fullWidth && 'w-full']"
-    :disabled="disabled"
+    :disabled="disabled || loading"
     v-bind="$attrs"
   >
-    <AppIcon v-if="icon" :name="icon" :size="iconSize" class="shrink-0" />
+    <AppSpinner v-if="loading" :size="spinnerSize" class="shrink-0" />
+    <AppIcon v-else-if="icon" :name="icon" :size="iconSize" class="shrink-0" />
     <span v-if="!iconOnly && (label || $slots.default)" class="truncate">
-      <slot>{{ label }}</slot>
+      <slot>{{ loading && loadingLabel ? loadingLabel : label }}</slot>
     </span>
   </button>
 </template>
@@ -32,12 +34,13 @@
 import { computed } from 'vue'
 import AppTooltip from './AppTooltip.vue'
 import AppIcon from './AppIcon.vue'
+import AppSpinner from './AppSpinner.vue'
 
 defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(
   defineProps<{
-    variant?: 'primary' | 'ghost' | 'muted' | 'danger' | 'surface' | 'outline'
+    variant?: 'primary' | 'secondary' | 'ghost' | 'muted' | 'danger' | 'success' | 'surface' | 'outline'
     icon?: string
     label?: string
     tooltip?: string
@@ -46,6 +49,9 @@ const props = withDefaults(
     size?: 'xs' | 'sm' | 'md' | 'lg'
     fullWidth?: boolean
     disabled?: boolean
+    loading?: boolean
+    loadingLabel?: string
+    type?: 'button' | 'submit' | 'reset'
   }>(),
   {
     variant: 'ghost',
@@ -57,6 +63,9 @@ const props = withDefaults(
     size: 'sm',
     fullWidth: false,
     disabled: false,
+    loading: false,
+    loadingLabel: '',
+    type: 'button',
   }
 )
 
@@ -94,9 +103,11 @@ const roundedClass = computed(() => {
 const variantClass = computed(() => {
   const map = {
     primary: 'bg-primary text-white shadow-sm hover:bg-primary/90 hover:shadow-md',
+    secondary: 'bg-secondary text-white shadow-sm hover:bg-secondary/90 hover:shadow-md',
     ghost: 'text-text-secondary hover:bg-muted hover:text-text',
     muted: 'bg-muted/50 text-text-secondary hover:bg-muted hover:text-text',
     danger: 'bg-error/10 text-error hover:bg-error/20',
+    success: 'bg-success/10 text-success hover:bg-success/20',
     surface: 'bg-surface text-primary border border-border shadow-sm hover:bg-muted hover:shadow',
     outline: 'border border-border bg-transparent text-text hover:bg-muted',
   }
@@ -105,6 +116,11 @@ const variantClass = computed(() => {
 
 const iconSize = computed(() => {
   const map = { xs: 0.75, sm: 1, md: 1.125, lg: 1.25 }
+  return map[props.size]
+})
+
+const spinnerSize = computed(() => {
+  const map = { xs: 'xs', sm: 'xs', md: 'sm', lg: 'sm' } as const
   return map[props.size]
 })
 </script>

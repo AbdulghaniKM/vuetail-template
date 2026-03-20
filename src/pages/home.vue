@@ -81,7 +81,7 @@
     </section>
 
     <!-- Features Grid -->
-    <section class="border-border border-y py-20">
+    <section id="features" class="border-border border-y py-20">
       <div class="container mx-auto px-4">
         <div class="mb-12 text-center">
           <AppText variant="overline" color="primary" class="mb-2">Why VueTail?</AppText>
@@ -134,12 +134,14 @@
           <div v-show="activeTab === 'buttons'" class="space-y-6">
             <div class="bg-surface border-border rounded-xl border p-6">
               <AppText variant="h3" class="mb-1">Button Variants</AppText>
-              <AppText variant="caption" color="text-secondary" class="mb-5">Six distinct styles for every use case.</AppText>
+              <AppText variant="caption" color="text-secondary" class="mb-5">Eight distinct styles for every use case.</AppText>
               <div class="flex flex-wrap items-center gap-3">
                 <AppButton variant="primary" label="Primary" icon="icon-[heroicons-outline--star]" />
+                <AppButton variant="secondary" label="Secondary" icon="icon-[heroicons-outline--sparkles]" />
                 <AppButton variant="ghost" label="Ghost" icon="icon-[heroicons-outline--eye]" />
                 <AppButton variant="muted" label="Muted" icon="icon-[heroicons-outline--minus-circle]" />
                 <AppButton variant="danger" label="Danger" icon="icon-[heroicons-outline--trash]" />
+                <AppButton variant="success" label="Success" icon="icon-[heroicons-outline--check-circle]" />
                 <AppButton variant="surface" label="Surface" icon="icon-[heroicons-outline--cube]" />
                 <AppButton variant="outline" label="Outline" icon="icon-[heroicons-outline--pencil]" />
               </div>
@@ -166,6 +168,16 @@
                   <AppButton icon="icon-[heroicons-outline--arrow-down-tray]" tooltip="Download" icon-only variant="surface" />
                   <AppButton icon="icon-[heroicons-outline--share]" tooltip="Share" icon-only variant="outline" />
                 </div>
+              </div>
+            </div>
+            <div class="bg-surface border-border rounded-xl border p-6">
+              <AppText variant="h3" class="mb-1">Loading State</AppText>
+              <AppText variant="caption" color="text-secondary" class="mb-5">Built-in spinner replaces the icon while loading.</AppText>
+              <div class="flex flex-wrap items-center gap-3">
+                <AppButton variant="primary" label="Save Changes" icon="icon-[heroicons-outline--check]" :loading="btnLoading" loading-label="Saving..." @click="simulateLoading" />
+                <AppButton variant="secondary" label="Uploading" icon="icon-[heroicons-outline--arrow-up-tray]" :loading="true" loading-label="Uploading..." />
+                <AppButton variant="outline" label="Processing" :loading="true" />
+                <AppButton variant="danger" icon="icon-[heroicons-outline--trash]" tooltip="Delete" icon-only :loading="btnIconLoading" @click="simulateIconLoading" />
               </div>
             </div>
           </div>
@@ -352,12 +364,12 @@
             <div class="grid gap-6 md:grid-cols-2">
               <div class="bg-surface border-border rounded-xl border p-6">
                 <AppText variant="h3" class="mb-1">Modals</AppText>
-                <AppText variant="caption" color="text-secondary" class="mb-5">Spring-animated with backdrop blur.</AppText>
+                <AppText variant="caption" color="text-secondary" class="mb-5">Animated with Escape close, scroll lock, icons, and loading overlay.</AppText>
                 <div class="flex flex-wrap gap-3">
-                  <AppButton variant="primary" label="Small" @click="demoModalSize = 'sm'; demoModalOpen = true" />
-                  <AppButton variant="outline" label="Medium" @click="demoModalSize = 'md'; demoModalOpen = true" />
-                  <AppButton variant="outline" label="Large" @click="demoModalSize = 'lg'; demoModalOpen = true" />
+                  <AppButton variant="primary" label="With Icon" icon="icon-[heroicons-outline--sparkles]" @click="demoModalSize = 'md'; demoModalOpen = true" />
                   <AppButton variant="outline" label="With Footer" @click="demoModalFooter = true; demoModalSize = 'md'; demoModalOpen = true" />
+                  <AppButton variant="secondary" label="Persistent" @click="persistentModalOpen = true" />
+                  <AppButton variant="surface" label="Loading" @click="loadingModalOpen = true; simulateModalLoading()" />
                 </div>
               </div>
               <div class="bg-surface border-border rounded-xl border p-6">
@@ -415,7 +427,7 @@
     </section>
 
     <!-- Theme Playground -->
-    <section class="bg-surface border-border border-y py-20">
+    <section id="theme" class="bg-surface border-border border-y py-20">
       <div class="container mx-auto px-4">
         <div class="mb-12 text-center">
           <AppText variant="overline" color="primary" class="mb-2">Customization</AppText>
@@ -620,21 +632,67 @@
     <AppModal
       :is-open="demoModalOpen"
       title="Demo Modal"
+      description="A showcase of the redesigned modal component with icon, description, and animated transitions."
+      icon="icon-[heroicons-outline--sparkles]"
       :max-width="demoModalSize"
       @close="demoModalOpen = false; demoModalFooter = false"
     >
-      <div class="p-5">
-        <AppText variant="p" class="mb-3">
-          This is a {{ demoModalSize }} modal with spring-physics animation, backdrop blur, and a gradient accent bar.
-        </AppText>
+      <div class="p-6">
         <AppText variant="p" color="text-secondary">
-          You can put any content here &mdash; forms, tables, images, or other components.
+          This modal features a header icon, description text, Escape key support,
+          body scroll lock, and smooth spring-physics animations. Put any content here &mdash;
+          forms, tables, images, or other components.
         </AppText>
       </div>
       <template v-if="demoModalFooter" #footer>
         <div class="flex justify-end gap-2">
           <AppButton variant="outline" label="Cancel" @click="demoModalOpen = false; demoModalFooter = false" />
-          <AppButton variant="primary" label="Confirm" @click="demoModalOpen = false; demoModalFooter = false; showToast('success', 'Confirmed!')" />
+          <AppButton variant="primary" label="Confirm" icon="icon-[heroicons-outline--check]" @click="demoModalOpen = false; demoModalFooter = false; showToast('success', 'Confirmed!')" />
+        </div>
+      </template>
+    </AppModal>
+
+    <AppModal
+      :is-open="persistentModalOpen"
+      title="Persistent Modal"
+      description="This dialog requires explicit user action to dismiss."
+      icon="icon-[heroicons-outline--lock-closed]"
+      max-width="sm"
+      :persistent="true"
+      @close="persistentModalOpen = false"
+    >
+      <div class="p-6">
+        <AppText variant="p" color="text-secondary">
+          Clicking the backdrop or pressing Escape will not close this modal.
+          Use the button below instead.
+        </AppText>
+      </div>
+      <template #footer>
+        <div class="flex justify-end">
+          <AppButton variant="primary" label="Got it" icon="icon-[heroicons-outline--check]" @click="persistentModalOpen = false" />
+        </div>
+      </template>
+    </AppModal>
+
+    <AppModal
+      :is-open="loadingModalOpen"
+      title="Processing"
+      description="Please wait while we process your request."
+      icon="icon-[heroicons-outline--arrow-path]"
+      max-width="sm"
+      :loading="modalLoading"
+      loading-text="Processing your request..."
+      @close="loadingModalOpen = false"
+    >
+      <div class="p-6">
+        <AppText variant="p" color="text-secondary">
+          The loading overlay blocks interaction until the operation completes.
+          Close button and backdrop clicks are disabled during loading.
+        </AppText>
+      </div>
+      <template #footer>
+        <div class="flex justify-end">
+          <AppButton variant="outline" label="Close" @click="loadingModalOpen = false" />
         </div>
       </template>
     </AppModal>
@@ -821,13 +879,44 @@
     }
   };
 
+  // ===== Button Loading Demo =====
+  const btnLoading = ref(false);
+  const btnIconLoading = ref(false);
+
+  const simulateLoading = () => {
+    btnLoading.value = true;
+    setTimeout(() => {
+      btnLoading.value = false;
+      showToast('success', 'Changes saved!');
+    }, 2000);
+  };
+
+  const simulateIconLoading = () => {
+    btnIconLoading.value = true;
+    setTimeout(() => {
+      btnIconLoading.value = false;
+      showToast('success', 'Item deleted!');
+    }, 1500);
+  };
+
   // ===== Modal =====
   const demoModalOpen = ref(false);
   const demoModalSize = ref<'sm' | 'md' | 'lg'>('md');
   const demoModalFooter = ref(false);
+  const persistentModalOpen = ref(false);
+  const loadingModalOpen = ref(false);
+  const modalLoading = ref(false);
   const dangerModalOpen = ref(false);
   const dangerLoadingModalOpen = ref(false);
   const dangerLoading = ref(false);
+
+  const simulateModalLoading = () => {
+    modalLoading.value = true;
+    setTimeout(() => {
+      modalLoading.value = false;
+      showToast('success', 'Processing complete!');
+    }, 3000);
+  };
 
   const simulateDangerLoading = () => {
     dangerLoading.value = true;
