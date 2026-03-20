@@ -335,7 +335,7 @@
                 <p class="text-text-secondary mb-4 text-sm">Pre-built destructive action dialog.</p>
                 <div class="flex flex-wrap gap-2">
                   <AppButton variant="danger" icon="icon-[heroicons-outline--trash]" label="Delete" size="sm" @click="dangerModalOpen = true" />
-                  <AppButton variant="danger" icon="icon-[heroicons-outline--exclamation-triangle]" label="With Loading" size="sm" @click="dangerLoadingModalOpen = true" />
+                  <AppButton variant="danger" icon="icon-[heroicons--exclamation-triangle]" label="With Loading" size="sm" @click="dangerLoadingModalOpen = true" />
                 </div>
               </div>
             </div>
@@ -345,7 +345,7 @@
                 <div class="grid grid-cols-2 gap-2">
                   <AppButton variant="primary" label="Success" size="sm" icon="icon-[heroicons-outline--check-circle]" @click="showToast('success', 'Operation completed!')" />
                   <AppButton variant="danger" label="Error" size="sm" icon="icon-[heroicons-outline--x-circle]" @click="showToast('error', 'Something went wrong!')" />
-                  <AppButton variant="surface" label="Warning" size="sm" icon="icon-[heroicons-outline--exclamation-triangle]" @click="showToast('warning', 'Check your input')" />
+                  <AppButton variant="surface" label="Warning" size="sm" icon="icon-[heroicons--exclamation-triangle]" @click="showToast('warning', 'Check your input')" />
                   <AppButton variant="outline" label="Info" size="sm" icon="icon-[heroicons-outline--information-circle]" @click="showToast('info', 'Here is some info')" />
                 </div>
               </div>
@@ -558,9 +558,7 @@
     <AppImageModal :images="demoImages" :is-open="isImageModalOpen" :initial-index="imageModalIndex" @update:is-open="isImageModalOpen = $event" @close="isImageModalOpen = false" />
 
     <AppModal :is-open="demoModalOpen" title="Demo Modal" description="A showcase of the modal with icon, description, and transitions." icon="icon-[heroicons-outline--sparkles]" :max-width="demoModalSize" @close="demoModalOpen = false; demoModalFooter = false">
-      <div class="p-6">
-        <AppText variant="p" color="text-secondary">This modal features a header icon, description text, Escape key support, body scroll lock, and smooth animations.</AppText>
-      </div>
+      <AppText variant="p" color="text-secondary">This modal features a header icon, description text, Escape key support, body scroll lock, and smooth animations.</AppText>
       <template v-if="demoModalFooter" #footer>
         <div class="flex justify-end gap-2">
           <AppButton variant="outline" label="Cancel" @click="demoModalOpen = false; demoModalFooter = false" />
@@ -569,10 +567,8 @@
       </template>
     </AppModal>
 
-    <AppModal :is-open="persistentModalOpen" title="Persistent Modal" description="Requires explicit user action to dismiss." icon="icon-[heroicons-outline--lock-closed]" max-width="sm" :persistent="true" @close="persistentModalOpen = false">
-      <div class="p-6">
-        <AppText variant="p" color="text-secondary">Clicking the backdrop or pressing Escape will not close this. Use the button below.</AppText>
-      </div>
+    <AppModal :is-open="persistentModalOpen" title="Persistent Modal" description="Requires explicit user action to dismiss." icon="icon-[heroicons-outline--lock-closed]" icon-variant="warning" max-width="sm" :persistent="true" @close="persistentModalOpen = false">
+      <AppText variant="p" color="text-secondary">Clicking the backdrop or pressing Escape will not close this. Use the button below.</AppText>
       <template #footer>
         <div class="flex justify-end">
           <AppButton variant="primary" label="Got it" icon="icon-[heroicons-outline--check]" @click="persistentModalOpen = false" />
@@ -581,9 +577,7 @@
     </AppModal>
 
     <AppModal :is-open="loadingModalOpen" title="Processing" description="Please wait while we process your request." icon="icon-[heroicons-outline--arrow-path]" max-width="sm" :loading="modalLoading" loading-text="Processing..." @close="loadingModalOpen = false">
-      <div class="p-6">
-        <AppText variant="p" color="text-secondary">The loading overlay blocks interaction until the operation completes.</AppText>
-      </div>
+      <AppText variant="p" color="text-secondary">The loading overlay blocks interaction until the operation completes.</AppText>
       <template #footer>
         <div class="flex justify-end">
           <AppButton variant="outline" label="Close" @click="loadingModalOpen = false" />

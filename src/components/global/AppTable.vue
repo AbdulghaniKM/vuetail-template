@@ -304,9 +304,7 @@
 
     <!-- ── Truncate expand modal (kept for backward compat) ───────── -->
     <AppModal :is-open="truncateModalOpen" :title="truncateModalTitle" max-width="sm" @close="truncateModalOpen = false">
-      <div class="p-4">
-        <p dir="auto" class="text-text whitespace-pre-wrap text-sm leading-relaxed">{{ truncateModalContent }}</p>
-      </div>
+      <p dir="auto" class="text-text whitespace-pre-wrap text-sm leading-relaxed">{{ truncateModalContent }}</p>
     </AppModal>
   </div>
 </template>

@@ -1,31 +1,53 @@
 <template>
   <Teleport to="body">
-    <div class="pointer-events-none fixed top-4 right-4 z-[10000] flex flex-col gap-2">
+    <div
+      class="pointer-events-none fixed inset-x-0 top-0 z-[10000] flex flex-col items-end gap-2.5 p-4 sm:inset-x-auto sm:end-4 sm:top-4"
+      role="log"
+      aria-live="polite"
+      aria-label="Notifications"
+    >
       <AnimatePresence>
         <motion.div
           v-for="toast in toasts"
           :key="toast.id"
-          class="pointer-events-auto flex max-w-md min-w-[20rem] items-start gap-3 rounded-lg px-4 py-3 shadow-lg backdrop-blur-sm"
-          :class="toastClass(toast.type)"
-          :initial="{ opacity: 0, x: '100%' }"
-          :animate="{ opacity: 1, x: 0 }"
-          :exit="{ opacity: 0, x: '100%' }"
-          :transition="{ type: 'spring', stiffness: 400, damping: 30 }"
+          class="pointer-events-auto relative w-full overflow-hidden rounded-xl shadow-lg sm:max-w-sm"
+          :class="containerClass(toast.type)"
+          role="alert"
+          :initial="{ opacity: 0, y: -12, scale: 0.95 }"
+          :animate="{ opacity: 1, y: 0, scale: 1 }"
+          :exit="{ opacity: 0, y: -8, scale: 0.95 }"
+          :transition="{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }"
         >
-          <AppIcon :name="toastIcon(toast.type)" :size="1" class="mt-0.5 flex-shrink-0" />
+          <div class="flex items-start gap-3 px-4 py-3">
+            <!-- Icon -->
+            <span class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full" :class="iconBgClass(toast.type)">
+              <AppIcon :name="toastIcon(toast.type)" :size="0.75" />
+            </span>
 
-          <div class="min-w-0 flex-1">
-            <p v-if="toast.title" class="mb-1 text-sm font-semibold">{{ toast.title }}</p>
-            <p class="text-sm">{{ toast.message }}</p>
+            <!-- Content -->
+            <div class="min-w-0 flex-1">
+              <p v-if="toast.title" class="text-sm font-semibold leading-snug">{{ toast.title }}</p>
+              <p class="text-sm leading-relaxed" :class="toast.title ? 'opacity-80' : ''">{{ toast.message }}</p>
+            </div>
+
+            <!-- Close -->
+            <button
+              type="button"
+              class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-lg opacity-60 transition-opacity hover:opacity-100"
+              aria-label="Dismiss notification"
+              @click="removeToast(toast.id)"
+            >
+              <AppIcon name="icon-[heroicons-outline--x-mark]" :size="0.875" />
+            </button>
           </div>
 
-          <button
-            @click="removeToast(toast.id)"
-            class="flex-shrink-0 text-current opacity-70 transition-opacity hover:opacity-100"
-            aria-label="Close"
-          >
-            <AppIcon name="mdi:close" :size="1" />
-          </button>
+          <!-- Progress bar -->
+          <div
+            v-if="toast.duration && toast.duration > 0"
+            class="h-0.5 origin-left"
+            :class="progressClass(toast.type)"
+            :style="{ animation: `toast-progress ${toast.duration}ms linear forwards` }"
+          />
         </motion.div>
       </AnimatePresence>
     </div>
@@ -37,37 +59,43 @@ import { AnimatePresence, motion } from 'motion-v'
 import type { Toast } from '../../composables/useToast'
 import AppIcon from './AppIcon.vue'
 
-interface Props {
-  toasts: Toast[]
-}
+defineProps<{ toasts: Toast[] }>()
 
-const props = defineProps<Props>()
+const emit = defineEmits<{ remove: [id: string] }>()
+const removeToast = (id: string) => emit('remove', id)
 
-const emit = defineEmits<{
-  remove: [id: string]
-}>()
+const containerClass = (type: Toast['type']) => ({
+  success: 'bg-surface border border-success/20 text-text',
+  error: 'bg-surface border border-error/20 text-text',
+  warning: 'bg-surface border border-warning/20 text-text',
+  info: 'bg-surface border border-info/20 text-text',
+})[type]
 
-const toastClass = (type: Toast['type']) => {
-  const classes = {
-    success: 'bg-green-500/90 text-white',
-    error: 'bg-red-500/90 text-white',
-    warning: 'bg-yellow-500/90 text-white',
-    info: 'bg-blue-500/90 text-white',
-  }
-  return classes[type]
-}
+const iconBgClass = (type: Toast['type']) => ({
+  success: 'bg-success/15 text-success',
+  error: 'bg-error/15 text-error',
+  warning: 'bg-warning/15 text-warning',
+  info: 'bg-info/15 text-info',
+})[type]
 
-const toastIcon = (type: Toast['type']) => {
-  const icons = {
-    success: 'mdi-check-circle',
-    error: 'mdi-alert-circle',
-    warning: 'mdi-alert',
-    info: 'mdi-information',
-  }
-  return icons[type]
-}
+const progressClass = (type: Toast['type']) => ({
+  success: 'bg-success/40',
+  error: 'bg-error/40',
+  warning: 'bg-warning/40',
+  info: 'bg-info/40',
+})[type]
 
-const removeToast = (id: string) => {
-  emit('remove', id)
-}
+const toastIcon = (type: Toast['type']) => ({
+  success: 'icon-[heroicons-outline--check-circle]',
+  error: 'icon-[heroicons-outline--x-circle]',
+  warning: 'icon-[heroicons--exclamation-triangle]',
+  info: 'icon-[heroicons-outline--information-circle]',
+})[type]
 </script>
+
+<style scoped>
+@keyframes toast-progress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+</style>

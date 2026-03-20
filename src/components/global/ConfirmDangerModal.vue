@@ -1,45 +1,45 @@
 <template>
-  <AppModal :is-open="isOpen" :title="title" max-width="sm" @close="emit('close')">
-    <div class="flex flex-col items-center gap-4 px-5 pt-2 pb-5">
-      <!-- Danger icon -->
-      <div class="flex size-14 items-center justify-center rounded-full bg-error/10 ring-4 ring-error/5">
-        <div class="flex size-10 items-center justify-center rounded-full bg-error/15">
-          <AppIcon name="icon-[heroicons--exclamation-triangle]" :size="1.375" class="text-error" />
-        </div>
-      </div>
-
-      <div class="flex flex-col items-center gap-1.5 text-center">
-        <h4 class="text-base font-bold text-text">{{ title }}</h4>
-        <p class="max-w-[18rem] text-sm leading-relaxed text-text-secondary">{{ message }}</p>
-      </div>
-
-      <div class="mt-1 flex w-full gap-2.5">
+  <AppModal
+    :is-open="isOpen"
+    :title="title"
+    :description="message"
+    icon="icon-[heroicons--exclamation-triangle]"
+    icon-variant="danger"
+    max-width="sm"
+    hide-close
+    @close="emit('close')"
+  >
+    <template #default>
+      <!-- intentionally empty — description in header is enough -->
+    </template>
+    <template #footer>
+      <div class="flex gap-2.5">
         <AppButton
           variant="outline"
-          icon="icon-[heroicons-outline--x-mark]"
           :label="cancelLabel"
           full-width
           size="md"
           class="flex-1"
           @click="emit('close')"
         />
-        <button
-          type="button"
-          :disabled="loading"
-          class="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-error px-4 text-sm font-semibold text-white shadow-sm transition-all hover:bg-error/90 hover:shadow-md active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
+        <AppButton
+          variant="danger"
+          :label="loading ? loadingLabel : confirmLabel"
+          :loading="loading"
+          :loading-label="loadingLabel"
+          icon="icon-[heroicons-outline--trash]"
+          full-width
+          size="md"
+          class="flex-1 !bg-error !text-white !shadow-sm hover:!bg-error/90"
           @click="emit('confirm')"
-        >
-          <AppIcon v-if="!loading" name="icon-[heroicons-outline--check]" :size="1.125" />
-          {{ loading ? loadingLabel : confirmLabel }}
-        </button>
+        />
       </div>
-    </div>
+    </template>
   </AppModal>
 </template>
 
 <script setup lang="ts">
 import AppModal from './AppModal.vue'
-import AppIcon from './AppIcon.vue'
 import AppButton from './AppButton.vue'
 
 withDefaults(
