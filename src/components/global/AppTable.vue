@@ -1,136 +1,168 @@
 <template>
   <div class="w-full">
-    <!-- Toolbar: Search + extra actions -->
-    <div v-if="searchable || $slots['toolbar-end']" class="mb-4 flex w-full min-w-0 items-center gap-2">
-      <div v-if="searchable" class="relative min-w-0 flex-1 sm:max-w-md">
+    <!-- ── Toolbar ────────────────────────────────────────────────── -->
+    <div v-if="searchable || $slots['toolbar-end']" class="mb-3 flex w-full min-w-0 items-center gap-2">
+      <div v-if="searchable" class="relative min-w-0 flex-1 sm:max-w-sm">
         <AppIcon
           name="icon-[heroicons-outline--magnifying-glass]"
-          :size="1.25"
+          :size="1.125"
           class="text-text-secondary pointer-events-none absolute start-3 top-1/2 -translate-y-1/2"
         />
         <input
+          ref="searchInputRef"
           v-model="searchQuery"
           type="text"
           :placeholder="searchPlaceholder"
-          class="border-border bg-surface text-text placeholder:text-text-secondary/70 w-full rounded-lg border py-2.5 pe-4 ps-10 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          class="border-border bg-surface text-text placeholder:text-text-secondary/60 w-full rounded-xl border py-2 pe-9 ps-9 text-sm transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
+        <button
+          v-if="searchQuery"
+          type="button"
+          class="text-text-secondary hover:text-text absolute end-2.5 top-1/2 -translate-y-1/2 transition-colors"
+          aria-label="Clear search"
+          @click="searchQuery = ''; searchInputRef?.focus()"
+        >
+          <AppIcon name="icon-[heroicons-outline--x-mark]" :size="1" />
+        </button>
       </div>
-      <slot name="toolbar-end" />
+      <div class="flex items-center gap-2">
+        <slot name="toolbar-end" />
+      </div>
     </div>
 
-    <!-- Table -->
+    <!-- ── Table wrapper ──────────────────────────────────────────── -->
     <div
-      class="overflow-x-auto rounded-xl"
-      :class="outlined ? 'border-border border bg-surface shadow-sm' : ''"
-      style="-webkit-overflow-scrolling: touch"
+      class="overflow-hidden rounded-2xl"
+      :class="outlined ? 'border-border border bg-surface' : ''"
     >
-      <table class="w-full min-w-[48rem] border-collapse" style="table-layout: auto">
-        <thead>
-          <tr>
-            <th
-              v-for="column in visibleColumns"
-              :key="column.key"
-              class="table-th border-b border-border px-3 py-2.5 text-start whitespace-nowrap text-xs font-bold sm:px-4 sm:py-3 sm:text-sm"
-              :class="[column.class, column.key === 'actions' ? 'sticky-actions-th w-px whitespace-nowrap' : '']"
-            >
-              <button
-                v-if="isColumnSortable(column)"
-                type="button"
-                class="hover:text-primary flex items-center gap-1.5 transition-colors"
-                :class="sortKey === column.key ? 'text-primary' : ''"
-                @click="handleSort(column.key)"
-              >
-                <span class="line-clamp-2">{{ column.label }}</span>
-                <AppIcon
-                  :name="
-                    sortKey === column.key && sortOrder === 'desc'
-                      ? 'icon-[heroicons-outline--chevron-down]'
-                      : 'icon-[heroicons-outline--chevron-up]'
-                  "
-                  :size="1"
-                  :class="sortKey === column.key ? 'opacity-100' : 'opacity-30'"
-                />
-              </button>
-              <span v-else class="line-clamp-2">{{ column.label }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="loading">
-            <td :colspan="visibleColumns.length" class="py-20 text-center">
-              <div class="text-text-secondary flex flex-col items-center gap-3">
-                <AppSpinner :size="2" class="text-primary" />
-                <span class="text-sm">{{ loadingMessage }}</span>
-              </div>
-            </td>
-          </tr>
-          <tr v-else-if="displayData.length === 0">
-            <td :colspan="visibleColumns.length" class="py-20 text-center">
-              <div class="text-text-secondary flex flex-col items-center gap-3">
-                <span class="bg-muted flex size-12 items-center justify-center rounded-full">
-                  <AppIcon name="icon-[heroicons-outline--inbox]" :size="1.5" class="opacity-60" />
-                </span>
-                <span class="text-sm">{{ emptyMessage }}</span>
-              </div>
-            </td>
-          </tr>
-          <tr
-            v-for="(row, index) in displayData"
-            v-else
-            :key="getRowKey(row, index)"
-            class="table-row-data border-b border-border/60 transition-colors hover:bg-muted/50 even:bg-muted/20"
-          >
-            <td
-              v-for="column in visibleColumns"
-              :key="column.key"
-              class="text-text min-w-0 whitespace-nowrap px-3 py-2.5 text-xs sm:px-4 sm:py-3.5 sm:text-sm"
-              :class="[column.class, column.key === 'actions' ? 'sticky-actions-td w-px whitespace-nowrap' : '']"
-            >
-              <slot
-                :name="`cell-${column.key}`"
-                :row="row"
-                :value="getValue(row, column.key)"
-                :column="column"
+      <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch">
+        <table class="w-full min-w-[48rem] border-collapse" style="table-layout: auto">
+          <!-- Header -->
+          <thead>
+            <tr class="bg-muted/60">
+              <th
+                v-for="column in visibleColumns"
+                :key="column.key"
+                class="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wider whitespace-nowrap"
+                :class="[
+                  column.class,
+                  column.key === 'actions' ? 'sticky-actions-th w-px' : '',
+                  'text-text-secondary',
+                ]"
               >
                 <button
-                  v-if="column.truncate && getValue(row, column.key)"
+                  v-if="isColumnSortable(column)"
                   type="button"
-                  class="text-text-secondary hover:text-primary block max-w-[14rem] truncate text-start text-xs transition-colors"
-                  :title="String(getValue(row, column.key))"
-                  @click="openTruncateModal(column.label, String(getValue(row, column.key)))"
+                  class="group flex items-center gap-1 transition-colors"
+                  :class="sortKey === column.key ? 'text-primary' : 'hover:text-text'"
+                  @click="handleSort(column.key)"
                 >
-                  {{ display(getValue(row, column.key)) }}
+                  <span>{{ column.label }}</span>
+                  <span
+                    class="flex size-5 items-center justify-center rounded transition-all"
+                    :class="sortKey === column.key ? 'bg-primary/10 opacity-100' : 'opacity-0 group-hover:opacity-50'"
+                  >
+                    <AppIcon
+                      :name="sortKey === column.key && sortOrder === 'desc' ? 'icon-[heroicons-outline--bars-arrow-down]' : 'icon-[heroicons-outline--bars-arrow-up]'"
+                      :size="0.875"
+                    />
+                  </span>
                 </button>
-                <template v-else>
-                  {{ display(getValue(row, column.key)) }}
-                </template>
-              </slot>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                <span v-else>{{ column.label }}</span>
+              </th>
+            </tr>
+          </thead>
+
+          <!-- Body -->
+          <tbody>
+            <!-- Skeleton loading -->
+            <template v-if="loading">
+              <tr v-for="i in skeletonRows" :key="`skeleton-${i}`" class="border-border/40 border-b">
+                <td v-for="column in visibleColumns" :key="column.key" class="px-4 py-3.5">
+                  <div class="bg-muted h-4 animate-pulse rounded-md" :class="column.key === 'actions' ? 'w-16' : 'w-full max-w-[10rem]'" />
+                </td>
+              </tr>
+            </template>
+
+            <!-- Empty state -->
+            <tr v-else-if="displayData.length === 0">
+              <td :colspan="visibleColumns.length" class="py-16 text-center">
+                <div class="flex flex-col items-center gap-3">
+                  <div class="bg-muted flex size-14 items-center justify-center rounded-2xl">
+                    <AppIcon name="icon-[heroicons-outline--inbox-stack]" :size="1.75" class="text-text-secondary/50" />
+                  </div>
+                  <div>
+                    <p class="text-text mb-0.5 text-sm font-medium">{{ emptyMessage }}</p>
+                    <p v-if="searchQuery" class="text-text-secondary text-xs">Try adjusting your search term</p>
+                  </div>
+                  <AppButton
+                    v-if="searchQuery"
+                    variant="ghost"
+                    label="Clear search"
+                    icon="icon-[heroicons-outline--arrow-path]"
+                    size="sm"
+                    @click="searchQuery = ''"
+                  />
+                </div>
+              </td>
+            </tr>
+
+            <!-- Data rows -->
+            <tr
+              v-for="(row, index) in displayData"
+              v-else
+              :key="getRowKey(row, index)"
+              class="table-row-data border-border/40 border-b transition-colors last:border-b-0 hover:bg-primary/[0.03]"
+            >
+              <td
+                v-for="column in visibleColumns"
+                :key="column.key"
+                class="text-text min-w-0 whitespace-nowrap px-4 py-3 text-sm"
+                :class="[column.class, column.key === 'actions' ? 'sticky-actions-td w-px' : '']"
+              >
+                <slot :name="`cell-${column.key}`" :row="row" :value="getValue(row, column.key)" :column="column">
+                  <AppTooltip
+                    v-if="column.truncate && getValue(row, column.key)"
+                    :content="String(getValue(row, column.key))"
+                    placement="top"
+                    :dark="false"
+                  >
+                    <span class="text-text-secondary block max-w-[14rem] truncate text-start text-sm">
+                      {{ display(getValue(row, column.key)) }}
+                    </span>
+                  </AppTooltip>
+                  <template v-else>
+                    {{ display(getValue(row, column.key)) }}
+                  </template>
+                </slot>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- Pagination & Controls -->
+    <!-- ── Bottom bar ─────────────────────────────────────────────── -->
     <div
       v-if="showPagination || showColumnToggle"
-      class="border-border text-text-secondary mt-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-surface px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3"
+      class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
     >
-      <div class="flex flex-wrap items-center gap-3">
-        <span v-if="showPagination" class="text-sm">
-          {{ paginationStart }}–{{ paginationEnd }} {{ ofLabel }} {{ paginationTotal }}
+      <!-- Left: info + controls -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span v-if="showPagination" class="text-text-secondary text-sm tabular-nums">
+          {{ paginationStart }}&ndash;{{ paginationEnd }} {{ ofLabel }} {{ paginationTotal }}
         </span>
+
+        <!-- Page size selector -->
         <div v-if="serverPaginated && pageSizeOptions.length > 0" ref="pageSizeRef" class="relative">
-          <AppTooltip content="Rows per page" placement="top">
-            <button
-              type="button"
-              class="border-border bg-surface text-text hover:bg-muted flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-sm transition-colors"
-              @click="showPageSizeMenu = !showPageSizeMenu"
-            >
-              <span>{{ pageSize }}</span>
-              <AppIcon name="icon-[heroicons-outline--chevron-down]" :size="0.875" class="text-text-secondary" />
-            </button>
-          </AppTooltip>
+          <button
+            type="button"
+            class="border-border bg-surface text-text hover:bg-muted flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors"
+            @click="showPageSizeMenu = !showPageSizeMenu"
+          >
+            {{ pageSize }} / page
+            <AppIcon name="icon-[heroicons-outline--chevron-up-down]" :size="0.75" class="text-text-secondary" />
+          </button>
           <Transition
             enter-active-class="transition duration-100 ease-out"
             enter-from-class="opacity-0 scale-95"
@@ -139,16 +171,13 @@
             leave-from-class="opacity-100 scale-100"
             leave-to-class="opacity-0 scale-95"
           >
-            <div
-              v-if="showPageSizeMenu"
-              class="border-border bg-surface absolute bottom-full end-0 z-50 mb-1.5 min-w-[4rem] origin-bottom rounded-lg border p-1 shadow-lg"
-            >
+            <div v-if="showPageSizeMenu" class="border-border bg-surface absolute bottom-full end-0 z-50 mb-1.5 min-w-[5rem] origin-bottom rounded-xl border p-1 shadow-lg">
               <button
                 v-for="n in pageSizeOptions"
                 :key="n"
                 type="button"
-                class="flex w-full items-center justify-center rounded-md px-3 py-1.5 text-sm transition-colors"
-                :class="n === pageSize ? 'bg-primary/15 text-primary font-medium' : 'text-text hover:bg-muted'"
+                class="flex w-full items-center justify-center rounded-lg px-3 py-1.5 text-sm transition-colors"
+                :class="n === pageSize ? 'bg-primary/10 text-primary font-medium' : 'text-text hover:bg-muted'"
                 @click="selectPageSize(n)"
               >
                 {{ n }}
@@ -156,22 +185,19 @@
             </div>
           </Transition>
         </div>
-        <!-- Column Toggle -->
+
+        <!-- Column toggle -->
         <div v-if="showColumnToggle" ref="columnToggleRef" class="relative">
-          <AppTooltip content="Show / hide columns" placement="top">
-            <button
-              type="button"
-              class="border-border bg-surface text-text hover:bg-muted flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-sm transition-colors"
-              aria-haspopup="true"
-              :aria-expanded="showColumnMenu"
-              @click="showColumnMenu = !showColumnMenu"
-            >
-              <AppIcon name="icon-[heroicons-outline--adjustments-horizontal]" :size="1" />
-              <span class="bg-primary/15 text-primary rounded-full px-1.5 text-xs font-semibold">
-                {{ visibleToggleableCount }}/{{ toggleableColumns.length }}
-              </span>
-            </button>
-          </AppTooltip>
+          <button
+            type="button"
+            class="border-border bg-surface text-text-secondary hover:text-text hover:bg-muted flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors"
+            aria-haspopup="true"
+            :aria-expanded="showColumnMenu"
+            @click="showColumnMenu = !showColumnMenu"
+          >
+            <AppIcon name="icon-[heroicons-outline--view-columns]" :size="1" />
+            <span class="text-text-secondary">{{ visibleToggleableCount }}/{{ toggleableColumns.length }}</span>
+          </button>
           <Transition
             enter-active-class="transition duration-150 ease-out"
             enter-from-class="opacity-0 scale-95 translate-y-1"
@@ -182,10 +208,10 @@
           >
             <div
               v-if="showColumnMenu"
-              class="border-border bg-surface absolute start-0 bottom-full z-50 mb-1.5 min-w-[14rem] origin-bottom-right rounded-xl border p-1.5 shadow-xl shadow-black/10"
+              class="border-border bg-surface absolute start-0 bottom-full z-50 mb-1.5 min-w-[13rem] origin-bottom-left rounded-xl border p-1 shadow-xl shadow-black/8"
             >
-              <div class="flex items-center justify-between px-2.5 pb-1.5 pt-1">
-                <p class="text-text-secondary text-xs font-semibold tracking-wide">Show / hide columns</p>
+              <div class="flex items-center justify-between px-3 py-2">
+                <p class="text-text-secondary text-xs font-semibold">Columns</p>
                 <Transition
                   enter-active-class="transition duration-200 ease-out"
                   enter-from-class="opacity-0 scale-90"
@@ -194,106 +220,92 @@
                   leave-from-class="opacity-100 scale-100"
                   leave-to-class="opacity-0 scale-90"
                 >
-                  <span
-                    v-if="columnSavedHint"
-                    class="text-success bg-success/10 flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[0.625rem] font-medium"
-                  >
-                    <AppIcon name="icon-[heroicons-outline--check]" :size="0.75" />
+                  <span v-if="columnSavedHint" class="text-success bg-success/10 flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium">
+                    <AppIcon name="icon-[heroicons-outline--check]" :size="0.625" />
                     Saved
                   </span>
                 </Transition>
               </div>
-              <div class="border-border mb-1 border-t" />
-              <button
-                v-for="col in toggleableColumns"
-                :key="col.key"
-                type="button"
-                class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-2.5 py-2 text-sm transition-colors"
-                :class="visibleColumnsSet.has(col.key) ? 'text-text hover:bg-muted/60' : 'text-text-secondary hover:bg-muted/40'"
-                @click="toggleColumn(col.key)"
-              >
-                <span class="flex items-center gap-2">
-                  <AppIcon
-                    :name="visibleColumnsSet.has(col.key) ? 'icon-[heroicons-outline--eye]' : 'icon-[heroicons-outline--eye-slash]'"
-                    :size="1.125"
-                    :class="visibleColumnsSet.has(col.key) ? 'text-primary' : 'text-text-secondary/50'"
-                  />
-                  {{ col.label }}
-                </span>
-                <span
-                  class="relative flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200"
-                  :class="visibleColumnsSet.has(col.key) ? 'bg-primary' : 'bg-border'"
+              <div class="border-border border-t" />
+              <div class="py-1">
+                <button
+                  v-for="col in toggleableColumns"
+                  :key="col.key"
+                  type="button"
+                  class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition-colors"
+                  :class="visibleColumnsSet.has(col.key) ? 'text-text hover:bg-muted/60' : 'text-text-secondary/60 hover:bg-muted/40'"
+                  @click="toggleColumn(col.key)"
                 >
+                  <span>{{ col.label }}</span>
                   <span
-                    class="absolute size-3.5 rounded-full bg-white shadow-sm transition-all duration-200"
-                    :class="visibleColumnsSet.has(col.key) ? 'start-[1.125rem]' : 'start-[0.1875rem]'"
-                  />
-                </span>
-              </button>
-              <div class="border-border mt-1 border-t" />
+                    class="flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200"
+                    :class="visibleColumnsSet.has(col.key) ? 'bg-primary' : 'bg-border'"
+                  >
+                    <span
+                      class="size-4 rounded-full bg-white shadow-sm transition-transform duration-200"
+                      :class="visibleColumnsSet.has(col.key) ? 'translate-x-4' : 'translate-x-0'"
+                    />
+                  </span>
+                </button>
+              </div>
+              <div class="border-border border-t" />
               <button
                 type="button"
-                class="text-text-secondary hover:bg-muted/60 hover:text-text mt-1 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs transition-colors"
+                class="text-text-secondary hover:bg-muted/60 hover:text-text mt-0.5 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs transition-colors"
                 @click="resetColumnVisibility"
               >
-                <AppIcon name="icon-[heroicons-outline--arrow-path]" :size="1" />
-                Restore defaults
+                <AppIcon name="icon-[heroicons-outline--arrow-path]" :size="0.875" />
+                Reset defaults
               </button>
             </div>
           </Transition>
         </div>
       </div>
-      <div v-if="showPagination" class="flex items-center gap-1">
+
+      <!-- Right: pagination nav -->
+      <div v-if="showPagination" class="flex items-center gap-1.5">
         <AppButton
           icon="icon-[heroicons-outline--chevron-left]"
-          tooltip="Previous page"
-          variant="outline"
+          tooltip="Previous"
+          variant="ghost"
           size="sm"
+          icon-only
           :disabled="!canGoPrev"
-          class="disabled:opacity-40 disabled:cursor-not-allowed"
           @click="goToPrev"
         />
-        <template v-if="!serverPaginated" v-for="page in visiblePages" :key="page">
+        <template v-if="!serverPaginated">
           <button
+            v-for="page in visiblePages"
+            :key="page"
             type="button"
-            class="border-border min-w-8 h-8 rounded-lg border px-2 text-sm transition-colors"
+            class="flex size-8 items-center justify-center rounded-lg text-sm font-medium transition-colors"
             :class="
               page === currentPageRef
-                ? 'bg-primary border-primary text-white'
-                : 'bg-surface text-text hover:bg-muted'
+                ? 'bg-primary text-white'
+                : 'text-text-secondary hover:bg-muted hover:text-text'
             "
             @click="goToPage(page)"
           >
             {{ page }}
           </button>
         </template>
-        <span
-          v-else
-          class="text-text min-w-8 px-2 text-center text-sm font-medium"
-        >
-          {{ props.pageNumber }}
-        </span>
+        <span v-else class="text-text px-2 text-sm font-medium tabular-nums">{{ props.pageNumber }}</span>
         <AppButton
           icon="icon-[heroicons-outline--chevron-right]"
-          tooltip="Next page"
-          variant="outline"
+          tooltip="Next"
+          variant="ghost"
           size="sm"
+          icon-only
           :disabled="!canGoNext"
-          class="disabled:opacity-40 disabled:cursor-not-allowed"
           @click="goToNext"
         />
       </div>
     </div>
 
-    <!-- Truncate expand modal -->
-    <AppModal
-      :is-open="truncateModalOpen"
-      :title="truncateModalTitle"
-      max-width="sm"
-      @close="truncateModalOpen = false"
-    >
+    <!-- ── Truncate expand modal (kept for backward compat) ───────── -->
+    <AppModal :is-open="truncateModalOpen" :title="truncateModalTitle" max-width="sm" @close="truncateModalOpen = false">
       <div class="p-4">
-        <p dir="auto" class="whitespace-pre-wrap text-sm leading-relaxed text-text">{{ truncateModalContent }}</p>
+        <p dir="auto" class="text-text whitespace-pre-wrap text-sm leading-relaxed">{{ truncateModalContent }}</p>
       </div>
     </AppModal>
   </div>
@@ -317,7 +329,6 @@ export interface TableColumn {
   hideable?: boolean
   defaultHidden?: boolean
   class?: string
-  /** Truncate cell text and show full content in a modal on click */
   truncate?: boolean
 }
 
@@ -334,16 +345,13 @@ interface Props {
   loadingMessage?: string
   ofLabel?: string
   rowKey?: string | ((row: any) => string | number)
-  /** Server-side pagination */
   serverPaginated?: boolean
   pageNumber?: number
   pageSize?: number
   totalCount?: number
   totalPages?: number
-  /** Column visibility */
   showColumnToggle?: boolean
   columnsVisibilityKey?: string
-  /** Page size options for server pagination */
   pageSizeOptions?: number[]
 }
 
@@ -373,7 +381,22 @@ const emit = defineEmits<{
   search: [query: string]
 }>()
 
-// Truncate modal
+// ── Refs ────────────────────────────────────────────────────────────
+const searchInputRef = ref<HTMLInputElement | null>(null)
+const searchQuery = ref('')
+const sortKey = ref<string | null>(null)
+const sortOrder = ref<'asc' | 'desc'>('asc')
+const currentPageRef = ref(1)
+
+// Column toggle
+const showColumnMenu = ref(false)
+const columnToggleRef = ref<HTMLElement | null>(null)
+
+// Page size
+const showPageSizeMenu = ref(false)
+const pageSizeRef = ref<HTMLElement | null>(null)
+
+// Truncate modal (kept for backward compat — truncate now uses tooltips)
 const truncateModalOpen = ref(false)
 const truncateModalTitle = ref('')
 const truncateModalContent = ref('')
@@ -384,19 +407,14 @@ function openTruncateModal(title: string, content: string) {
   truncateModalOpen.value = true
 }
 
-const STORAGE_PREFIX = 'app-table-columns-'
-
-const searchQuery = ref('')
-const sortKey = ref<string | null>(null)
-const sortOrder = ref<'asc' | 'desc'>('asc')
-const currentPageRef = ref(1)
-const showColumnMenu = ref(false)
-const columnToggleRef = ref<HTMLElement | null>(null)
-const showPageSizeMenu = ref(false)
-const pageSizeRef = ref<HTMLElement | null>(null)
-
 onClickOutside(columnToggleRef, () => { showColumnMenu.value = false })
 onClickOutside(pageSizeRef, () => { showPageSizeMenu.value = false })
+
+// ── Skeleton rows ───────────────────────────────────────────────────
+const skeletonRows = computed(() => Math.min(props.itemsPerPage, 5))
+
+// ── Column visibility ───────────────────────────────────────────────
+const STORAGE_PREFIX = 'app-table-columns-'
 
 function loadColumnVisibility(): Record<string, boolean> {
   if (!props.columnsVisibilityKey) return {}
@@ -405,7 +423,6 @@ function loadColumnVisibility(): Record<string, boolean> {
     if (!raw) return {}
     const parsed = JSON.parse(raw)
     if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
-    // Only keep entries whose values are booleans to prevent injection
     const safe: Record<string, boolean> = Object.create(null)
     for (const [key, value] of Object.entries(parsed)) {
       if (typeof value === 'boolean') safe[key] = value
@@ -420,9 +437,7 @@ function saveColumnVisibility(visibility: Record<string, boolean>) {
   if (!props.columnsVisibilityKey) return
   try {
     localStorage.setItem(STORAGE_PREFIX + props.columnsVisibilityKey, JSON.stringify(visibility))
-  } catch {
-    /* ignore */
-  }
+  } catch { /* ignore */ }
 }
 
 const columnVisibility = ref<Record<string, boolean>>(loadColumnVisibility())
@@ -435,9 +450,7 @@ function showSavedHint() {
   savedHintTimer = setTimeout(() => { columnSavedHint.value = false }, 1500)
 }
 
-const toggleableColumns = computed(() =>
-  props.columns.filter((c) => c.hideable !== false)
-)
+const toggleableColumns = computed(() => props.columns.filter((c) => c.hideable !== false))
 
 const visibleColumnsSet = computed(() => {
   const saved = columnVisibility.value
@@ -454,9 +467,7 @@ const visibleColumnsSet = computed(() => {
   return set
 })
 
-const visibleColumns = computed(() =>
-  props.columns.filter((c) => visibleColumnsSet.value.has(c.key))
-)
+const visibleColumns = computed(() => props.columns.filter((c) => visibleColumnsSet.value.has(c.key)))
 
 const visibleToggleableCount = computed(() =>
   toggleableColumns.value.filter((c) => visibleColumnsSet.value.has(c.key)).length
@@ -464,8 +475,7 @@ const visibleToggleableCount = computed(() =>
 
 function toggleColumn(key: string) {
   const currentlyVisible = visibleColumnsSet.value.has(key)
-  const visibleCount = visibleColumnsSet.value.size
-  if (currentlyVisible && visibleCount <= 1) return
+  if (currentlyVisible && visibleColumnsSet.value.size <= 1) return
   const nextVisibility = { ...columnVisibility.value, [key]: !currentlyVisible }
   columnVisibility.value = nextVisibility
   saveColumnVisibility(nextVisibility)
@@ -480,8 +490,19 @@ function resetColumnVisibility() {
   showSavedHint()
 }
 
+// ── Sort ────────────────────────────────────────────────────────────
 const isColumnSortable = (column: TableColumn): boolean => column.sortable === true
 
+const handleSort = (key: string) => {
+  if (sortKey.value === key) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortKey.value = key
+    sortOrder.value = 'asc'
+  }
+}
+
+// ── Row helpers ─────────────────────────────────────────────────────
 const getRowKey = (row: any, index: number): string | number => {
   if (typeof props.rowKey === 'function') return props.rowKey(row)
   return row[props.rowKey] ?? index
@@ -501,6 +522,7 @@ const parseSortValue = (val: any): string | number | Date => {
   return String(val).toLowerCase()
 }
 
+// ── Data pipeline ───────────────────────────────────────────────────
 const filteredData = computed(() => {
   let result = [...props.data]
   if (props.searchable && searchQuery.value) {
@@ -521,58 +543,32 @@ const filteredData = computed(() => {
   return result
 })
 
-const clientTotalPages = computed(() =>
-  props.paginated ? Math.ceil(filteredData.value.length / props.itemsPerPage) : 1
-)
+const clientTotalPages = computed(() => props.paginated ? Math.ceil(filteredData.value.length / props.itemsPerPage) : 1)
+const clientStartIndex = computed(() => props.paginated ? (currentPageRef.value - 1) * props.itemsPerPage : 0)
+const clientEndIndex = computed(() => props.paginated ? Math.min(clientStartIndex.value + props.itemsPerPage, filteredData.value.length) : filteredData.value.length)
+const clientPaginatedData = computed(() => props.paginated ? filteredData.value.slice(clientStartIndex.value, clientEndIndex.value) : filteredData.value)
+const displayData = computed(() => props.serverPaginated ? props.data : clientPaginatedData.value)
 
-const clientStartIndex = computed(() =>
-  props.paginated ? (currentPageRef.value - 1) * props.itemsPerPage : 0
-)
-
-const clientEndIndex = computed(() =>
-  props.paginated
-    ? Math.min(clientStartIndex.value + props.itemsPerPage, filteredData.value.length)
-    : filteredData.value.length
-)
-
-const clientPaginatedData = computed(() =>
-  props.paginated ? filteredData.value.slice(clientStartIndex.value, clientEndIndex.value) : filteredData.value
-)
-
-const displayData = computed(() =>
-  props.serverPaginated ? props.data : clientPaginatedData.value
-)
-
+// ── Pagination ──────────────────────────────────────────────────────
 const showPagination = computed(() => {
   if (props.serverPaginated) return props.totalCount > 0
   return props.paginated && clientTotalPages.value > 1
 })
 
 const paginationStart = computed(() => {
-  if (props.serverPaginated) {
-    return props.totalCount === 0 ? 0 : (props.pageNumber - 1) * props.pageSize + 1
-  }
+  if (props.serverPaginated) return props.totalCount === 0 ? 0 : (props.pageNumber - 1) * props.pageSize + 1
   return props.totalCount === 0 ? 0 : clientStartIndex.value + 1
 })
 
 const paginationEnd = computed(() => {
-  if (props.serverPaginated) {
-    return Math.min(props.pageNumber * props.pageSize, props.totalCount)
-  }
+  if (props.serverPaginated) return Math.min(props.pageNumber * props.pageSize, props.totalCount)
   return clientEndIndex.value
 })
 
-const paginationTotal = computed(() =>
-  props.serverPaginated ? props.totalCount : filteredData.value.length
-)
+const paginationTotal = computed(() => props.serverPaginated ? props.totalCount : filteredData.value.length)
 
-const canGoPrev = computed(() =>
-  props.serverPaginated ? props.pageNumber > 1 : currentPageRef.value > 1
-)
-
-const canGoNext = computed(() =>
-  props.serverPaginated ? props.pageNumber < props.totalPages : currentPageRef.value < clientTotalPages.value
-)
+const canGoPrev = computed(() => props.serverPaginated ? props.pageNumber > 1 : currentPageRef.value > 1)
+const canGoNext = computed(() => props.serverPaginated ? props.pageNumber < props.totalPages : currentPageRef.value < clientTotalPages.value)
 
 const visiblePages = computed(() => {
   const pages: number[] = []
@@ -585,19 +581,8 @@ const visiblePages = computed(() => {
   return pages
 })
 
-const handleSort = (key: string) => {
-  if (sortKey.value === key) {
-    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
-  } else {
-    sortKey.value = key
-    sortOrder.value = 'asc'
-  }
-}
-
 const goToPage = (page: number) => {
-  if (page >= 1 && page <= clientTotalPages.value) {
-    currentPageRef.value = page
-  }
+  if (page >= 1 && page <= clientTotalPages.value) currentPageRef.value = page
 }
 
 const goToPrev = () => {
@@ -608,11 +593,6 @@ const goToPrev = () => {
   }
 }
 
-function selectPageSize(size: number) {
-  showPageSizeMenu.value = false
-  emit('pageChange', { pageNumber: 1, pageSize: size })
-}
-
 const goToNext = () => {
   if (props.serverPaginated) {
     if (props.pageNumber < props.totalPages) emit('pageChange', { pageNumber: props.pageNumber + 1, pageSize: props.pageSize })
@@ -621,6 +601,12 @@ const goToNext = () => {
   }
 }
 
+function selectPageSize(size: number) {
+  showPageSizeMenu.value = false
+  emit('pageChange', { pageNumber: 1, pageSize: size })
+}
+
+// ── Watchers ────────────────────────────────────────────────────────
 watch(() => props.data, () => { currentPageRef.value = 1 })
 watch(searchQuery, () => { currentPageRef.value = 1 })
 
@@ -631,25 +617,7 @@ watch(searchQuery, (q) => {
 </script>
 
 <style scoped>
-/* ── Header ── */
-.table-th {
-  background: linear-gradient(to bottom, var(--color-muted, #f3f4f6), color-mix(in srgb, var(--color-muted, #f3f4f6) 70%, var(--color-surface, #fff)));
-  color: var(--color-text, #1f2937);
-  text-transform: none;
-  letter-spacing: 0.01em;
-}
-
-/* ── Row hover: lift above sticky header so tooltips are visible ── */
-.table-row-data {
-  position: relative;
-  z-index: 0;
-}
-
-.table-row-data:hover {
-  z-index: 12;
-}
-
-/* ── Sticky actions column ── */
+/* Sticky actions column */
 .sticky-actions-th,
 .sticky-actions-td {
   position: sticky;
@@ -658,33 +626,38 @@ watch(searchQuery, (q) => {
 
 .sticky-actions-th {
   z-index: 11;
-  background: linear-gradient(to bottom, var(--color-muted, #f3f4f6), color-mix(in srgb, var(--color-muted, #f3f4f6) 70%, var(--color-surface, #fff)));
-  border-inline-start: 1px solid var(--color-border, #e5e7eb);
+  background: color-mix(in srgb, var(--color-muted, #f3f4f6) 60%, transparent);
 }
 
 .sticky-actions-td {
+  z-index: 10;
   background: var(--color-surface, #fff);
-  border-inline-start: 1px solid var(--color-border, #e5e7eb);
-}
-
-tr:nth-child(even) > .sticky-actions-td {
-  background: color-mix(in srgb, var(--color-muted, #f3f4f6) 20%, var(--color-surface, #fff));
 }
 
 tr:hover > .sticky-actions-td {
-  background: color-mix(in srgb, var(--color-muted, #f3f4f6) 50%, var(--color-surface, #fff));
+  background: color-mix(in srgb, var(--color-primary, #3b82f6) 3%, var(--color-surface, #fff));
 }
 
-/* Shadow edge for sticky column */
+/* Fade-in edge for sticky column */
 .sticky-actions-th::before,
 .sticky-actions-td::before {
   content: '';
   position: absolute;
   top: 0;
-  inset-inline-start: -1.5rem;
+  inset-inline-start: -1rem;
   bottom: 0;
-  width: 1.5rem;
+  width: 1rem;
   pointer-events: none;
-  background: linear-gradient(to right, transparent, rgb(0 0 0 / 0.06));
+  background: linear-gradient(to right, transparent, rgb(0 0 0 / 0.04));
+}
+
+/* Row data hover lift for tooltips */
+.table-row-data {
+  position: relative;
+  z-index: 0;
+}
+
+.table-row-data:hover {
+  z-index: 12;
 }
 </style>
