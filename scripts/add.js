@@ -118,6 +118,17 @@ const collectMissing = (name, depMap, visited = new Set()) => {
   return [...new Set(missing)];
 };
 
+// ─── template file requirements ──────────────────────────────────────────────
+// Walks `requires.files` for every item being installed, aggregates the set,
+// and returns only the ones missing from the consumer's working directory.
+const collectMissingFiles = (names, requiresMap) => {
+  const required = new Set();
+  for (const n of names) {
+    for (const f of requiresMap[n]?.files ?? []) required.add(f);
+  }
+  return [...required].filter((f) => !fs.existsSync(path.join(process.cwd(), f)));
+};
+
 // ─── install ─────────────────────────────────────────────────────────────────
 
 const installItem = async (name, lock) => {
@@ -253,7 +264,9 @@ const addCommand = async (name) => {
     console.log(`  ! Registry unreachable: ${err.message}`);
     process.exit(1);
   }
-  const depMap = res.ok ? ((await res.json()).dependencies ?? {}) : {};
+  const index = res.ok ? await res.json() : {};
+  const depMap = index.dependencies ?? {};
+  const requiresMap = index.requires ?? {};
   if (!res.ok) {
     console.log('  ! Registry index unavailable — skipping dep check.');
   }
@@ -264,6 +277,17 @@ const addCommand = async (name) => {
   lock.installed = lock.installed ?? {};
 
   const missing = noDeps ? [] : collectMissing(name, depMap);
+
+  // Check that every template file the item(s) need is present BEFORE we
+  // fetch anything. No schema validator, just existence of relative paths.
+  const allToInstall = [name, ...missing];
+  const missingFiles = collectMissingFiles(allToInstall, requiresMap);
+  if (missingFiles.length > 0) {
+    console.log(`\n  ✗ ${name} requires template files that are missing:\n`);
+    for (const f of missingFiles) console.log(`      ${f}`);
+    console.log(`\n  Create these files (or pull them from the template) and retry.\n`);
+    process.exit(1);
+  }
 
   if (missing.length > 0) {
     const components = missing.filter((d) => !isComposableName(d));

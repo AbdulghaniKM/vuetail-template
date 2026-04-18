@@ -70,6 +70,117 @@
   color-scheme: light;
 }
 
+/* ─── Brand presets (src/theme.ts) ──────────────────────────────────────────
+   Each [data-brand=X] block overrides --color-primary / --color-secondary /
+   --color-accent / --color-link / --color-link-hover / --color-emphasis for
+   light mode. The [data-theme="dark"][data-brand=X] block overrides for dark.
+   Attribute selectors outrank `:root` so these win over the defaults above.
+   ────────────────────────────────────────────────────────────────────────── */
+
+html[data-brand='neutral'] {
+  --color-primary: #3b82f6;
+  --color-secondary: #8b5cf6;
+  --color-accent: #f59e0b;
+  --color-link: #3b82f6;
+  --color-link-hover: #2563eb;
+  --color-emphasis: #1e40af;
+}
+html[data-theme='dark'][data-brand='neutral'] {
+  --color-primary: #60a5fa;
+  --color-secondary: #a78bfa;
+  --color-accent: #fbbf24;
+  --color-link: #60a5fa;
+  --color-link-hover: #93bbfd;
+  --color-emphasis: #60a5fa;
+}
+
+html[data-brand='ocean'] {
+  --color-primary: #0ea5e9;
+  --color-secondary: #6366f1;
+  --color-accent: #22d3ee;
+  --color-link: #0284c7;
+  --color-link-hover: #0369a1;
+  --color-emphasis: #075985;
+}
+html[data-theme='dark'][data-brand='ocean'] {
+  --color-primary: #38bdf8;
+  --color-secondary: #818cf8;
+  --color-accent: #67e8f9;
+  --color-link: #38bdf8;
+  --color-link-hover: #7dd3fc;
+  --color-emphasis: #38bdf8;
+}
+
+html[data-brand='sunset'] {
+  --color-primary: #f97316;
+  --color-secondary: #a855f7;
+  --color-accent: #ec4899;
+  --color-link: #ea580c;
+  --color-link-hover: #c2410c;
+  --color-emphasis: #9a3412;
+}
+html[data-theme='dark'][data-brand='sunset'] {
+  --color-primary: #fb923c;
+  --color-secondary: #c084fc;
+  --color-accent: #f472b6;
+  --color-link: #fb923c;
+  --color-link-hover: #fdba74;
+  --color-emphasis: #fb923c;
+}
+
+html[data-brand='forest'] {
+  --color-primary: #10b981;
+  --color-secondary: #14b8a6;
+  --color-accent: #84cc16;
+  --color-link: #059669;
+  --color-link-hover: #047857;
+  --color-emphasis: #065f46;
+}
+html[data-theme='dark'][data-brand='forest'] {
+  --color-primary: #34d399;
+  --color-secondary: #2dd4bf;
+  --color-accent: #a3e635;
+  --color-link: #34d399;
+  --color-link-hover: #6ee7b7;
+  --color-emphasis: #34d399;
+}
+
+html[data-brand='mono'] {
+  --color-primary: #374151;
+  --color-secondary: #6b7280;
+  --color-accent: #9ca3af;
+  --color-link: #374151;
+  --color-link-hover: #111827;
+  --color-emphasis: #111827;
+}
+html[data-theme='dark'][data-brand='mono'] {
+  --color-primary: #e5e7eb;
+  --color-secondary: #9ca3af;
+  --color-accent: #d1d5db;
+  --color-link: #e5e7eb;
+  --color-link-hover: #f9fafb;
+  --color-emphasis: #f9fafb;
+}
+
+/* ─── Shape knob (overrides Tailwind's --radius-* scale) ───────────────── */
+html[data-shape='square'] {
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+}
+
+html[data-shape='pill'] {
+  --radius-sm: 9999px;
+  --radius-md: 9999px;
+  --radius-lg: 9999px;
+  --radius-xl: 9999px;
+  --radius-2xl: 9999px;
+  --radius-3xl: 9999px;
+}
+
 /* Smooth theme transitions — only applied during an active theme swap.
    The `theme-switching` class is toggled on <html> by applyThemeToDOM
    (utils/theme.ts) for ~300ms. Keeps transitions off `*` the rest of the

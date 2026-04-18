@@ -39,7 +39,7 @@ cp .env.example .env
 ```
 src/
 ├── components/
-│   ├── global/              # Reusable UI components
+│   ├── ui/                  # Registry-installed UI components (shadcn-style)
 │   │   ├── Fields/          # Form field components
 │   │   │   ├── AppForm.vue        # Declarative form builder with Zod validation
 │   │   │   ├── InputField.vue     # Text/email/password/number input

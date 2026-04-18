@@ -1,5 +1,5 @@
 import axios, { AxiosError, type AxiosRequestConfig, type InternalAxiosRequestConfig } from 'axios';
-import { getApiUrl } from '../config/env';
+import { getApiUrl } from '@/config/env';
 
 export interface AuthProvider {
   getToken?: () => string | null | undefined;
@@ -7,10 +7,17 @@ export interface AuthProvider {
   onUnauthorized?: () => void;
 }
 
-let authProvider: AuthProvider = {};
+type AuthStore = {
+  provider: AuthProvider;
+  refreshPromise: Promise<string | null> | null;
+};
+
+const g = globalThis as typeof globalThis & { __vuetailAuth?: AuthStore };
+const store: AuthStore = g.__vuetailAuth ?? (g.__vuetailAuth = { provider: {}, refreshPromise: null });
 
 export const setAuthProvider = (provider: AuthProvider): void => {
-  authProvider = { ...authProvider, ...provider };
+  store.refreshPromise = null;
+  store.provider = { ...store.provider, ...provider };
 };
 
 const api = axios.create({
@@ -26,7 +33,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = authProvider.getToken?.();
+    const token = store.provider.getToken?.();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -37,16 +44,14 @@ api.interceptors.request.use(
 
 type RetryableRequest = AxiosRequestConfig & { _retry?: boolean };
 
-let refreshPromise: Promise<string | null> | null = null;
-
 const performRefresh = (): Promise<string | null> => {
-  if (refreshPromise) return refreshPromise;
-  const refresh = authProvider.refreshToken;
+  if (store.refreshPromise) return store.refreshPromise;
+  const refresh = store.provider.refreshToken;
   if (!refresh) return Promise.resolve(null);
-  refreshPromise = refresh().finally(() => {
-    refreshPromise = null;
+  store.refreshPromise = refresh().finally(() => {
+    store.refreshPromise = null;
   });
-  return refreshPromise;
+  return store.refreshPromise;
 };
 
 api.interceptors.response.use(
@@ -58,8 +63,8 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (!authProvider.refreshToken) {
-      authProvider.onUnauthorized?.();
+    if (!store.provider.refreshToken) {
+      store.provider.onUnauthorized?.();
       return Promise.reject(error);
     }
 
@@ -68,7 +73,7 @@ api.interceptors.response.use(
     try {
       const newToken = await performRefresh();
       if (!newToken) {
-        authProvider.onUnauthorized?.();
+        store.provider.onUnauthorized?.();
         return Promise.reject(error);
       }
       if (originalRequest.headers) {
@@ -76,10 +81,69 @@ api.interceptors.response.use(
       }
       return api(originalRequest);
     } catch (refreshError) {
-      authProvider.onUnauthorized?.();
+      store.provider.onUnauthorized?.();
       return Promise.reject(refreshError);
     }
   },
 );
 
 export default api;
+
+export const apiGet = <T>(url: string, cfg?: AxiosRequestConfig) =>
+  api.get<T>(url, cfg).then((r) => r.data);
+
+export const apiPost = <T, B = unknown>(url: string, body?: B, cfg?: AxiosRequestConfig) =>
+  api.post<T>(url, body, cfg).then((r) => r.data);
+
+export const apiPut = <T, B = unknown>(url: string, body?: B, cfg?: AxiosRequestConfig) =>
+  api.put<T>(url, body, cfg).then((r) => r.data);
+
+export const apiPatch = <T, B = unknown>(url: string, body?: B, cfg?: AxiosRequestConfig) =>
+  api.patch<T>(url, body, cfg).then((r) => r.data);
+
+export const apiDelete = <T>(url: string, cfg?: AxiosRequestConfig) =>
+  api.delete<T>(url, cfg).then((r) => r.data);
+
+export interface ErrorToastOptions {
+  onError: (message: string, opts?: { title?: string }) => void;
+  messages?: {
+    forbidden?: string;
+    serverError?: string;
+    network?: string;
+  };
+}
+
+let errorInterceptorId: number | null = null;
+
+export const registerErrorToasts = (options: ErrorToastOptions): void => {
+  if (errorInterceptorId !== null) api.interceptors.response.eject(errorInterceptorId);
+  const msgs = {
+    forbidden: "You don't have permission to do that.",
+    serverError: 'Something went wrong on our end. Please try again.',
+    network: 'Network error — check your connection.',
+    ...options.messages,
+  };
+
+  errorInterceptorId = api.interceptors.response.use(
+    (r) => r,
+    (error: AxiosError) => {
+      const status = error.response?.status;
+      if (!error.response) {
+        options.onError(msgs.network);
+      } else if (status === 403) {
+        options.onError(msgs.forbidden);
+      } else if (status && status >= 500) {
+        options.onError(msgs.serverError);
+      }
+      // 401 is handled by the refresh interceptor — don't toast it.
+      return Promise.reject(error);
+    },
+  );
+};
+
+export const unregisterErrorToasts = (): void => {
+  if (errorInterceptorId !== null) {
+    api.interceptors.response.eject(errorInterceptorId);
+    errorInterceptorId = null;
+  }
+};
