@@ -78,6 +78,7 @@ const removeStructuredData = (): void => {
 };
 
 export const useSeo = (config: SeoConfig): void => {
+  if (typeof document === 'undefined') return;
   // Title
   if (config.title) {
     document.title = config.title;
@@ -156,6 +157,7 @@ export const useSeo = (config: SeoConfig): void => {
 };
 
 export const clearSeo = (): void => {
+  if (typeof document === 'undefined') return;
   // Remove common meta tags
   const metaTagsToRemove = [
     'description',

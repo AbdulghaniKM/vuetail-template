@@ -10,6 +10,11 @@ const loadedFonts = new Set<string>();
 
 export const loadFont = (config: FontConfig): Promise<void> => {
   return new Promise((resolve, reject) => {
+    if (typeof document === 'undefined' || typeof FontFace === 'undefined') {
+      resolve();
+      return;
+    }
+
     if (loadedFonts.has(config.name)) {
       resolve();
       return;
@@ -37,6 +42,7 @@ export const loadFont = (config: FontConfig): Promise<void> => {
 };
 
 export const preloadFont = (src: string, as: string = 'font', type?: string): void => {
+  if (typeof document === 'undefined') return;
   const link = document.createElement('link');
   link.rel = 'preload';
   link.href = src;
@@ -49,6 +55,7 @@ export const preloadFont = (src: string, as: string = 'font', type?: string): vo
 };
 
 export const registerFontFamily = (config: FontFamilyConfig): void => {
+  if (typeof document === 'undefined') return;
   const fallbacks = config.fallbacks ? `, ${config.fallbacks.join(', ')}` : '';
   const fontFamily = `'${config.name}'${fallbacks}`;
 

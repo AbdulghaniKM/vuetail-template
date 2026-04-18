@@ -70,19 +70,33 @@
   color-scheme: light;
 }
 
-/* Smooth theme transitions */
-* {
+/* Smooth theme transitions — only applied during an active theme swap.
+   The `theme-switching` class is toggled on <html> by applyThemeToDOM
+   (utils/theme.ts) for ~300ms. Keeps transitions off `*` the rest of the
+   time so hover/focus doesn't repaint huge subtrees. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
   transition-property: background-color, border-color, color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-switching *,
+  html.theme-switching *::before,
+  html.theme-switching *::after {
+    transition-duration: 0ms !important;
+  }
 }
 
 body {
   font-family: var(--font-primary);
 }
 
-/* Custom scrollbar - theme-aware, slim & smooth */
-* {
+/* Custom scrollbar - theme-aware, slim & smooth.
+   Scoped to html/body (not `*`) to avoid overriding component scrollers. */
+html {
   scrollbar-width: thin;
   scrollbar-color: var(--color-primary) transparent;
 }

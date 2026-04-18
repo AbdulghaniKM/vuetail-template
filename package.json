@@ -10,7 +10,8 @@
     "lint": "eslint . --ext .vue,.ts,.js",
     "format": "prettier --write .",
     "add-component": "node scripts/add.js",
-    "add-composable": "node scripts/add.js --composable"
+    "add-composable": "node scripts/add.js --composable",
+    "vuetail:verify": "node scripts/add.js verify"
   },
   "dependencies": {
     "@vueuse/core": "^13.1.0",

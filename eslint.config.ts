@@ -3,6 +3,22 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 import vue from 'eslint-plugin-vue';
 import tseslint from 'typescript-eslint';
 
+// Minimal Node globals for scripts that run under `node` (not Vite).
+// Avoids pulling in the `globals` npm package.
+const nodeGlobals = {
+  process: 'readonly',
+  console: 'readonly',
+  setTimeout: 'readonly',
+  clearTimeout: 'readonly',
+  setInterval: 'readonly',
+  clearInterval: 'readonly',
+  AbortController: 'readonly',
+  fetch: 'readonly',
+  Buffer: 'readonly',
+  __dirname: 'readonly',
+  __filename: 'readonly',
+} as const;
+
 export default tseslint.config(
   // Base ESLint recommended rules
   eslint.configs.recommended,
@@ -31,6 +47,17 @@ export default tseslint.config(
       'vue/multi-word-component-names': 'off',
       'no-console': 'warn',
       'no-debugger': 'warn',
+    },
+  },
+
+  // Node scripts run outside Vite — give them Node globals.
+  {
+    files: ['scripts/**/*.js', 'scripts/**/*.ts'],
+    languageOptions: {
+      globals: nodeGlobals,
+    },
+    rules: {
+      'no-console': 'off',
     },
   },
 

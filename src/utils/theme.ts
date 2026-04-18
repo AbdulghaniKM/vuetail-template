@@ -72,8 +72,9 @@ const generateColorVariables = (palette: ColorPalette): string => {
 };
 
 export const applyTheme = (theme: ThemeConfig): void => {
+  if (typeof document === 'undefined') return;
   const styleId = 'app-theme-variables';
-  let styleElement = document.getElementById(styleId) as HTMLStyleElement;
+  let styleElement = document.getElementById(styleId) as HTMLStyleElement | null;
 
   if (!styleElement) {
     styleElement = document.createElement('style');
@@ -84,16 +85,30 @@ export const applyTheme = (theme: ThemeConfig): void => {
   styleElement.textContent = generateCSSVariables(theme);
 };
 
+let transitionTimer: ReturnType<typeof setTimeout> | null = null;
+
 export const getSystemTheme = (): 'light' | 'dark' => {
   if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
 export const applyThemeToDOM = (theme: 'light' | 'dark' | 'system'): void => {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+
+  // Scope transitions to a ~300ms window after a theme swap. Avoids the
+  // universal `* { transition }` perf cost on every hover/focus.
+  root.classList.add('theme-switching');
+  if (transitionTimer) clearTimeout(transitionTimer);
+  transitionTimer = setTimeout(() => {
+    root.classList.remove('theme-switching');
+    transitionTimer = null;
+  }, 300);
+
   if (theme === 'system') {
-    document.documentElement.removeAttribute('data-theme');
+    root.removeAttribute('data-theme');
   } else {
-    document.documentElement.setAttribute('data-theme', theme);
+    root.setAttribute('data-theme', theme);
   }
 };
 

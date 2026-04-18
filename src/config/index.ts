@@ -7,13 +7,25 @@ import type { AppConfig } from './types';
 export { appConfig };
 export type { AppConfig };
 
+const readStoredTheme = (): 'light' | 'dark' | null => {
+  if (typeof window === 'undefined') return null;
+  const raw = localStorage.getItem('app-theme');
+  if (!raw) return null;
+  // Tolerate both raw strings ("dark") and JSON-encoded strings ('"dark"')
+  // that useTheme (via useLocalStorage) may write.
+  const value = raw.startsWith('"') ? raw.slice(1, -1) : raw;
+  return value === 'light' || value === 'dark' ? value : null;
+};
+
 export const initializeConfig = (): void => {
+  if (typeof document === 'undefined') return;
+
   // Apply theme
   applyTheme(appConfig.theme);
 
   // Set initial theme from storage or config default
-  const stored = typeof window !== 'undefined' ? localStorage.getItem('app-theme') : null;
-  const initialMode = stored === 'light' || stored === 'dark' ? stored : (appConfig.theme.defaultTheme || 'system');
+  const stored = readStoredTheme();
+  const initialMode = stored ?? (appConfig.theme.defaultTheme || 'system');
   const resolvedTheme = initialMode === 'system' ? getSystemTheme() : initialMode;
   applyThemeToDOM(resolvedTheme);
 
@@ -87,3 +99,5 @@ export const initializeConfig = (): void => {
     document.documentElement.lang = appConfig.app.language;
   }
 };
+
+export { readStoredTheme };

@@ -1,5 +1,5 @@
 import api from '../plugins/axios';
-import axios, { type AxiosProgressEvent, type AxiosRequestConfig, CancelTokenSource } from 'axios';
+import axios, { type AxiosProgressEvent, type AxiosRequestConfig, type CancelTokenSource } from 'axios';
 import { API_PATHS } from '../config/api-paths';
 import { formatFileSize, getFileExtension } from '../utils/file';
 

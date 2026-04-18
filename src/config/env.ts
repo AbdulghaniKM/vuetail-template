@@ -38,13 +38,22 @@ export const getApiUrl = (): string => {
 };
 
 export const getAppUrl = (): string => {
-  return getEnv('VITE_APP_URL', window.location.origin);
+  const fallback = typeof window !== 'undefined' ? window.location.origin : '';
+  return getEnv('VITE_APP_URL', fallback);
 };
 
 export const envConfig = {
-  apiUrl: getApiUrl(),
-  appUrl: getAppUrl(),
-  isDev: isDev(),
-  isProd: isProd(),
+  get apiUrl() {
+    return getApiUrl();
+  },
+  get appUrl() {
+    return getAppUrl();
+  },
+  get isDev() {
+    return isDev();
+  },
+  get isProd() {
+    return isProd();
+  },
   mode: env.MODE || 'development',
 };
