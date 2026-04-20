@@ -233,7 +233,10 @@ const listCommand = async () => {
 const verifyCommand = async () => {
   const lock = readLockfile();
   const entries = Object.entries(lock.installed ?? {});
-  if (!entries.length) { console.log('No installed items recorded in vuetail.json.'); return; }
+  if (!entries.length) {
+    console.log('No installed items recorded in vuetail.json.');
+    return 0;
+  }
   let drift = 0;
   for (const [name, rec] of entries) {
     const p = localFilePath(name);
@@ -244,25 +247,35 @@ const verifyCommand = async () => {
     }
     const sha = sha256(fs.readFileSync(p, 'utf8'));
     if (sha !== rec.sha) {
-      console.log(`  ! ${name} — drift (expected ${rec.sha.slice(0, 8)}, got ${sha.slice(0, 8)})`);
+      console.log(
+        `  ! ${name} — drift (expected ${rec.sha.slice(0, 8)}, got ${sha.slice(
+          0,
+          8
+        )})`
+      );
       drift++;
     } else {
       console.log(`  ✓ ${name}`);
     }
   }
-  console.log(`\n${drift === 0 ? 'All files match.' : `${drift} drifted / missing.`}`);
-  process.exit(drift === 0 ? 0 : 1);
+  console.log(
+    `\n${drift === 0 ? 'All files match.' : `${drift} drifted / missing.`}`
+  );
+  return drift === 0 ? 0 : 1;
 };
 
 const addCommand = async (name) => {
   if (ref === 'main') {
-    console.log(`  ! Using ref 'main' — output is not reproducible. Pin with --ref <tag|sha>.\n`);
+    console.log(
+      `  ! Using ref 'main' — output is not reproducible. Pin with --ref <tag|sha>.\n`
+    );
   }
 
   let res;
-  try { res = await fetchWithRetry(REGISTRY_INDEX); } catch (err) {
-    console.log(`  ! Registry unreachable: ${err.message}`);
-    process.exit(1);
+  try {
+    res = await fetchWithRetry(REGISTRY_INDEX);
+  } catch (err) {
+    throw new Error(`Registry unreachable: ${err.message}`);
   }
   const index = res.ok ? await res.json() : {};
   const depMap = index.dependencies ?? {};
@@ -285,29 +298,53 @@ const addCommand = async (name) => {
   if (missingFiles.length > 0) {
     console.log(`\n  ✗ ${name} requires template files that are missing:\n`);
     for (const f of missingFiles) console.log(`      ${f}`);
-    console.log(`\n  Create these files (or pull them from the template) and retry.\n`);
-    process.exit(1);
+    console.log(
+      `\n  Create these files (or pull them from the template) and retry.\n`
+    );
+    return 1;
   }
 
   if (missing.length > 0) {
     const components = missing.filter((d) => !isComposableName(d));
     const composables = missing.filter((d) => isComposableName(d));
-    console.log(`\n  Installing ${name} + ${missing.length} missing dep${missing.length > 1 ? 's' : ''}:\n`);
+    console.log(
+      `\n  Installing ${name} + ${missing.length} missing dep${
+        missing.length > 1 ? 's' : ''
+      }:\n`
+    );
     if (components.length) console.log(`  Components : ${components.join(', ')}`);
-    if (composables.length) console.log(`  Composables: ${composables.join(', ')}`);
+    if (composables.length)
+      console.log(`  Composables: ${composables.join(', ')}`);
     console.log('');
     for (const dep of missing) await installItem(dep, lock);
     console.log('');
   }
 
-  await installItem(name, lock);
+  const success = await installItem(name, lock);
   writeLockfile(lock);
   console.log('');
+  return success ? 0 : 1;
 };
 
 // ─── entry ───────────────────────────────────────────────────────────────────
 
-if (!command || command === '--help' || command === '-h') { showHelp(); process.exit(0); }
-if (command === 'list') { await listCommand(); process.exit(0); }
-if (command === 'verify') { await verifyCommand(); process.exit(0); }
-await addCommand(command);
+async function run() {
+  if (!command || command === '--help' || command === '-h') {
+    showHelp();
+    return;
+  }
+  let code = 0;
+  if (command === 'list') {
+    await listCommand();
+  } else if (command === 'verify') {
+    code = await verifyCommand();
+  } else {
+    code = await addCommand(command);
+  }
+  if (code !== 0) process.exit(code);
+}
+
+run().catch((err) => {
+  console.error(`\n  ✗ Fatal error: ${err.message}`);
+  process.exit(1);
+});
