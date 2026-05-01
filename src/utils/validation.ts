@@ -74,7 +74,7 @@ export const min = (minValue: number, message?: string): ValidationRule => {
   return (value: any) => {
     if (!value) return true;
     const num = Number(value);
-    return !isNaN(num) && num >= minValue || message || `Must be at least ${minValue}`;
+    return (!isNaN(num) && num >= minValue) || message || `Must be at least ${minValue}`;
   };
 };
 
@@ -82,7 +82,7 @@ export const max = (maxValue: number, message?: string): ValidationRule => {
   return (value: any) => {
     if (!value) return true;
     const num = Number(value);
-    return !isNaN(num) && num <= maxValue || message || `Must be no more than ${maxValue}`;
+    return (!isNaN(num) && num <= maxValue) || message || `Must be no more than ${maxValue}`;
   };
 };
 
@@ -96,7 +96,6 @@ export const pattern = (regex: RegExp, message: string = 'Invalid format'): Vali
 export const validateField = (field: FieldValidation): ValidationResult => {
   const errors: string[] = [];
 
-  // Check required
   if (field.required) {
     const requiredRule = required();
     const requiredResult = requiredRule(field.value);
@@ -106,7 +105,6 @@ export const validateField = (field: FieldValidation): ValidationResult => {
     }
   }
 
-  // Check rules
   for (const rule of field.rules) {
     const result = rule(field.value);
     if (result !== true) {

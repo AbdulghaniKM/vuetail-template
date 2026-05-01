@@ -13,7 +13,8 @@ type AuthStore = {
 };
 
 const g = globalThis as typeof globalThis & { __vuetailAuth?: AuthStore };
-const store: AuthStore = g.__vuetailAuth ?? (g.__vuetailAuth = { provider: {}, refreshPromise: null });
+const store: AuthStore =
+  g.__vuetailAuth ?? (g.__vuetailAuth = { provider: {}, refreshPromise: null });
 
 export const setAuthProvider = (provider: AuthProvider): void => {
   store.refreshPromise = null;
@@ -89,20 +90,20 @@ api.interceptors.response.use(
 
 export default api;
 
-export const apiGet = <T>(url: string, cfg?: AxiosRequestConfig) =>
-  api.get<T>(url, cfg).then((r) => r.data);
+export const apiGet = <T>(url: string, config?: AxiosRequestConfig) =>
+  api.get<T>(url, config).then((response) => response.data);
 
-export const apiPost = <T, B = unknown>(url: string, body?: B, cfg?: AxiosRequestConfig) =>
-  api.post<T>(url, body, cfg).then((r) => r.data);
+export const apiPost = <T, B = unknown>(url: string, body?: B, config?: AxiosRequestConfig) =>
+  api.post<T>(url, body, config).then((response) => response.data);
 
-export const apiPut = <T, B = unknown>(url: string, body?: B, cfg?: AxiosRequestConfig) =>
-  api.put<T>(url, body, cfg).then((r) => r.data);
+export const apiPut = <T, B = unknown>(url: string, body?: B, config?: AxiosRequestConfig) =>
+  api.put<T>(url, body, config).then((response) => response.data);
 
-export const apiPatch = <T, B = unknown>(url: string, body?: B, cfg?: AxiosRequestConfig) =>
-  api.patch<T>(url, body, cfg).then((r) => r.data);
+export const apiPatch = <T, B = unknown>(url: string, body?: B, config?: AxiosRequestConfig) =>
+  api.patch<T>(url, body, config).then((response) => response.data);
 
-export const apiDelete = <T>(url: string, cfg?: AxiosRequestConfig) =>
-  api.delete<T>(url, cfg).then((r) => r.data);
+export const apiDelete = <T>(url: string, config?: AxiosRequestConfig) =>
+  api.delete<T>(url, config).then((response) => response.data);
 
 export interface ErrorToastOptions {
   onError: (message: string, opts?: { title?: string }) => void;
@@ -125,7 +126,7 @@ export const registerErrorToasts = (options: ErrorToastOptions): void => {
   };
 
   errorInterceptorId = api.interceptors.response.use(
-    (r) => r,
+    (response) => response,
     (error: AxiosError) => {
       const status = error.response?.status;
       if (!error.response) {

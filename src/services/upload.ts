@@ -1,5 +1,9 @@
 import api from '../plugins/axios';
-import axios, { type AxiosProgressEvent, type AxiosRequestConfig, type CancelTokenSource } from 'axios';
+import axios, {
+  type AxiosProgressEvent,
+  type AxiosRequestConfig,
+  type CancelTokenSource,
+} from 'axios';
 import { API_PATHS } from '../config/api-paths';
 import { formatFileSize, getFileExtension } from '../utils/file';
 
@@ -25,7 +29,7 @@ export interface FileValidationResult {
 
 export const validateFile = (
   file: File,
-  options: { maxSize?: number; allowedTypes?: string[] } = {}
+  options: { maxSize?: number; allowedTypes?: string[] } = {},
 ): FileValidationResult => {
   const { maxSize, allowedTypes } = options;
 
@@ -56,7 +60,7 @@ export const validateFile = (
 
 export const uploadFile = async (
   file: File,
-  options: UploadOptions = {}
+  options: UploadOptions = {},
 ): Promise<UploadResult> => {
   const {
     endpoint = API_PATHS.UPLOAD,
@@ -67,7 +71,6 @@ export const uploadFile = async (
     config = {},
   } = options;
 
-  // Validate file
   const validation = validateFile(file, { maxSize, allowedTypes });
   if (!validation.valid) {
     return {
@@ -108,7 +111,7 @@ export const uploadFile = async (
 
 export const uploadMultipleFiles = async (
   files: File[],
-  options: UploadOptions = {}
+  options: UploadOptions = {},
 ): Promise<UploadResult[]> => {
   const uploadPromises = files.map((file) => uploadFile(file, options));
   return Promise.all(uploadPromises);
@@ -118,10 +121,7 @@ export class UploadController {
   private cancelTokenSource: CancelTokenSource = axios.CancelToken.source();
   private currentProgress = 0;
 
-  async upload(
-    file: File,
-    options: UploadOptions = {}
-  ): Promise<UploadResult> {
+  async upload(file: File, options: UploadOptions = {}): Promise<UploadResult> {
     const {
       endpoint = API_PATHS.UPLOAD,
       fieldName = 'file',

@@ -40,7 +40,11 @@ export interface SeoConfig {
   keywords?: string;
 }
 
-const updateOrCreateMetaTag = (name: string, content: string, attribute: 'name' | 'property' = 'name'): void => {
+const updateOrCreateMetaTag = (
+  name: string,
+  content: string,
+  attribute: 'name' | 'property' = 'name',
+): void => {
   let metaTag = document.querySelector<HTMLMetaElement>(`meta[${attribute}="${name}"]`);
   if (!metaTag) {
     metaTag = document.createElement('meta');
@@ -50,7 +54,11 @@ const updateOrCreateMetaTag = (name: string, content: string, attribute: 'name' 
   metaTag.content = content;
 };
 
-const updateOrCreateLinkTag = (rel: string, href: string, attributes?: Record<string, string>): void => {
+const updateOrCreateLinkTag = (
+  rel: string,
+  href: string,
+  attributes?: Record<string, string>,
+): void => {
   let linkTag = document.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
   if (!linkTag) {
     linkTag = document.createElement('link');
@@ -79,38 +87,32 @@ const removeStructuredData = (): void => {
 
 export const useSeo = (config: SeoConfig): void => {
   if (typeof document === 'undefined') return;
-  // Title
+
   if (config.title) {
     document.title = config.title;
     updateOrCreateMetaTag('title', config.title);
   }
 
-  // Description
   if (config.description) {
     updateOrCreateMetaTag('description', config.description);
   }
 
-  // Keywords
   if (config.keywords) {
     updateOrCreateMetaTag('keywords', config.keywords);
   }
 
-  // Robots
   if (config.robots) {
     updateOrCreateMetaTag('robots', config.robots);
   }
 
-  // Favicon
   if (config.icon) {
     updateOrCreateLinkTag('icon', config.icon);
   }
 
-  // Canonical URL
   if (config.canonical) {
     updateOrCreateLinkTag('canonical', config.canonical);
   }
 
-  // Open Graph Tags
   if (config.openGraph) {
     const og = config.openGraph;
     if (og.title) updateOrCreateMetaTag('og:title', og.title, 'property');
@@ -122,7 +124,6 @@ export const useSeo = (config: SeoConfig): void => {
     if (og.locale) updateOrCreateMetaTag('og:locale', og.locale, 'property');
   }
 
-  // Twitter Card Tags
   if (config.twitter) {
     const twitter = config.twitter;
     if (twitter.card) updateOrCreateMetaTag('twitter:card', twitter.card);
@@ -133,17 +134,17 @@ export const useSeo = (config: SeoConfig): void => {
     if (twitter.creator) updateOrCreateMetaTag('twitter:creator', twitter.creator);
   }
 
-  // Custom Meta Tags
   if (config.metaTags) {
     Object.entries(config.metaTags).forEach(([key, value]) => {
       updateOrCreateMetaTag(key, value);
     });
   }
 
-  // Structured Data (JSON-LD)
   if (config.structuredData) {
     removeStructuredData();
-    const dataArray = Array.isArray(config.structuredData) ? config.structuredData : [config.structuredData];
+    const dataArray = Array.isArray(config.structuredData)
+      ? config.structuredData
+      : [config.structuredData];
     dataArray.forEach((data) => {
       const script = document.createElement('script');
       script.type = 'application/ld+json';
@@ -158,7 +159,7 @@ export const useSeo = (config: SeoConfig): void => {
 
 export const clearSeo = (): void => {
   if (typeof document === 'undefined') return;
-  // Remove common meta tags
+
   const metaTagsToRemove = [
     'description',
     'keywords',
