@@ -97,8 +97,9 @@ src/
 │   ├── theme.ts             # CSS variable generation, theme application
 │   └── validation.ts        # Pure validation rule functions
 ├── services/
-│   ├── products.ts          # Product API service
-│   └── upload.ts            # File upload with progress and cancellation
+│   ├── BaseApiService.ts    # Generic REST CRUD base class
+│   ├── product.service.ts   # Product API service
+│   └── upload.service.ts    # File upload with progress and cancellation
 ├── plugins/
 │   └── axios.ts             # Axios instance with auth, CSRF, interceptors
 ├── stores/                  # Pinia stores

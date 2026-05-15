@@ -1,4 +1,4 @@
-export type { PaginatedResponse, PaginationMeta, QueryParams } from './resource';
+export type { PaginatedResponse, PaginationMeta, QueryParams } from './resource.types';
 
 export interface Product {
   id: number;

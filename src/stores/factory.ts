@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { computed, ref, type ComputedRef, type Ref } from 'vue';
-import type { PaginationMeta, QueryParams, PaginatedResponse } from '@/types/resource';
+import type { PaginationMeta, QueryParams, PaginatedResponse } from '@/types/resource.types';
 
 const STALE_AFTER_MINUTES = 5;
 

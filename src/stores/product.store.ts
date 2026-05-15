@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { createResourceStore } from '@/stores/factory';
-import { productService } from '@/services/products';
+import { productService } from '@/services/product.service';
 import type { Product } from '@/types';
 
 export const useProductStore = createResourceStore<Product>('products', productService, () => {

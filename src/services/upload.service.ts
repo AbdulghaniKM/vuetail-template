@@ -1,12 +1,12 @@
-import api from '../plugins/axios';
+import api from '@/plugins/axios';
 import axios, {
   type AxiosProgressEvent,
   type AxiosRequestConfig,
   type CancelTokenSource,
   isAxiosError,
 } from 'axios';
-import { API_PATHS } from '../config/api-paths';
-import { formatFileSize, getFileExtension } from '../utils/file';
+import { API_PATHS } from '@/config/api-paths';
+import { formatFileSize, getFileExtension } from '@/utils/file';
 
 export interface UploadOptions {
   endpoint?: string;

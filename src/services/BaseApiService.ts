@@ -1,5 +1,5 @@
 import api from '@/plugins/axios';
-import type { PaginatedResponse, PaginationMeta, QueryParams } from '@/types/resource';
+import type { PaginatedResponse, PaginationMeta, QueryParams } from '@/types/resource.types';
 
 function paginationMetaForBareArrayResponse(
   elementCount: number,

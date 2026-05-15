@@ -12,6 +12,12 @@ Techinical Rules :
   - always follow DRY principle (DON'T REPEAT YOURSELF)
   - every now and then check DESIGN_SYSTEM.MD to make sure you are designing using the right design system
 - check swagger.json file for api endpoints to add them to api-paths
+- File naming (suffix convention — singular domain):
+  - Feature files: `<domain>.<layer>.ts` — e.g. `product.service.ts`, `product.store.ts`, `resource.types.ts`
+  - Shared base classes: PascalCase matching the class — `BaseApiService.ts`, `FormModel.ts`, `ThemePersistence.ts`
+  - Composables: `use*.ts` — `useTheme.ts`
+  - Config files: `*.config.ts` — `app.config.ts`
+  - Pure type modules only: `*.types.ts` — `resource.types.ts`, `form.types.ts`
 
 Agent Rules :
 
