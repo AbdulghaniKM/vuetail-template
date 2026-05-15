@@ -1,35 +1,14 @@
 import { appConfig } from '@/config/app.config';
+import { ThemePersistence, type ThemeMode } from '@/lib/ThemePersistence';
 import { applyThemeToDOM, getColorValue, getSystemTheme, type ColorPalette } from '@/utils/theme';
 import { computed, onMounted, ref, watch } from 'vue';
 
-type ThemeMode = 'light' | 'dark' | 'system';
+const defaultMode: ThemeMode =
+  ThemePersistence.readPersistedAppearancePreference() ?? appConfig.theme.defaultTheme ?? 'system';
 
-const STORAGE_KEY = 'app-theme';
-const readStored = (): ThemeMode | null => {
-  if (typeof localStorage === 'undefined') return null;
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw === 'light' || raw === 'dark') return raw;
-  if (raw && raw.startsWith('"')) {
-    const unquoted = raw.slice(1, -1);
-    if (unquoted === 'light' || unquoted === 'dark') return unquoted;
-  }
-  return null;
-};
-const writeStored = (value: ThemeMode | null): void => {
-  if (typeof localStorage === 'undefined') return;
-  if (value === null || value === 'system') {
-    localStorage.removeItem(STORAGE_KEY);
-  } else {
-    localStorage.setItem(STORAGE_KEY, value);
-  }
-};
+const resolveTheme = (mode: ThemeMode | null): 'light' | 'dark' =>
+  ThemePersistence.resolveEffectiveAppearance(mode);
 
-const resolveTheme = (mode: ThemeMode | null): 'light' | 'dark' => {
-  if (mode === 'light' || mode === 'dark') return mode;
-  return getSystemTheme();
-};
-
-const defaultMode: ThemeMode = readStored() ?? appConfig.theme.defaultTheme ?? 'system';
 const currentTheme = ref<'light' | 'dark'>(resolveTheme(defaultMode));
 const themeMode = ref<ThemeMode>(defaultMode);
 
@@ -48,13 +27,13 @@ export const useTheme = () => {
 
     if (theme === 'system') {
       currentTheme.value = getSystemTheme();
-      writeStored(null);
+      ThemePersistence.writeAppearancePreference(null);
     } else {
       currentTheme.value = theme;
-      writeStored(theme);
+      ThemePersistence.writeAppearancePreference(theme);
     }
 
-    applyThemeToDOM(theme);
+    ThemePersistence.applyAppearanceToDocument(theme);
   };
 
   const getColor = (colorKey: keyof ColorPalette): string => {
@@ -70,17 +49,17 @@ export const useTheme = () => {
 
     if (themeMode.value === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = (e: MediaQueryListEvent) => {
+      const handlePreferredSchemeChange = (event: MediaQueryListEvent) => {
         if (themeMode.value === 'system') {
-          currentTheme.value = e.matches ? 'dark' : 'light';
+          currentTheme.value = event.matches ? 'dark' : 'light';
           applyThemeToDOM('system');
         }
       };
 
       if (mediaQuery.addEventListener) {
-        mediaQuery.addEventListener('change', handleChange);
+        mediaQuery.addEventListener('change', handlePreferredSchemeChange);
       } else {
-        mediaQuery.addListener(handleChange);
+        mediaQuery.addListener(handlePreferredSchemeChange);
       }
     }
   });

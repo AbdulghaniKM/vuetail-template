@@ -1,23 +1,21 @@
-import api from '../plugins/axios';
-import { API_PATHS } from '../config/api-paths';
+import api from '@/plugins/axios';
+import { API_PATHS } from '@/config/api-paths';
+import type { Product } from '@/types';
+import { BaseApiService } from '@/services/BaseApiService';
 
-const getAllProducts = async () => {
-  const productsResponse = await api.get(API_PATHS.PRODUCTS.ALL);
-  return productsResponse.data;
-};
+export class ProductService extends BaseApiService<Product> {
+  constructor() {
+    super(API_PATHS.PRODUCTS.ALL);
+  }
 
-const getFeaturedProducts = async () => {
-  const featuredResponse = await api.get(API_PATHS.PRODUCTS.SHUFFLE);
-  return featuredResponse.data;
-};
+  async getFeatured(): Promise<Product[]> {
+    const { data: featuredProducts } = await api.get<Product[]>(API_PATHS.PRODUCTS.SHUFFLE);
+    return featuredProducts;
+  }
 
-const getSingleProduct = async (id: string) => {
-  const productResponse = await api.get(API_PATHS.PRODUCTS.SINGLE(id));
-  return productResponse.data;
-};
+  async getSingleProduct(id: string): Promise<Product> {
+    return this.findOne(id);
+  }
+}
 
-export default {
-  getAllProducts,
-  getFeaturedProducts,
-  getSingleProduct,
-};
+export const productService = new ProductService();

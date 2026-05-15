@@ -25,6 +25,7 @@
       (function () {
         try {
           // Theme: 'light' | 'dark' | null(=system). Tolerate legacy JSON.
+          // Must match src/lib/ThemePersistence.ts THEME_STORAGE_KEY ('app-theme').
           var raw = localStorage.getItem('app-theme');
           var theme = null;
           if (raw === 'light' || raw === 'dark') theme = raw;

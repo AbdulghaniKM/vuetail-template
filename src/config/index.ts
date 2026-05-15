@@ -1,5 +1,6 @@
 import { appConfig } from './app.config';
-import { applyTheme, applyThemeToDOM, getSystemTheme } from '../utils/theme';
+import { applyTheme } from '../utils/theme';
+import { ThemePersistence } from '@/lib/ThemePersistence';
 import { useSeo } from '../utils/seo';
 import { registerFontFamily, loadFont } from '../utils/fonts';
 import type { AppConfig } from './types';
@@ -7,27 +8,13 @@ import type { AppConfig } from './types';
 export { appConfig };
 export type { AppConfig };
 
-const readStoredTheme = (): 'light' | 'dark' | null => {
-  if (typeof window === 'undefined') return null;
-  const raw = localStorage.getItem('app-theme');
-  if (!raw) return null;
-  // Tolerate both raw strings ("dark") and JSON-encoded strings ('"dark"')
-  // that useTheme (via useLocalStorage) may write.
-  const value = raw.startsWith('"') ? raw.slice(1, -1) : raw;
-  return value === 'light' || value === 'dark' ? value : null;
-};
-
 export const initializeConfig = (): void => {
   if (typeof document === 'undefined') return;
 
   // Apply theme
   applyTheme(appConfig.theme);
 
-  // Set initial theme from storage or config default
-  const stored = readStoredTheme();
-  const initialMode = stored ?? (appConfig.theme.defaultTheme || 'system');
-  const resolvedTheme = initialMode === 'system' ? getSystemTheme() : initialMode;
-  applyThemeToDOM(resolvedTheme);
+  ThemePersistence.synchronizeDocumentWithApplicationConfig();
 
   // Apply SEO defaults
   if (appConfig.seo) {
@@ -100,4 +87,5 @@ export const initializeConfig = (): void => {
   }
 };
 
-export { readStoredTheme };
+/** @deprecated Prefer `ThemePersistence.readPersistedLightOrDark` */
+export const readStoredTheme = ThemePersistence.readPersistedLightOrDark;

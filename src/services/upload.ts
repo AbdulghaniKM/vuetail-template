@@ -3,6 +3,7 @@ import axios, {
   type AxiosProgressEvent,
   type AxiosRequestConfig,
   type CancelTokenSource,
+  isAxiosError,
 } from 'axios';
 import { API_PATHS } from '../config/api-paths';
 import { formatFileSize, getFileExtension } from '../utils/file';
@@ -16,9 +17,9 @@ export interface UploadOptions {
   config?: AxiosRequestConfig;
 }
 
-export interface UploadResult {
+export interface UploadResult<T = unknown> {
   success: boolean;
-  data?: any;
+  data?: T;
   error?: string;
 }
 
@@ -58,10 +59,19 @@ export const validateFile = (
   return { valid: true };
 };
 
-export const uploadFile = async (
+const describeUploadFailure = (failure: unknown): string => {
+  if (isAxiosError(failure)) {
+    const responsePayload = failure.response?.data as { message?: string } | undefined;
+    return responsePayload?.message ?? failure.message ?? 'Upload failed';
+  }
+  if (failure instanceof Error) return failure.message;
+  return 'Upload failed';
+};
+
+export const uploadFile = async <T = unknown>(
   file: File,
   options: UploadOptions = {},
-): Promise<UploadResult> => {
+): Promise<UploadResult<T>> => {
   const {
     endpoint = API_PATHS.UPLOAD,
     fieldName = 'file',
@@ -71,11 +81,11 @@ export const uploadFile = async (
     config = {},
   } = options;
 
-  const validation = validateFile(file, { maxSize, allowedTypes });
-  if (!validation.valid) {
+  const fileValidationOutcome = validateFile(file, { maxSize, allowedTypes });
+  if (!fileValidationOutcome.valid) {
     return {
       success: false,
-      error: validation.error,
+      error: fileValidationOutcome.error,
     };
   }
 
@@ -83,7 +93,7 @@ export const uploadFile = async (
   formData.append(fieldName, file);
 
   try {
-    const response = await api.post(endpoint, formData, {
+    const httpResponse = await api.post(endpoint, formData, {
       ...config,
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -91,37 +101,37 @@ export const uploadFile = async (
       },
       onUploadProgress: (progressEvent: AxiosProgressEvent) => {
         if (progressEvent.total && onProgress) {
-          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          onProgress(progress);
+          const progressPercent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(progressPercent);
         }
       },
     });
 
     return {
       success: true,
-      data: response.data,
+      data: httpResponse.data as T,
     };
-  } catch (error: any) {
+  } catch (failure: unknown) {
     return {
       success: false,
-      error: error.response?.data?.message || error.message || 'Upload failed',
+      error: describeUploadFailure(failure),
     };
   }
 };
 
-export const uploadMultipleFiles = async (
+export const uploadMultipleFiles = async <T = unknown>(
   files: File[],
   options: UploadOptions = {},
-): Promise<UploadResult[]> => {
-  const uploadPromises = files.map((file) => uploadFile(file, options));
+): Promise<UploadResult<T>[]> => {
+  const uploadPromises = files.map((file) => uploadFile<T>(file, options));
   return Promise.all(uploadPromises);
 };
 
-export class UploadController {
+export class MultipartUpload<TResponsePayload = unknown> {
   private cancelTokenSource: CancelTokenSource = axios.CancelToken.source();
-  private currentProgress = 0;
+  private latestReportedProgressPercent = 0;
 
-  async upload(file: File, options: UploadOptions = {}): Promise<UploadResult> {
+  async upload(file: File, options: UploadOptions = {}): Promise<UploadResult<TResponsePayload>> {
     const {
       endpoint = API_PATHS.UPLOAD,
       fieldName = 'file',
@@ -131,12 +141,11 @@ export class UploadController {
       config = {},
     } = options;
 
-    // Validate file
-    const validation = validateFile(file, { maxSize, allowedTypes });
-    if (!validation.valid) {
+    const fileValidationOutcome = validateFile(file, { maxSize, allowedTypes });
+    if (!fileValidationOutcome.valid) {
       return {
         success: false,
-        error: validation.error,
+        error: fileValidationOutcome.error,
       };
     }
 
@@ -144,7 +153,7 @@ export class UploadController {
     formData.append(fieldName, file);
 
     try {
-      const response = await api.post(endpoint, formData, {
+      const httpResponse = await api.post(endpoint, formData, {
         ...config,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -153,9 +162,11 @@ export class UploadController {
         cancelToken: this.cancelTokenSource.token,
         onUploadProgress: (progressEvent: AxiosProgressEvent) => {
           if (progressEvent.total) {
-            this.currentProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            this.latestReportedProgressPercent = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total,
+            );
             if (onProgress) {
-              onProgress(this.currentProgress);
+              onProgress(this.latestReportedProgressPercent);
             }
           }
         },
@@ -163,10 +174,10 @@ export class UploadController {
 
       return {
         success: true,
-        data: response.data,
+        data: httpResponse.data as TResponsePayload,
       };
-    } catch (error: any) {
-      if (axios.isCancel(error)) {
+    } catch (failure: unknown) {
+      if (axios.isCancel(failure)) {
         return {
           success: false,
           error: 'Upload cancelled',
@@ -174,7 +185,7 @@ export class UploadController {
       }
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Upload failed',
+        error: describeUploadFailure(failure),
       };
     }
   }
@@ -185,6 +196,9 @@ export class UploadController {
   }
 
   getProgress(): number {
-    return this.currentProgress;
+    return this.latestReportedProgressPercent;
   }
 }
+
+/** @deprecated Use {@link MultipartUpload}. */
+export const UploadController = MultipartUpload;
