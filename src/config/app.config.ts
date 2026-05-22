@@ -14,40 +14,40 @@ export const appConfig: AppConfig = {
   theme: {
     defaultTheme: 'system',
     light: {
-      primary: '#3b82f6', // blue-500
-      secondary: '#8b5cf6', // violet-500
-      accent: '#f59e0b', // amber-500
+      primary: '#3b82f6',
+      secondary: '#8b5cf6',
+      accent: '#f59e0b',
       background: '#ffffff',
-      surface: '#f9fafb', // gray-50
-      text: '#111827', // gray-900
-      textSecondary: '#6b7280', // gray-500
-      border: '#e5e7eb', // gray-200
-      muted: '#f3f4f6', // gray-100
-      link: '#3b82f6', // blue-500
-      linkHover: '#2563eb', // blue-600
-      emphasis: '#1e40af', // blue-800
-      success: '#10b981', // emerald-500
-      warning: '#f59e0b', // amber-500
-      error: '#ef4444', // red-500
-      info: '#3b82f6', // blue-500
+      surface: '#f9fafb',
+      text: '#111827',
+      textSecondary: '#6b7280',
+      border: '#e5e7eb',
+      muted: '#f3f4f6',
+      link: '#3b82f6',
+      linkHover: '#2563eb',
+      emphasis: '#1e40af',
+      success: '#10b981',
+      warning: '#f59e0b',
+      error: '#ef4444',
+      info: '#3b82f6',
     },
     dark: {
-      primary: '#60a5fa', // blue-400
-      secondary: '#a78bfa', // violet-400
-      accent: '#fbbf24', // amber-400
-      background: '#111827', // gray-900
-      surface: '#1f2937', // gray-800
-      text: '#f9fafb', // gray-50
-      textSecondary: '#9ca3af', // gray-400
-      border: '#374151', // gray-700
-      muted: '#1f2937', // gray-800
-      link: '#60a5fa', // blue-400
-      linkHover: '#93bbfd', // blue-300
-      emphasis: '#60a5fa', // blue-400
-      success: '#34d399', // emerald-400
-      warning: '#fbbf24', // amber-400
-      error: '#f87171', // red-400
-      info: '#60a5fa', // blue-400
+      primary: '#60a5fa',
+      secondary: '#a78bfa',
+      accent: '#fbbf24',
+      background: '#111827',
+      surface: '#1f2937',
+      text: '#f9fafb',
+      textSecondary: '#9ca3af',
+      border: '#374151',
+      muted: '#1f2937',
+      link: '#60a5fa',
+      linkHover: '#93bbfd',
+      emphasis: '#60a5fa',
+      success: '#34d399',
+      warning: '#fbbf24',
+      error: '#f87171',
+      info: '#60a5fa',
     },
   },
 
