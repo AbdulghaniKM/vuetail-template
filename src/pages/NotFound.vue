@@ -13,7 +13,3 @@
     </RouterLink>
   </AppEmptyState>
 </template>
-
-<script setup lang="ts">
-import AppEmptyState from '@/components/ui/AppEmptyState.vue';
-</script>

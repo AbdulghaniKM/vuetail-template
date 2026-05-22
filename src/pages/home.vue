@@ -33,6 +33,3 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
-  import AppIcon from '@/components/ui/AppIcon.vue';
-</script>

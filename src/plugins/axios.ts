@@ -21,7 +21,7 @@ export const setAuthProvider = (provider: AuthProvider): void => {
   store.provider = { ...store.provider, ...provider };
 };
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: getApiUrl(),
   timeout: 15_000,
   headers: {

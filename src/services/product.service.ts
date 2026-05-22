@@ -1,8 +1,3 @@
-import api from '@/plugins/axios';
-import { API_PATHS } from '@/config/api-paths';
-import type { Product } from '@/types';
-import { BaseApiService } from '@/services/BaseApiService';
-
 export class ProductService extends BaseApiService<Product> {
   constructor() {
     super(API_PATHS.PRODUCTS.ALL);

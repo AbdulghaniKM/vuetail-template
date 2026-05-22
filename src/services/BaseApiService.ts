@@ -1,6 +1,3 @@
-import api from '@/plugins/axios';
-import type { PaginatedResponse, PaginationMeta, QueryParams } from '@/types/resource.types';
-
 function paginationMetaForBareArrayResponse(
   elementCount: number,
   page = 1,
@@ -17,7 +14,7 @@ function paginationMetaForBareArrayResponse(
   };
 }
 
-export abstract class BaseApiService<T, CreateDto = Partial<T>, UpdateDto = Partial<T>> {
+export class BaseApiService<T, CreateDto = Partial<T>, UpdateDto = Partial<T>> {
   constructor(protected readonly basePath: string) {}
 
   protected coerceToPaginatedResponse(

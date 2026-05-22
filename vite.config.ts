@@ -1,11 +1,54 @@
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { fileURLToPath, URL } from 'node:url';
+import AutoImport from 'unplugin-auto-import/vite';
+import Components from 'unplugin-vue-components/vite';
 import { defineConfig } from 'vite';
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  plugins: [
+    vue(),
+    tailwindcss(),
+    AutoImport({
+      imports: [
+        'vue',
+        'vue-router',
+        'pinia',
+        '@vueuse/core',
+        {
+          'axios': [
+            ['default', 'axios'],
+            'isAxiosError',
+            'AxiosError',
+          ],
+          '@/plugins/axios': [
+            'api',
+            'apiGet',
+            'apiPost',
+            'apiPut',
+            'apiPatch',
+            'apiDelete',
+          ],
+        },
+      ],
+      dirs: [
+        'src/composables/**',
+        'src/stores/**',
+        'src/services/**',
+        'src/types/**',
+        'src/config/**',
+      ],
+      dts: 'src/auto-imports.d.ts',
+      vueTemplate: true,
+    }),
+
+    Components({
+      dirs: ['src/components'],
+      extensions: ['vue'],
+      dts: 'src/components.d.ts',
+      directoryAsNamespace: true,
+    }),
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
