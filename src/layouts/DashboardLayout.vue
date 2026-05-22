@@ -14,7 +14,7 @@
           :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
           @click="toggle"
         >
-          <AppIcon
+          <UiAppIcon
             :name="
               collapsed
                 ? 'icon-[solar--alt-arrow-right-linear]'
@@ -35,7 +35,7 @@
         <slot name="header-start" />
         <div class="ms-auto flex items-center gap-2">
           <slot name="header-end" />
-          <ThemeToggle />
+          <UiThemeToggle />
         </div>
       </header>
       <a
@@ -51,10 +51,6 @@
   </div>
 </template>
 <script setup lang="ts">
-  import AppIcon from '@/components/ui/AppIcon.vue';
-  import ThemeToggle from '@/components/ui/ThemeToggle.vue';
-  import { useAppConfig } from '@/composables/useAppConfig';
-  import { useSidebar } from '@/composables/useSidebar';
-  const { appName } = useAppConfig();
   const { collapsed, toggle } = useSidebar();
+  const { appName } = useAppConfig();
 </script>

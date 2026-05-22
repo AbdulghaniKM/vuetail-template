@@ -1,8 +1,8 @@
-import { appConfig } from './app.config';
-import { applyTheme } from '../utils/theme';
 import { ThemePersistence } from '@/lib/ThemePersistence';
+import { loadFont, registerFontFamily } from '../utils/fonts';
 import { useSeo } from '../utils/seo';
-import { registerFontFamily, loadFont } from '../utils/fonts';
+import { applyTheme } from '../utils/theme';
+import { appConfig } from './app.config';
 import type { AppConfig } from './types';
 
 export { appConfig };
@@ -11,12 +11,10 @@ export type { AppConfig };
 export const initializeConfig = (): void => {
   if (typeof document === 'undefined') return;
 
-  // Apply theme
   applyTheme(appConfig.theme);
 
   ThemePersistence.synchronizeDocumentWithApplicationConfig();
 
-  // Apply SEO defaults
   if (appConfig.seo) {
     useSeo({
       title: appConfig.seo.title || appConfig.app.title,
@@ -40,7 +38,6 @@ export const initializeConfig = (): void => {
       },
     });
   } else {
-    // Fallback to basic SEO
     useSeo({
       title: appConfig.app.title,
       description: appConfig.app.description,
@@ -48,7 +45,6 @@ export const initializeConfig = (): void => {
     });
   }
 
-  // Register fonts
   if (appConfig.typography.fonts) {
     appConfig.typography.fonts.forEach((font) => {
       loadFont(font).catch((error) => {
@@ -81,11 +77,9 @@ export const initializeConfig = (): void => {
     });
   }
 
-  // Set document language
   if (appConfig.app.language) {
     document.documentElement.lang = appConfig.app.language;
   }
 };
 
-/** @deprecated Prefer `ThemePersistence.readPersistedLightOrDark` */
 export const readStoredTheme = ThemePersistence.readPersistedLightOrDark;
