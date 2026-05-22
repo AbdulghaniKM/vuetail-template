@@ -3,7 +3,7 @@
     class="bg-background flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center"
   >
     <div class="bg-primary/10 flex size-16 items-center justify-center rounded-2xl">
-      <AppIcon name="icon-[logos--vue]" class="size-8" />
+      <UiAppIcon name="icon-[logos--vue]" class="size-8" />
     </div>
 
     <div class="space-y-2">
