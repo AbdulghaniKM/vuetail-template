@@ -1,7 +1,8 @@
 <template>
   <Teleport to="body">
     <div
-      class="pointer-events-none fixed inset-x-0 top-0 z-[10000] flex flex-col items-end gap-2.5 p-4 sm:inset-x-auto sm:end-4 sm:top-4"
+      class="pointer-events-none fixed z-[10000] flex flex-col gap-2.5 p-4 sm:max-w-sm"
+      :class="positionClass"
       role="log"
       aria-live="polite"
       aria-label="Notifications"
@@ -13,9 +14,9 @@
           class="pointer-events-auto relative w-full overflow-hidden rounded-xl shadow-lg sm:max-w-sm"
           :class="containerClass(toast.type)"
           role="alert"
-          :initial="{ opacity: 0, y: -12, scale: 0.95 }"
-          :animate="{ opacity: 1, y: 0, scale: 1 }"
-          :exit="{ opacity: 0, y: -8, scale: 0.95 }"
+          :initial="motionConfig.initial"
+          :animate="motionConfig.animate"
+          :exit="motionConfig.exit"
           :transition="{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }"
           @mouseenter="emit('pause', toast.id)"
           @mouseleave="emit('resume', toast.id)"
@@ -27,7 +28,7 @@
               class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full"
               :class="iconBgClass(toast.type)"
             >
-              <UiAppIcon :name="toastIcon(toast.type)" :size="0.75" />
+              <AppIcon :name="toastIcon(toast.type)" :size="0.75" />
             </span>
             <div class="min-w-0 flex-1">
               <p v-if="toast.title" class="text-sm leading-snug font-semibold">{{ toast.title }}</p>
@@ -41,7 +42,7 @@
               aria-label="Dismiss notification"
               @click="removeToast(toast.id)"
             >
-              <UiAppIcon name="icon-[heroicons-outline--x-mark]" :size="0.875" />
+              <AppIcon name="icon-[heroicons-outline--x-mark]" :size="0.875" />
             </button>
           </div>
           <div
@@ -57,16 +58,46 @@
 </template>
 
 <script setup lang="ts">
+  import { computed } from 'vue';
   import { AnimatePresence, motion } from 'motion-v';
+  import type { Toast } from '@/composables/useToast';
+  import AppIcon from './AppIcon.vue';
 
-  defineProps<{ toasts: Toast[] }>();
+  export interface AppToastProps {
+    toasts: Toast[];
+    position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+  }
+
+  const props = withDefaults(defineProps<AppToastProps>(), {
+    position: 'top-right',
+  });
 
   const emit = defineEmits<{
     remove: [id: string];
     pause: [id: string];
     resume: [id: string];
   }>();
+  
   const removeToast = (id: string) => emit('remove', id);
+
+  const positionClass = computed(() => {
+    switch (props.position) {
+      case 'top-left': return 'inset-x-0 top-0 items-start sm:inset-x-auto sm:start-4 sm:top-4';
+      case 'top-right': return 'inset-x-0 top-0 items-end sm:inset-x-auto sm:end-4 sm:top-4';
+      case 'bottom-left': return 'inset-x-0 bottom-0 items-start sm:inset-x-auto sm:start-4 sm:bottom-4';
+      case 'bottom-right': return 'inset-x-0 bottom-0 items-end sm:inset-x-auto sm:end-4 sm:bottom-4';
+    }
+  });
+
+  const motionConfig = computed(() => {
+    const isTop = props.position.startsWith('top');
+    const yOffset = isTop ? -12 : 12;
+    return {
+      initial: { opacity: 0, y: yOffset, scale: 0.95 },
+      animate: { opacity: 1, y: 0, scale: 1 },
+      exit: { opacity: 0, y: isTop ? -8 : 8, scale: 0.95 }
+    };
+  });
 
   const containerClass = (type: Toast['type']) =>
     ({
