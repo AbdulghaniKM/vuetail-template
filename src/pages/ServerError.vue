@@ -16,5 +16,9 @@
 </template>
 
 <script setup lang="ts">
+  definePage({
+    path: '/500',
+  });
+
   const reload = () => window.location.reload();
 </script>

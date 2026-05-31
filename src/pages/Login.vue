@@ -1,3 +1,11 @@
+<script setup lang="ts">
+  definePage({
+    meta: {
+      layout: 'auth',
+    },
+  });
+</script>
+
 <template>
   <div>
     <h1 class="mb-4 text-xl font-semibold text-text">Sign in</h1>

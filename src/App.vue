@@ -52,10 +52,10 @@
 
   // Simple online/offline routing — redirects to /offline when disconnected
   const onOffline = () => {
-    if (route.name !== 'offline') router.push({ name: 'offline' });
+    if (route.name !== '/Offline') router.push({ name: '/Offline' });
   };
   const onOnline = () => {
-    if (route.name === 'offline') router.push({ path: '/' });
+    if (route.name === '/Offline') router.push({ path: '/' });
   };
 
   onMounted(() => {

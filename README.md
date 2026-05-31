@@ -11,7 +11,7 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 | Language   | TypeScript 6 (strict)                                                       |
 | Build      | Vite 8 (Rolldown)                                                           |
 | State      | Pinia 3                                                                     |
-| Routing    | Vue Router 5                                                                |
+| Routing    | Vue Router 5 with `unplugin-vue-router` (typed file-system routing)        |
 | Validation | Zod 4                                                                       |
 | HTTP       | Axios (interceptors, CSRF, auth token plumbing)                             |
 | Icons      | Iconify (200k+ icons via `@iconify/tailwind4`)                              |
@@ -111,8 +111,8 @@ src/
 │   └── axios.ts             # Axios instance with auth, CSRF, interceptors
 ├── stores/                  # Pinia stores
 ├── layouts/                 # App layouts (default, auth, dashboard)
-├── pages/                   # Route page components
-├── router/                  # Vue Router configuration
+├── pages/                   # File-based typed route page components
+├── router/                  # Auto-routing configuration & custom guards
 ├── types/                   # Shared TypeScript types
 ├── style.css                # Tailwind imports, CSS variables, scrollbar styles
 ├── App.vue                  # Root component
@@ -167,6 +167,47 @@ Customize colors at runtime:
 ```ts
 const { updateColor, resetColors } = useColorCustomizer();
 updateColor('primary', '#e11d48');
+```
+
+## Routing
+
+The template utilizes **`unplugin-vue-router`** to implement a zero-boilerplate, type-safe, file-system-based routing flow that matches the **Nuxt 3** developer experience.
+
+### File Structure Mapping
+
+Vue page components created under `src/pages/` are automatically scanned and registered as routes:
+
+- `src/pages/index.vue` → `/` (Home page)
+- `src/pages/Login.vue` → `/Login`
+- `src/pages/ServerError.vue` → `/ServerError` (custom mapped to `/500` via `definePage`)
+- `src/pages/Offline.vue` → `/Offline`
+- `src/pages/[...pathMatch].vue` → `/:pathMatch(.*)*` (Catch-all 404 handler page)
+
+### Route Metadata & Layouts (`definePage`)
+
+You can declare custom layout overrides, page paths, dynamic page configurations, and navigation guard flags directly inside the SFC page component using the compile-time `definePage` macro:
+
+```vue
+<script setup lang="ts">
+  definePage({
+    meta: {
+      layout: 'auth',        // Overrides default layout to AuthLayout
+      requiresAuth: false,   // Bypasses global authentication guard
+    }
+  });
+</script>
+```
+
+### Type-Safe Navigation
+
+`unplugin-vue-router` automatically maintains compile-time route declarations inside `src/typed-router.d.ts`. This gives you full autocompletion and compiler checks for routes across your IDE:
+
+```ts
+const router = useRouter();
+
+// IDE autocomplete will guide you and show compile errors if you make a typo!
+router.push('/Login'); 
+router.push({ name: '/Login' });
 ```
 
 ## Components

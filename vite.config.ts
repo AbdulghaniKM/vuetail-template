@@ -1,5 +1,7 @@
 import { DevTools } from '@vitejs/devtools';
 import tailwindcss from '@tailwindcss/vite';
+import VueRouter from 'unplugin-vue-router/vite';
+import { VueRouterAutoImports } from 'unplugin-vue-router';
 import vue from '@vitejs/plugin-vue';
 import { fileURLToPath, URL } from 'node:url';
 import AutoImport from 'unplugin-auto-import/vite';
@@ -9,12 +11,16 @@ import { defineConfig } from 'vite';
 export default defineConfig(async () => ({
   plugins: [
     ...(await DevTools()),
+    VueRouter({
+      routesFolder: 'src/pages',
+      dts: 'src/typed-router.d.ts',
+    }),
     vue(),
     tailwindcss(),
     AutoImport({
       imports: [
         'vue',
-        'vue-router',
+        VueRouterAutoImports,
         'pinia',
         '@vueuse/core',
         {
