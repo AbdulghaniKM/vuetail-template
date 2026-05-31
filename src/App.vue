@@ -37,9 +37,8 @@
   // Router-wired page loader
   const pageLoaderRef = ref<InstanceType<typeof AppPageLoader> | null>(null);
 
-  router.beforeEach((_to, _from, next) => {
+  router.beforeEach(() => {
     pageLoaderRef.value?.start();
-    next();
   });
 
   router.afterEach(() => {
