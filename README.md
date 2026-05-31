@@ -348,6 +348,22 @@ pnpm format:check  # Fail CI if anything is unformatted
 
 Generated files (`src/auto-imports.d.ts`, `src/components.d.ts`) are ignored by both tools.
 
+## Vite DevTools (embedded)
+
+Per the [official guide](https://devtools.vite.dev/guide/), embedded DevTools needs a production build first so Rolldown metadata exists, then the dev server:
+
+```bash
+pnpm build   # once (or after dependency / config changes)
+pnpm dev
+```
+
+1. Open the app in the browser.
+2. Check the console for `[VITE DEVTOOLS] Client injected` — if missing, restart `pnpm dev` after changing `vite.config.ts`.
+3. Look for a **thin vertical tab on the left edge** of the page (panel starts collapsed). Click it to open the dock.
+4. Rolldown build analysis panels need the `pnpm build` step above.
+
+`vite.config.ts` uses `await DevTools()` because the plugin returns a `Promise<Plugin[]>` — passing `DevTools()` without `await` silently skips all DevTools plugins.
+
 ## Scripts
 
 ```bash

@@ -364,7 +364,7 @@ declare global {
   export type { PaginationMeta, PaginatedResponse, QueryParams } from './types/resource.types'
   import('./types/resource.types')
   // @ts-ignore
-  export type { TextVariant, TextSize, TextWeight, TextColor, TextAlign, TextTransform, TextDecoration, TextDecorationStyle, TextFont, TextTracking, TextLeading, TextWrap, TextWhitespace, TextMaxWidth, AppTextProps } from './types/text.types'
+  export type { TextVariant, TextSize, TextWeight, TextColor, TextAlign, TextTransform, TextDecoration, TextDecorationStyle, TextFont, TextTracking, TextLeading, TextWrap, TextWhitespace, TextMaxWidth, AppTextProps, VariantConfig } from './types/text.types'
   import('./types/text.types')
   // @ts-ignore
   export type { ColorPalette, ThemeConfig, FontConfig, TypographyConfig, AppMetadata, IconConfig, SeoDefaults, LayoutConfig, AppConfig } from './config/types'
@@ -380,7 +380,6 @@ declare module 'vue' {
     readonly AxiosError: UnwrapRef<typeof import('axios')['AxiosError']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly VARIANT_MAP: UnwrapRef<typeof import('./types/text.types')['VARIANT_MAP']>
-    readonly VariantConfig: UnwrapRef<typeof import('./types/text.types')['VariantConfig']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
     readonly api: UnwrapRef<typeof import('@/plugins/axios')['api']>
     readonly apiDelete: UnwrapRef<typeof import('@/plugins/axios')['apiDelete']>
@@ -400,6 +399,7 @@ declare module 'vue' {
     readonly controlledComputed: UnwrapRef<typeof import('@vueuse/core')['controlledComputed']>
     readonly controlledRef: UnwrapRef<typeof import('@vueuse/core')['controlledRef']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>
+    readonly createDisposableDirective: UnwrapRef<typeof import('@vueuse/core')['createDisposableDirective']>
     readonly createEventHook: UnwrapRef<typeof import('@vueuse/core')['createEventHook']>
     readonly createGlobalState: UnwrapRef<typeof import('@vueuse/core')['createGlobalState']>
     readonly createInjectionState: UnwrapRef<typeof import('@vueuse/core')['createInjectionState']>
@@ -414,7 +414,6 @@ declare module 'vue' {
     readonly customRef: UnwrapRef<typeof import('vue')['customRef']>
     readonly debouncedRef: UnwrapRef<typeof import('@vueuse/core')['debouncedRef']>
     readonly debouncedWatch: UnwrapRef<typeof import('@vueuse/core')['debouncedWatch']>
-    readonly defaultValue: UnwrapRef<typeof import('./config/env')['defaultValue']>
     readonly defineAsyncComponent: UnwrapRef<typeof import('vue')['defineAsyncComponent']>
     readonly defineComponent: UnwrapRef<typeof import('vue')['defineComponent']>
     readonly defineStore: UnwrapRef<typeof import('pinia')['defineStore']>
@@ -475,7 +474,6 @@ declare module 'vue' {
     readonly onUpdated: UnwrapRef<typeof import('vue')['onUpdated']>
     readonly onWatcherCleanup: UnwrapRef<typeof import('vue')['onWatcherCleanup']>
     readonly pausableWatch: UnwrapRef<typeof import('@vueuse/core')['pausableWatch']>
-    readonly productService: UnwrapRef<typeof import('./stores/product.store')['productService']>
     readonly provide: UnwrapRef<typeof import('vue')['provide']>
     readonly provideLocal: UnwrapRef<typeof import('@vueuse/core')['provideLocal']>
     readonly reactify: UnwrapRef<typeof import('@vueuse/core')['reactify']>
@@ -489,11 +487,10 @@ declare module 'vue' {
     readonly refAutoReset: UnwrapRef<typeof import('@vueuse/core')['refAutoReset']>
     readonly refDebounced: UnwrapRef<typeof import('@vueuse/core')['refDebounced']>
     readonly refDefault: UnwrapRef<typeof import('@vueuse/core')['refDefault']>
+    readonly refManualReset: UnwrapRef<typeof import('@vueuse/core')['refManualReset']>
     readonly refThrottled: UnwrapRef<typeof import('@vueuse/core')['refThrottled']>
     readonly refWithControl: UnwrapRef<typeof import('@vueuse/core')['refWithControl']>
     readonly resolveComponent: UnwrapRef<typeof import('vue')['resolveComponent']>
-    readonly resolveRef: UnwrapRef<typeof import('@vueuse/core')['resolveRef']>
-    readonly resolveUnref: UnwrapRef<typeof import('@vueuse/core')['resolveUnref']>
     readonly setActivePinia: UnwrapRef<typeof import('pinia')['setActivePinia']>
     readonly setMapStoreSuffix: UnwrapRef<typeof import('pinia')['setMapStoreSuffix']>
     readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
@@ -553,6 +550,7 @@ declare module 'vue' {
     readonly useCountdown: UnwrapRef<typeof import('@vueuse/core')['useCountdown']>
     readonly useCounter: UnwrapRef<typeof import('@vueuse/core')['useCounter']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
+    readonly useCssSupports: UnwrapRef<typeof import('@vueuse/core')['useCssSupports']>
     readonly useCssVar: UnwrapRef<typeof import('@vueuse/core')['useCssVar']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
     readonly useCurrentElement: UnwrapRef<typeof import('@vueuse/core')['useCurrentElement']>
@@ -668,6 +666,7 @@ declare module 'vue' {
     readonly useThrottleFn: UnwrapRef<typeof import('@vueuse/core')['useThrottleFn']>
     readonly useThrottledRefHistory: UnwrapRef<typeof import('@vueuse/core')['useThrottledRefHistory']>
     readonly useTimeAgo: UnwrapRef<typeof import('@vueuse/core')['useTimeAgo']>
+    readonly useTimeAgoIntl: UnwrapRef<typeof import('@vueuse/core')['useTimeAgoIntl']>
     readonly useTimeout: UnwrapRef<typeof import('@vueuse/core')['useTimeout']>
     readonly useTimeoutFn: UnwrapRef<typeof import('@vueuse/core')['useTimeoutFn']>
     readonly useTimeoutPoll: UnwrapRef<typeof import('@vueuse/core')['useTimeoutPoll']>

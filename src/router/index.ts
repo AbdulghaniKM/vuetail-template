@@ -50,11 +50,11 @@ const router = createRouter({
   },
 });
 
-router.beforeEach((to, _from, next) => {
-  if (!to.meta.requiresAuth) return next();
+router.beforeEach((to) => {
+  if (!to.meta.requiresAuth) return true;
   const token = typeof localStorage !== "undefined" ? localStorage.getItem("auth-token") : null;
-  if (token) return next();
-  next({ name: "login", query: { redirect: to.fullPath } });
+  if (token) return true;
+  return { name: "login", query: { redirect: to.fullPath } };
 });
 
 export default router;

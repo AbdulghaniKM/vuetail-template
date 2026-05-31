@@ -6,9 +6,9 @@ import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(async () => ({
   plugins: [
-    DevTools(),
+    ...(await DevTools()),
     vue(),
     tailwindcss(),
     AutoImport({
@@ -47,4 +47,4 @@ export default defineConfig({
       devtools: {},
     },
   },
-});
+}));
