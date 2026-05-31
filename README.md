@@ -8,10 +8,10 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 | ---------- | --------------------------------------------------------------------------- |
 | Framework  | Vue 3.5 with `<script setup>` + Composition API                             |
 | Styling    | Tailwind CSS v4 with CSS variable theming                                   |
-| Language   | TypeScript 5.7 (strict)                                                     |
+| Language   | TypeScript 6 (strict)                                                       |
 | Build      | Vite 8 (Rolldown)                                                           |
 | State      | Pinia 3                                                                     |
-| Routing    | Vue Router 4                                                                |
+| Routing    | Vue Router 5                                                                |
 | Validation | Zod 4                                                                       |
 | HTTP       | Axios (interceptors, CSRF, auth token plumbing)                             |
 | Icons      | Iconify (200k+ icons via `@iconify/tailwind4`)                              |
@@ -19,6 +19,7 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 | Utilities  | VueUse, date-fns                                                            |
 | Linting    | [Oxlint](https://oxc.rs/docs/guide/usage/linter)                            |
 | Formatting | [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) (Tailwind class sorting) |
+| DevTools   | [Vite DevTools](https://devtools.vite.dev/) (embedded panel)                |
 
 ## Prerequisites
 
