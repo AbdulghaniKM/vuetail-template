@@ -47,46 +47,20 @@ cp .env.example .env
 src/
 ├── components/
 │   ├── ui/                  # Registry-installed UI components (shadcn-style)
-│   │   ├── Fields/          # Form field components
-│   │   │   ├── AppForm.vue        # Declarative form builder with Zod validation
-│   │   │   ├── InputField.vue     # Text/email/password/number input
-│   │   │   ├── Textarea.vue       # Multiline text input
-│   │   │   ├── Select.vue         # Searchable dropdown select
-│   │   │   ├── PhoneInput.vue     # Phone number input with formatting
-│   │   │   ├── DatePicker.vue     # Calendar date/datetime picker
-│   │   │   ├── TimePickerClock.vue # Hour/minute stepper
-│   │   │   ├── FileInput.vue      # File upload button
-│   │   │   └── FileDisplay.vue    # Attached file display with remove
-│   │   ├── AppButton.vue         # 8 variants, 4 sizes, loading state, tooltips
-│   │   ├── AppModal.vue          # Animated modal with icon, loading, persistent mode
-│   │   ├── AppTable.vue          # Data table with search, sort, pagination, column toggle
-│   │   ├── AppText.vue           # Typography component with responsive sizes, gradients
-│   │   ├── AppToast.vue          # Toast notifications with progress bar
-│   │   ├── AppTooltip.vue        # Tooltip with arrow, 4 placements, keyboard support
-│   │   ├── AppIcon.vue           # Iconify icon wrapper
-│   │   ├── AppSpinner.vue        # Loading spinner (5 sizes)
-│   │   ├── AppImageModal.vue     # Fullscreen image gallery with zoom
-│   │   ├── AppErrorBoundary.vue  # Error boundary wrapper
-│   │   └── ConfirmDangerModal.vue # Destructive action confirmation dialog
-│   ├── AppHeader.vue             # App header with nav, theme toggle, mobile menu
-│   └── FeatureCard.vue           # Feature showcase card
+│   │   ├── AppEmptyState.vue # Empty state placeholders and illustration containers
+│   │   ├── AppIcon.vue       # Scalable Iconify SVG loader
+│   │   ├── AppPageLoader.vue # Absolute layout overlay spinner for route loading
+│   │   ├── AppSkeleton.vue   # Dynamic skeleton shimmer loading placeholders
+│   │   ├── AppToast.vue      # Floating notification toasts with progress timelines
+│   │   └── ThemeToggle.vue   # Sun/moon hover-animated dark mode toggle
+│   ├── AppHeader.vue         # Main layout header with theme toggle and mobile navigation
+│   └── FeatureCard.vue       # Feature showcase cards
 ├── composables/
-│   ├── useAppConfig.ts      # Read-only access to app configuration
-│   ├── useAuth.ts           # Authentication state, login/logout, token lifecycle
-│   ├── useBreakpoint.ts     # Reactive Tailwind breakpoint detection
-│   ├── useClipboard.ts      # Copy to clipboard with feedback
-│   ├── useColorCustomizer.ts # Runtime theme color editing
-│   ├── useConfirm.ts        # Programmatic confirm dialog (Promise-based)
-│   ├── useDateFormat.ts     # Reactive date formatting with presets
-│   ├── useDebounce.ts       # Debounced and throttled refs
-│   ├── useFormValidation.ts # Zod-based reactive form error clearing
-│   ├── useInfiniteScroll.ts # Intersection Observer infinite scroll
-│   ├── useKeyboard.ts       # Keyboard shortcut registration
-│   ├── useLocalStorage.ts   # Typed reactive localStorage with Zod validation
-│   ├── usePagination.ts     # Standalone pagination logic
-│   ├── useSeo.ts            # Page-level SEO meta tags with cleanup
-│   ├── useTheme.ts          # Light/dark/system theme switching
-│   └── useToast.ts          # Toast notification manager
+│   ├── useAppConfig.ts      # Access to centralized Vite layout settings
+│   ├── useAppUi.ts          # Page-level shape overrides and layout configs
+│   ├── useSidebar.ts        # Drawer navigation panel state
+│   ├── useTheme.ts          # Syncs light/dark/system mode class mappings
+│   └── useToast.ts          # Queue manager for toast notifications
 ├── config/
 │   ├── app.config.ts        # Centralized app configuration
 │   ├── api-paths.ts         # API endpoint constants
@@ -112,6 +86,12 @@ src/
 ├── stores/                  # Pinia stores
 ├── layouts/                 # App layouts (default, auth, dashboard)
 ├── pages/                   # File-based typed route page components
+│   ├── index.vue            # Root/Home route (/)
+│   ├── Login.vue            # Login route (/Login, uses auth layout)
+│   ├── ServerError.vue      # Server error route (/ServerError -> custom /500)
+│   ├── Offline.vue          # Offline route (/Offline)
+│   ├── _theme.vue           # Theme Studio (dev-only route)
+│   └── [...pathMatch].vue   # Catch-all 404 route handler
 ├── router/                  # Auto-routing configuration & custom guards
 ├── types/                   # Shared TypeScript types
 ├── style.css                # Tailwind imports, CSS variables, scrollbar styles
