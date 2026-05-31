@@ -17,7 +17,8 @@
 
 <script setup lang="ts">
   definePage({
-    path: '/500',
+    route: "500",
+    head: "Something went wrong"
   });
 
   const reload = () => window.location.reload();

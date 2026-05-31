@@ -1,5 +1,9 @@
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
+
+// Define definePage globally at runtime as a no-op to prevent ReferenceError in pages
+(window as any).definePage = () => {};
+
 import App from './App.vue';
 import router from './router';
 import './style.css';
@@ -47,4 +51,12 @@ registerErrorToasts({
 
 app.use(pinia);
 app.use(router);
+
+// Debug-print the exact routes registered in the browser console
+console.log('[Router Registry]:', router.getRoutes().map(r => ({
+  path: r.path,
+  name: r.name,
+  meta: r.meta
+})));
+
 app.mount('#app');

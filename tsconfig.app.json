@@ -6,7 +6,6 @@
 
     /* Path alias — anchor for template↔registry contract */
     "baseUrl": ".",
-    "types": ["unplugin-vue-router/client"],
     "paths": {
       "@/*": ["src/*"]
     },

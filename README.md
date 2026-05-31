@@ -11,7 +11,7 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 | Language   | TypeScript 6 (strict)                                                       |
 | Build      | Vite 8 (Rolldown)                                                           |
 | State      | Pinia 3                                                                     |
-| Routing    | Vue Router 5 with `unplugin-vue-router` (typed file-system routing)        |
+| Routing    | Vue Router 5 with custom Vite plugin + native glob auto-registry           |
 | Validation | Zod 4                                                                       |
 | HTTP       | Axios (interceptors, CSRF, auth token plumbing)                             |
 | Icons      | Iconify (200k+ icons via `@iconify/tailwind4`)                              |
@@ -65,6 +65,7 @@ src/
 │   ├── app.config.ts        # Centralized app configuration
 │   ├── api-paths.ts         # API endpoint constants
 │   ├── env.ts               # Environment variable accessors
+│   ├── router.ts            # Bespoke compile-time route scan registry
 │   ├── types.ts             # Config type definitions
 │   └── index.ts             # Config initialization
 ├── utils/
@@ -92,7 +93,7 @@ src/
 │   ├── Offline.vue          # Offline route (/Offline)
 │   ├── _theme.vue           # Theme Studio (dev-only route)
 │   └── [...pathMatch].vue   # Catch-all 404 route handler
-├── router/                  # Auto-routing configuration & custom guards
+├── router/                  # Runtime router instantiation & navigation guards
 ├── types/                   # Shared TypeScript types
 ├── style.css                # Tailwind imports, CSS variables, scrollbar styles
 ├── App.vue                  # Root component
@@ -151,44 +152,34 @@ updateColor('primary', '#e11d48');
 
 ## Routing
 
-The template utilizes **`unplugin-vue-router`** to implement a zero-boilerplate, type-safe, file-system-based routing flow that matches the **Nuxt 3** developer experience.
+The template features a **custom, lightweight compile-time route registry** that automates route mapping directly from `src/pages/` using a tailored Vite macro parser and native glob scanning.
 
-### File Structure Mapping
+### Custom Page Definitions (`definePage`)
 
-Vue page components created under `src/pages/` are automatically scanned and registered as routes:
-
-- `src/pages/index.vue` → `/` (Home page)
-- `src/pages/Login.vue` → `/Login`
-- `src/pages/ServerError.vue` → `/ServerError` (custom mapped to `/500` via `definePage`)
-- `src/pages/Offline.vue` → `/Offline`
-- `src/pages/[...pathMatch].vue` → `/:pathMatch(.*)*` (Catch-all 404 handler page)
-
-### Route Metadata & Layouts (`definePage`)
-
-You can declare custom layout overrides, page paths, dynamic page configurations, and navigation guard flags directly inside the SFC page component using the compile-time `definePage` macro:
+You can configure custom route paths, page titles, and layout overrides directly inside your page components using the `definePage` macro:
 
 ```vue
 <script setup lang="ts">
   definePage({
-    meta: {
-      layout: 'auth',        // Overrides default layout to AuthLayout
-      requiresAuth: false,   // Bypasses global authentication guard
-    }
+    route: "account/logout/",
+    head: "Logout",
+    layout: "default"
   });
 </script>
 ```
 
-### Type-Safe Navigation
+- **`route`**: The target URL path (e.g. `account/logout/` resolves to `/account/logout/`). If omitted, the router automatically falls back to file-system-based path names.
+- **`head`**: Page title automatically managed at route changes.
+- **`layout`**: Page layout overrides (`'default'`, `'auth'`, `'dashboard'`).
 
-`unplugin-vue-router` automatically maintains compile-time route declarations inside `src/typed-router.d.ts`. This gives you full autocompletion and compiler checks for routes across your IDE:
+### File-System Mapping Fallbacks
 
-```ts
-const router = useRouter();
+If a page does not specify an explicit `route`, the router maps it automatically based on its filename:
 
-// IDE autocomplete will guide you and show compile errors if you make a typo!
-router.push('/Login'); 
-router.push({ name: '/Login' });
-```
+- `src/pages/index.vue` → `/` (Home page)
+- `src/pages/[...pathMatch].vue` → `/:pathMatch(.*)*` (Catch-all 404 handler page)
+- `src/pages/Offline.vue` → `/offline`
+- `src/pages/Login.vue` → `/login`
 
 ## Components
 
