@@ -14,17 +14,17 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import MarketingLayout from '@/layouts/MarketingLayout.vue';
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import AppToast from '@/components/ui/AppToast.vue';
 import AppPageLoader from '@/components/ui/AppPageLoader.vue';
 import { useToast } from '@/composables/useToast';
 
-type LayoutName = 'marketing' | 'auth' | 'dashboard';
+type LayoutName = 'default' | 'auth' | 'dashboard';
 
 const layouts: Record<LayoutName, unknown> = {
-  marketing: MarketingLayout,
+  default: DefaultLayout,
   auth: AuthLayout,
   dashboard: DashboardLayout,
 };
@@ -33,8 +33,8 @@ const route = useRoute();
 const router = useRouter();
 
 const Layout = computed(() => {
-  const name = (route.meta.layout as LayoutName) ?? 'marketing';
-  return layouts[name] ?? MarketingLayout;
+  const name = (route.meta.layout as LayoutName) ?? 'default';
+  return layouts[name] ?? DefaultLayout;
 });
 
 const { toasts, remove, pause, resume } = useToast();

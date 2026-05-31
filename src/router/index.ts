@@ -7,7 +7,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('@/pages/home.vue'),
-      meta: { layout: 'marketing' },
+      meta: { layout: 'default' },
     },
     {
       path: '/login',
@@ -19,13 +19,13 @@ const router = createRouter({
       path: '/500',
       name: 'server-error',
       component: () => import('@/pages/ServerError.vue'),
-      meta: { layout: 'marketing' },
+      meta: { layout: 'default' },
     },
     {
       path: '/offline',
       name: 'offline',
       component: () => import('@/pages/Offline.vue'),
-      meta: { layout: 'marketing' },
+      meta: { layout: 'default' },
     },
     // Dev-only theme studio. Tree-shaken out of prod by import.meta.env.DEV.
     ...(import.meta.env.DEV
@@ -34,7 +34,7 @@ const router = createRouter({
             path: '/_theme',
             name: 'theme-studio',
             component: () => import('@/pages/_theme.vue'),
-            meta: { layout: 'marketing' },
+            meta: { layout: 'default' },
           },
         ]
       : []),
@@ -42,7 +42,7 @@ const router = createRouter({
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/pages/NotFound.vue'),
-      meta: { layout: 'marketing' },
+      meta: { layout: 'default' },
     },
   ],
   scrollBehavior() {
