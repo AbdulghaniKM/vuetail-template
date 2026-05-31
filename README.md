@@ -83,7 +83,8 @@ src/
 │   ├── product.service.ts   # Product API service
 │   └── upload.service.ts    # File upload with progress and cancellation
 ├── plugins/
-│   └── axios.ts             # Axios instance with auth, CSRF, interceptors
+│   ├── axios.config.ts      # Pure Axios instance and networking config
+│   └── axios.ts             # Axios interceptors, auth state, error handling
 ├── stores/                  # Pinia stores
 ├── layouts/                 # App layouts (default, auth, dashboard)
 ├── pages/                   # File-based typed route page components
