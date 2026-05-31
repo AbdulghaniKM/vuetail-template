@@ -1,14 +1,11 @@
 <template>
   <div>
-    <h1 class="text-text mb-4 text-xl font-semibold">Sign in</h1>
-    <p class="text-text-secondary mb-6 text-sm">
-      Login page stub. Wire this up to your auth flow via <code>useAuth().login(…)</code>.
+    <h1 class="mb-4 text-xl font-semibold text-text">Sign in</h1>
+    <p class="mb-6 text-sm text-text-secondary">
+      Login page stub. Wire this up to your auth flow via
+      <code>useAuth().login(…)</code>
+      .
     </p>
-    <RouterLink
-      to="/"
-      class="text-primary text-sm hover:underline"
-    >
-      ← Back home
-    </RouterLink>
+    <RouterLink to="/" class="text-sm text-primary hover:underline">← Back home</RouterLink>
   </div>
 </template>

@@ -16,7 +16,7 @@ export function extractApiErrorMessage(error: unknown): string {
 
 export async function withApiErrorHandler<T>(
   fn: () => Promise<T>,
-  loadingRef?: { value: boolean }
+  loadingRef?: { value: boolean },
 ): Promise<T> {
   try {
     if (loadingRef) loadingRef.value = true;

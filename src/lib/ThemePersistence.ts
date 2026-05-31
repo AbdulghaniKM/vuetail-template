@@ -65,8 +65,7 @@ export class ThemePersistence {
     if (typeof document === 'undefined') return;
     const storedPreference = readPersistedLightOrDarkPreference();
     const requestedMode = storedPreference ?? appConfig.theme.defaultTheme ?? 'system';
-    const effectiveAppearance =
-      requestedMode === 'system' ? getSystemTheme() : requestedMode;
+    const effectiveAppearance = requestedMode === 'system' ? getSystemTheme() : requestedMode;
     applyThemeToDOM(effectiveAppearance);
   }
 }

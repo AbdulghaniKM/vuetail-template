@@ -77,15 +77,19 @@
     pause: [id: string];
     resume: [id: string];
   }>();
-  
+
   const removeToast = (id: string) => emit('remove', id);
 
   const positionClass = computed(() => {
     switch (props.position) {
-      case 'top-left': return 'inset-x-0 top-0 items-start sm:inset-x-auto sm:start-4 sm:top-4';
-      case 'top-right': return 'inset-x-0 top-0 items-end sm:inset-x-auto sm:end-4 sm:top-4';
-      case 'bottom-left': return 'inset-x-0 bottom-0 items-start sm:inset-x-auto sm:start-4 sm:bottom-4';
-      case 'bottom-right': return 'inset-x-0 bottom-0 items-end sm:inset-x-auto sm:end-4 sm:bottom-4';
+      case 'top-left':
+        return 'inset-x-0 top-0 items-start sm:inset-x-auto sm:start-4 sm:top-4';
+      case 'top-right':
+        return 'inset-x-0 top-0 items-end sm:inset-x-auto sm:end-4 sm:top-4';
+      case 'bottom-left':
+        return 'inset-x-0 bottom-0 items-start sm:inset-x-auto sm:start-4 sm:bottom-4';
+      case 'bottom-right':
+        return 'inset-x-0 bottom-0 items-end sm:inset-x-auto sm:end-4 sm:bottom-4';
     }
   });
 
@@ -95,7 +99,7 @@
     return {
       initial: { opacity: 0, y: yOffset, scale: 0.95 },
       animate: { opacity: 1, y: 0, scale: 1 },
-      exit: { opacity: 0, y: isTop ? -8 : 8, scale: 0.95 }
+      exit: { opacity: 0, y: isTop ? -8 : 8, scale: 0.95 },
     };
   });
 

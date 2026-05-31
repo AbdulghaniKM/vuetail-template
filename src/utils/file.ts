@@ -36,19 +36,34 @@ export function getFileExtension(filename: string): string {
 }
 
 const IMAGE_EXTENSIONS = new Set([
-  'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico', 'avif', 'tiff',
+  'jpg',
+  'jpeg',
+  'png',
+  'gif',
+  'webp',
+  'svg',
+  'bmp',
+  'ico',
+  'avif',
+  'tiff',
 ]);
 
-const VIDEO_EXTENSIONS = new Set([
-  'mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv',
-]);
+const VIDEO_EXTENSIONS = new Set(['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv']);
 
-const AUDIO_EXTENSIONS = new Set([
-  'mp3', 'wav', 'ogg', 'flac', 'aac', 'wma', 'm4a',
-]);
+const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'ogg', 'flac', 'aac', 'wma', 'm4a']);
 
 const DOCUMENT_EXTENSIONS = new Set([
-  'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf', 'odt',
+  'pdf',
+  'doc',
+  'docx',
+  'xls',
+  'xlsx',
+  'ppt',
+  'pptx',
+  'txt',
+  'csv',
+  'rtf',
+  'odt',
 ]);
 
 /**
@@ -99,7 +114,14 @@ export function getFileCategory(
     if (type === 'image') return 'image';
     if (type === 'video') return 'video';
     if (type === 'audio') return 'audio';
-    if (filenameOrMime.includes('pdf') || type === 'text' || filenameOrMime.includes('document') || filenameOrMime.includes('spreadsheet') || filenameOrMime.includes('presentation')) return 'document';
+    if (
+      filenameOrMime.includes('pdf') ||
+      type === 'text' ||
+      filenameOrMime.includes('document') ||
+      filenameOrMime.includes('spreadsheet') ||
+      filenameOrMime.includes('presentation')
+    )
+      return 'document';
     return 'other';
   }
 

@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@plugin "@iconify/tailwind4";
+@plugin '@iconify/tailwind4';
 
 /* Tailwind Theme Definitions */
 /* Fallback values for build-time; runtime colors come from app.config.ts via applyTheme() */

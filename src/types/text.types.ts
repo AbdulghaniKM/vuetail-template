@@ -1,7 +1,27 @@
-export type TextVariant = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'label' | 'caption' | 'overline';
+export type TextVariant =
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
+  | 'p'
+  | 'span'
+  | 'label'
+  | 'caption'
+  | 'overline';
 export type TextSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
 export type TextWeight = 'light' | 'normal' | 'medium' | 'semibold' | 'bold';
-export type TextColor = 'primary' | 'secondary' | 'accent' | 'text' | 'text-secondary' | 'success' | 'warning' | 'error' | 'info';
+export type TextColor =
+  | 'primary'
+  | 'secondary'
+  | 'accent'
+  | 'text'
+  | 'text-secondary'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'info';
 export type TextAlign = 'left' | 'center' | 'right' | 'justify';
 export type TextTransform = 'uppercase' | 'lowercase' | 'capitalize' | 'normal-case';
 export type TextDecoration = 'underline' | 'line-through' | 'no-underline';
@@ -75,5 +95,12 @@ export const VARIANT_MAP: Record<TextVariant, VariantConfig> = {
   span: { tag: 'span', size: 'base', weight: 'normal', leading: 'normal' },
   label: { tag: 'label', size: 'sm', weight: 'medium', leading: 'normal' },
   caption: { tag: 'span', size: 'xs', weight: 'normal', leading: 'tight' },
-  overline: { tag: 'span', size: 'xs', weight: 'semibold', leading: 'tight', transform: 'uppercase', tracking: 'wider' },
+  overline: {
+    tag: 'span',
+    size: 'xs',
+    weight: 'semibold',
+    leading: 'tight',
+    transform: 'uppercase',
+    tracking: 'wider',
+  },
 };

@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="active"
-    class="bg-primary/20 pointer-events-none fixed inset-x-0 top-0 z-[10001] h-0.5"
+    class="pointer-events-none fixed inset-x-0 top-0 z-[10001] h-0.5 bg-primary/20"
     role="progressbar"
     aria-label="Loading"
     :aria-valuenow="Math.round(progress * 100)"
@@ -9,7 +9,7 @@
     aria-valuemax="100"
   >
     <div
-      class="bg-primary h-full transition-[width,opacity] duration-200 ease-out"
+      class="h-full bg-primary transition-[width,opacity] duration-200 ease-out"
       :style="{ width: `${progress * 100}%`, opacity: fading ? 0 : 1 }"
     />
   </div>

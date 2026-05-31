@@ -15,7 +15,10 @@ function emptyPaginationMeta(): PaginationMeta {
   };
 }
 
-function hasExceededStaleThreshold(lastCompletedFetch: Date | null, staleAfterMinutes: number): boolean {
+function hasExceededStaleThreshold(
+  lastCompletedFetch: Date | null,
+  staleAfterMinutes: number,
+): boolean {
   if (!lastCompletedFetch) return true;
   return Date.now() - lastCompletedFetch.getTime() > staleAfterMinutes * 60_000;
 }
@@ -141,10 +144,7 @@ export function createResourceStore<T extends object>(
           entityIdsMatch(readEntityIdentifier(item), id),
         );
         if (matchingIndex >= 0) items.value[matchingIndex] = updatedEntity;
-        if (
-          selected.value &&
-          entityIdsMatch(readEntityIdentifier(selected.value), id)
-        ) {
+        if (selected.value && entityIdsMatch(readEntityIdentifier(selected.value), id)) {
           selected.value = updatedEntity;
         }
         return updatedEntity;
@@ -161,13 +161,8 @@ export function createResourceStore<T extends object>(
       error.value = null;
       try {
         await remoteCollection.remove(id);
-        items.value = items.value.filter(
-          (item) => !entityIdsMatch(readEntityIdentifier(item), id),
-        );
-        if (
-          selected.value &&
-          entityIdsMatch(readEntityIdentifier(selected.value), id)
-        ) {
+        items.value = items.value.filter((item) => !entityIdsMatch(readEntityIdentifier(item), id));
+        if (selected.value && entityIdsMatch(readEntityIdentifier(selected.value), id)) {
           selected.value = null;
         }
       } catch (failure: unknown) {

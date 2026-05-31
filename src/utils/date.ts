@@ -32,7 +32,7 @@ const formatPresets: Record<DateFormatPreset, string> = {
 
 export const formatDate = (
   date: Date | string | number,
-  options: DateFormatOptions = {}
+  options: DateFormatOptions = {},
 ): string => {
   const { preset = 'medium', customFormat, locale = enUS } = options;
 
@@ -65,7 +65,7 @@ export const formatDate = (
 export const formatDateRange = (
   startDate: Date | string | number,
   endDate: Date | string | number,
-  options: DateFormatOptions = {}
+  options: DateFormatOptions = {},
 ): string => {
   const start = formatDate(startDate, options);
   const end = formatDate(endDate, options);

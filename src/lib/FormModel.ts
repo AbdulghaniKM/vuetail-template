@@ -8,9 +8,7 @@ export class FormModel<T extends Record<string, unknown>> {
 
   private readonly serializedInitialFields: string;
 
-  readonly isDirty = computed(
-    () => JSON.stringify(this.fields) !== this.serializedInitialFields,
-  );
+  readonly isDirty = computed(() => JSON.stringify(this.fields) !== this.serializedInitialFields);
 
   constructor(
     initialFields: T,

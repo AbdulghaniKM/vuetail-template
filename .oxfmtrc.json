@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "sortTailwindcss": {
+    "stylesheet": "./src/style.css"
+  },
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "vueIndentScriptAndStyle": true,
+  "htmlWhitespaceSensitivity": "ignore",
+  "embeddedLanguageFormatting": "auto",
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "dist/**",
+    "node_modules/**",
+    "pnpm-lock.yaml",
+    "src/auto-imports.d.ts",
+    "src/components.d.ts"
+  ]
+}

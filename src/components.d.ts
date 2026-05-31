@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* oxlint-disable */
 // @ts-nocheck
 // biome-ignore lint: disable
 // oxlint-disable
@@ -8,7 +8,7 @@
 
 export {}
 
-/* prettier-ignore */
+/* oxfmt-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
     RouterLink: typeof import('vue-router')['RouterLink']

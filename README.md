@@ -1,23 +1,29 @@
 # VueTail
 
-A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and a complete component library.
+A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and a complete component library. Built on the [Oxc](https://oxc.rs) toolchain (Oxlint + Oxfmt) and Vite 8 with Rolldown.
 
 ## Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Vue 3.5 with `<script setup>` + Composition API |
-| Styling | Tailwind CSS v4 with CSS variable theming |
-| Language | TypeScript 5.7 (strict) |
-| Build | Vite 7 |
-| State | Pinia 3 |
-| Routing | Vue Router 4 |
-| Validation | Zod 4 |
-| HTTP | Axios (interceptors, CSRF, auth token plumbing) |
-| Icons | Iconify (200k+ icons via `@iconify/tailwind4`) |
-| Animations | motion-v (spring physics) |
-| Utilities | VueUse, date-fns |
-| Linting | ESLint + Prettier (with Tailwind class sorting) |
+| Layer      | Technology                                                                  |
+| ---------- | --------------------------------------------------------------------------- |
+| Framework  | Vue 3.5 with `<script setup>` + Composition API                             |
+| Styling    | Tailwind CSS v4 with CSS variable theming                                   |
+| Language   | TypeScript 5.7 (strict)                                                     |
+| Build      | Vite 8 (Rolldown)                                                           |
+| State      | Pinia 3                                                                     |
+| Routing    | Vue Router 4                                                                |
+| Validation | Zod 4                                                                       |
+| HTTP       | Axios (interceptors, CSRF, auth token plumbing)                             |
+| Icons      | Iconify (200k+ icons via `@iconify/tailwind4`)                              |
+| Animations | motion-v (spring physics)                                                   |
+| Utilities  | VueUse, date-fns                                                            |
+| Linting    | [Oxlint](https://oxc.rs/docs/guide/usage/linter)                            |
+| Formatting | [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) (Tailwind class sorting) |
+
+## Prerequisites
+
+- **Node.js** 20.19+ or 22.12+ (required by Vite 8)
+- **pnpm** (recommended)
 
 ## Quick Start
 
@@ -103,7 +109,7 @@ src/
 ├── plugins/
 │   └── axios.ts             # Axios instance with auth, CSRF, interceptors
 ├── stores/                  # Pinia stores
-├── layout/                  # Layout wrapper
+├── layouts/                 # App layouts (default, auth, dashboard)
 ├── pages/                   # Route page components
 ├── router/                  # Vue Router configuration
 ├── types/                   # Shared TypeScript types
@@ -151,15 +157,15 @@ Use theme colors directly in Tailwind classes: `bg-primary`, `text-secondary`, `
 Switch themes programmatically:
 
 ```ts
-const { theme, setTheme, isDark } = useTheme()
-setTheme('dark')   // 'light' | 'dark' | 'system'
+const { theme, setTheme, isDark } = useTheme();
+setTheme('dark'); // 'light' | 'dark' | 'system'
 ```
 
 Customize colors at runtime:
 
 ```ts
-const { updateColor, resetColors } = useColorCustomizer()
-updateColor('primary', '#e11d48')
+const { updateColor, resetColors } = useColorCustomizer();
+updateColor('primary', '#e11d48');
 ```
 
 ## Components
@@ -219,12 +225,7 @@ Features: search with clear, sort, client/server pagination, column visibility t
 ### AppForm
 
 ```vue
-<AppForm
-  v-model="formData"
-  :fields="fields"
-  :schema="zodSchema"
-  @submitted="onSubmit"
-/>
+<AppForm v-model="formData" :fields="fields" :schema="zodSchema" @submitted="onSubmit" />
 ```
 
 Field types: `text`, `email`, `password`, `number`, `textarea`, `select`, `phone`, `date`, `datetime`. Supports multi-column rows, custom actions slot, and Zod schema validation.
@@ -232,9 +233,9 @@ Field types: `text`, `email`, `password`, `number`, `textarea`, `select`, `phone
 ### AppToast
 
 ```ts
-const { success, error, warning, info } = useToast()
-success('Changes saved!')
-error('Something went wrong', { title: 'Error', duration: 8000 })
+const { success, error, warning, info } = useToast();
+success('Changes saved!');
+error('Something went wrong', { title: 'Error', duration: 8000 });
 ```
 
 ### AppText
@@ -253,8 +254,8 @@ Variants: `h1`-`h6`, `p`, `span`, `label`, `caption`, `overline`.
 ### useAuth
 
 ```ts
-const { user, isAuthenticated, login, logout, fetchUser } = useAuth()
-await login({ email: 'user@example.com', password: '...' })
+const { user, isAuthenticated, login, logout, fetchUser } = useAuth();
+await login({ email: 'user@example.com', password: '...' });
 ```
 
 Token is stored in localStorage and automatically attached to every Axios request via the interceptor. 401 responses clear the session.
@@ -264,26 +265,26 @@ Token is stored in localStorage and automatically attached to every Axios reques
 ```ts
 useKeyboard({
   'ctrl+k': () => openSearch(),
-  'escape': () => closePanel(),
-})
+  escape: () => closePanel(),
+});
 
 // Conditional — only active when ref is true
-useKeyboard({ 'escape': () => close() }, isOpen)
+useKeyboard({ escape: () => close() }, isOpen);
 ```
 
 ### useLocalStorage
 
 ```ts
-const settings = useLocalStorage('app-settings', { sidebar: true }, zodSchema)
-settings.value.sidebar = false // auto-persisted, validated on read
+const settings = useLocalStorage('app-settings', { sidebar: true }, zodSchema);
+settings.value.sidebar = false; // auto-persisted, validated on read
 ```
 
 ### useConfirm
 
 ```ts
-const { confirm } = useConfirm()
-const ok = await confirm({ title: 'Delete item?', message: 'This cannot be undone.' })
-if (ok) deleteItem()
+const { confirm } = useConfirm();
+const ok = await confirm({ title: 'Delete item?', message: 'This cannot be undone.' });
+if (ok) deleteItem();
 ```
 
 ### usePagination
@@ -292,48 +293,73 @@ if (ok) deleteItem()
 const { page, totalPages, next, prev, visiblePages, paginate } = usePagination({
   total: computed(() => items.length),
   pageSize: 20,
-})
-const pageItems = paginate(items)
+});
+const pageItems = paginate(items);
 ```
 
 ### useBreakpoint
 
 ```ts
-const { isMobile, isDesktop, current, greaterThan } = useBreakpoint()
+const { isMobile, isDesktop, current, greaterThan } = useBreakpoint();
 // current.value → 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 ```
 
 ### useClipboard
 
 ```ts
-const { copy, copied } = useClipboard()
-await copy('text to copy', true) // true = show toast
+const { copy, copied } = useClipboard();
+await copy('text to copy', true); // true = show toast
 ```
 
 ### useDebounce / useThrottle
 
 ```ts
-const debouncedSearch = useDebounce(searchQuery, 300)
-const throttledScroll = useThrottle(scrollPosition, 100)
+const debouncedSearch = useDebounce(searchQuery, 300);
+const throttledScroll = useThrottle(scrollPosition, 100);
 ```
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `VITE_API_URL` | API base URL (required in production) | `/api` |
-| `VITE_APP_URL` | Public app URL (used for SEO) | `window.location.origin` |
+| Variable       | Description                           | Default                  |
+| -------------- | ------------------------------------- | ------------------------ |
+| `VITE_API_URL` | API base URL (required in production) | `/api`                   |
+| `VITE_APP_URL` | Public app URL (used for SEO)         | `window.location.origin` |
 
 See `.env.example` for reference.
+
+## Code quality
+
+Linting and formatting use the Oxc toolchain — fast, no ESLint/Prettier dependency tree.
+
+| File                               | Purpose                                                     |
+| ---------------------------------- | ----------------------------------------------------------- |
+| [`.oxlintrc.json`](.oxlintrc.json) | Lint rules (TypeScript, Vue, recommended presets)           |
+| [`.oxfmtrc.json`](.oxfmtrc.json)   | Format options + Tailwind class sorting via `src/style.css` |
+
+**Editor:** install the [Oxc VS Code extension](https://marketplace.visualstudio.com/items?itemName=oxc.oxc-vscode) and set it as the default formatter for JS/TS/Vue.
+
+```bash
+pnpm lint          # Lint (warnings for no-console, no-explicit-any, etc.)
+pnpm lint:fix      # Lint with auto-fix
+pnpm format        # Format the repo with Oxfmt
+pnpm format:check  # Fail CI if anything is unformatted
+```
+
+Generated files (`src/auto-imports.d.ts`, `src/components.d.ts`) are ignored by both tools.
 
 ## Scripts
 
 ```bash
-pnpm dev        # Start dev server
-pnpm build      # Type-check + production build
-pnpm preview    # Preview production build
-pnpm lint       # Run ESLint
-pnpm format     # Run Prettier
+pnpm dev              # Start dev server
+pnpm build            # Type-check + production build
+pnpm preview          # Preview production build
+pnpm lint             # Run Oxlint
+pnpm lint:fix         # Run Oxlint with auto-fix
+pnpm format           # Format with Oxfmt
+pnpm format:check     # Check formatting (CI)
+pnpm add-component    # Scaffold a UI component
+pnpm add-composable   # Scaffold a composable
+pnpm vuetail:verify   # Verify registry / install integrity
 ```
 
 ## License

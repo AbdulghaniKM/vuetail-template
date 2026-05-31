@@ -16,27 +16,11 @@ export default defineConfig({
         'pinia',
         '@vueuse/core',
         {
-          'axios': [
-            ['default', 'axios'],
-            'isAxiosError',
-            'AxiosError',
-          ],
-          '@/plugins/axios': [
-            'api',
-            'apiGet',
-            'apiPost',
-            'apiPut',
-            'apiPatch',
-            'apiDelete',
-          ],
+          axios: [['default', 'axios'], 'isAxiosError', 'AxiosError'],
+          '@/plugins/axios': ['api', 'apiGet', 'apiPost', 'apiPut', 'apiPatch', 'apiDelete'],
         },
       ],
-      dirs: [
-        'src/composables/**',
-        'src/stores/**',
-        'src/types/**',
-        'src/config/**',
-      ],
+      dirs: ['src/composables/**', 'src/stores/**', 'src/types/**', 'src/config/**'],
       dirsScanOptions: {
         fileFilter: (file) => !file.endsWith('index.ts'),
       },

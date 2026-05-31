@@ -8,7 +8,10 @@ const SHAPES: readonly Shape[] = ['square', 'rounded', 'pill'] as const;
 const isShape = (v: string | null): v is Shape =>
   v !== null && (SHAPES as readonly string[]).includes(v);
 
-const readStored = <T extends string>(key: string, guard: (v: string | null) => v is T): T | null => {
+const readStored = <T extends string>(
+  key: string,
+  guard: (v: string | null) => v is T,
+): T | null => {
   if (typeof localStorage === 'undefined') return null;
   try {
     const raw = localStorage.getItem(key);
@@ -23,7 +26,9 @@ const writeStored = (key: string, value: string | null): void => {
   try {
     if (value === null) localStorage.removeItem(key);
     else localStorage.setItem(key, value);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 };
 
 const applyAttr = (attr: string, value: string | null): void => {
@@ -44,7 +49,9 @@ watch(shape, (v) => {
 });
 
 export const useAppUi = () => {
-  const setShape = (value: Shape) => { shape.value = value; };
+  const setShape = (value: Shape) => {
+    shape.value = value;
+  };
 
   const reset = () => {
     shape.value = defaultTheme.shape;

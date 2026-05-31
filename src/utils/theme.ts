@@ -61,8 +61,7 @@ export const generateCSSVariables = (theme: ThemeConfig): string => {
   `;
 };
 
-const camelToKebab = (str: string): string =>
-  str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+const camelToKebab = (str: string): string => str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 
 const generateColorVariables = (palette: ColorPalette): string => {
   return Object.entries(palette)

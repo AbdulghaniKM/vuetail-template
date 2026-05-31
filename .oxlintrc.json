@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "vue", "unicorn", "oxc"],
+  "env": {
+    "builtin": true,
+    "browser": true
+  },
+  "ignorePatterns": [
+    "dist/**",
+    "node_modules/**",
+    "*.config.js",
+    "*.config.ts",
+    "src/auto-imports.d.ts",
+    "src/components.d.ts"
+  ],
+  "rules": {
+    "typescript/no-unused-vars": "off",
+    "typescript/no-explicit-any": "warn",
+    "no-console": "warn",
+    "no-debugger": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["scripts/**/*.js", "scripts/**/*.ts"],
+      "env": {
+        "node": true
+      },
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
+}

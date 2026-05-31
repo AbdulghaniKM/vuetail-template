@@ -3,11 +3,11 @@ import { ref } from 'vue';
 // NOTE: Module-scope ref() state. SPA-only — not safe under SSR.
 
 export interface Toast {
-  id: string
-  type: 'success' | 'error' | 'warning' | 'info'
-  message: string
-  title?: string
-  duration?: number
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  message: string;
+  title?: string;
+  duration?: number;
 }
 
 interface TimerRecord {

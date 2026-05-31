@@ -7,7 +7,7 @@
   >
     <RouterLink
       to="/"
-      class="bg-primary rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+      class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
     >
       Go home
     </RouterLink>

@@ -19,13 +19,9 @@ const force = args.includes('--force');
 const refIdx = args.findIndex((a) => a === '--ref' || a.startsWith('--ref='));
 let ref = DEFAULT_REF;
 if (refIdx !== -1) {
-  ref = args[refIdx].includes('=')
-    ? args[refIdx].split('=')[1]
-    : args[refIdx + 1];
+  ref = args[refIdx].includes('=') ? args[refIdx].split('=')[1] : args[refIdx + 1];
 }
-const positional = args.filter(
-  (a, i) => !a.startsWith('--') && args[i - 1] !== '--ref'
-);
+const positional = args.filter((a, i) => !a.startsWith('--') && args[i - 1] !== '--ref');
 const command = positional[0];
 
 const REGISTRY_BASE = `https://raw.githubusercontent.com/${REGISTRY_REPO}/${ref}`;
@@ -212,7 +208,9 @@ const showHelp = () => {
 
 const listCommand = async () => {
   let res;
-  try { res = await fetchWithRetry(REGISTRY_INDEX); } catch (err) {
+  try {
+    res = await fetchWithRetry(REGISTRY_INDEX);
+  } catch (err) {
     console.log(`Registry unreachable: ${err.message}`);
     return;
   }
@@ -224,7 +222,10 @@ const listCommand = async () => {
   const index = await res.json();
   const items = isComposable ? index.composables : index.components;
   const label = isComposable ? 'composables' : 'components';
-  if (!items?.length) { console.log(`No ${label} in registry yet.`); return; }
+  if (!items?.length) {
+    console.log(`No ${label} in registry yet.`);
+    return;
+  }
   console.log(`\nAvailable ${label} (ref: ${ref}):\n`);
   items.forEach((name) => console.log(`  ${isInstalled(name) ? '✓' : '·'} ${name}`));
   console.log('');
@@ -247,28 +248,19 @@ const verifyCommand = async () => {
     }
     const sha = sha256(fs.readFileSync(p, 'utf8'));
     if (sha !== rec.sha) {
-      console.log(
-        `  ! ${name} — drift (expected ${rec.sha.slice(0, 8)}, got ${sha.slice(
-          0,
-          8
-        )})`
-      );
+      console.log(`  ! ${name} — drift (expected ${rec.sha.slice(0, 8)}, got ${sha.slice(0, 8)})`);
       drift++;
     } else {
       console.log(`  ✓ ${name}`);
     }
   }
-  console.log(
-    `\n${drift === 0 ? 'All files match.' : `${drift} drifted / missing.`}`
-  );
+  console.log(`\n${drift === 0 ? 'All files match.' : `${drift} drifted / missing.`}`);
   return drift === 0 ? 0 : 1;
 };
 
 const addCommand = async (name) => {
   if (ref === 'main') {
-    console.log(
-      `  ! Using ref 'main' — output is not reproducible. Pin with --ref <tag|sha>.\n`
-    );
+    console.log(`  ! Using ref 'main' — output is not reproducible. Pin with --ref <tag|sha>.\n`);
   }
 
   let res;
@@ -298,9 +290,7 @@ const addCommand = async (name) => {
   if (missingFiles.length > 0) {
     console.log(`\n  ✗ ${name} requires template files that are missing:\n`);
     for (const f of missingFiles) console.log(`      ${f}`);
-    console.log(
-      `\n  Create these files (or pull them from the template) and retry.\n`
-    );
+    console.log(`\n  Create these files (or pull them from the template) and retry.\n`);
     return 1;
   }
 
@@ -308,13 +298,10 @@ const addCommand = async (name) => {
     const components = missing.filter((d) => !isComposableName(d));
     const composables = missing.filter((d) => isComposableName(d));
     console.log(
-      `\n  Installing ${name} + ${missing.length} missing dep${
-        missing.length > 1 ? 's' : ''
-      }:\n`
+      `\n  Installing ${name} + ${missing.length} missing dep${missing.length > 1 ? 's' : ''}:\n`,
     );
     if (components.length) console.log(`  Components : ${components.join(', ')}`);
-    if (composables.length)
-      console.log(`  Composables: ${composables.join(', ')}`);
+    if (composables.length) console.log(`  Composables: ${composables.join(', ')}`);
     console.log('');
     for (const dep of missing) await installItem(dep, lock);
     console.log('');

@@ -18,14 +18,12 @@
           } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.setAttribute('data-theme', 'dark');
           }
-          var pairs = [
-            ['app-shape', 'data-shape'],
-          ];
+          var pairs = [['app-shape', 'data-shape']];
           for (var i = 0; i < pairs.length; i++) {
             var v = localStorage.getItem(pairs[i][0]);
             if (v) document.documentElement.setAttribute(pairs[i][1], v);
           }
-        } catch (_) { }
+        } catch (_) {}
       })();
     </script>
 

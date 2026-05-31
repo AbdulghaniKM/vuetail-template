@@ -4,13 +4,13 @@
     <span
       v-for="n in lines"
       :key="n"
-      class="app-skeleton bg-muted block h-3 rounded"
+      class="app-skeleton block h-3 rounded bg-muted"
       :class="n === lines ? 'w-2/3' : 'w-full'"
     />
   </div>
   <span
     v-else
-    class="app-skeleton bg-muted block"
+    class="app-skeleton block bg-muted"
     :class="[shapeClass, containerClass]"
     :style="sizeStyle"
   />

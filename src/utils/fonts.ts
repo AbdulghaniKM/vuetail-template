@@ -22,12 +22,14 @@ export const loadFont = (config: FontConfig): Promise<void> => {
 
     const fontFace = new FontFace(
       config.name,
-      typeof config.src === 'string' ? `url(${config.src})` : config.src.map((s) => `url(${s})`).join(', '),
+      typeof config.src === 'string'
+        ? `url(${config.src})`
+        : config.src.map((s) => `url(${s})`).join(', '),
       {
         weight: config.weight?.toString(),
         style: config.style || 'normal',
         display: config.display || 'swap',
-      }
+      },
     );
 
     fontFace
