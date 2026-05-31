@@ -1,6 +1,14 @@
 import type { AppConfig } from './types';
+import { getApiUrl } from './env';
 
 export const appConfig: AppConfig = {
+  api: {
+    baseUrl: getApiUrl(),
+    version: 'v1',
+    timeout: 15000,
+    retryAttempts: 3,
+  },
+
   app: {
     name: 'Vue Template',
     title: 'Vue Template - Modern Vue 3 Application',

@@ -114,6 +114,13 @@ export interface LayoutConfig {
   };
 }
 
+export interface ApiConfig {
+  baseUrl: string;
+  version?: string;
+  timeout?: number;
+  retryAttempts?: number;
+}
+
 export interface AppConfig {
   app: AppMetadata;
   theme: ThemeConfig;
@@ -121,4 +128,5 @@ export interface AppConfig {
   icons: IconConfig;
   seo?: SeoDefaults;
   layout?: LayoutConfig;
+  api?: ApiConfig;
 }

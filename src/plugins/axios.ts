@@ -1,5 +1,7 @@
-import axios, { AxiosError, type AxiosRequestConfig, type InternalAxiosRequestConfig } from 'axios';
-import { getApiUrl } from '@/config/env';
+import { AxiosError, type AxiosRequestConfig, type InternalAxiosRequestConfig } from 'axios';
+import { api } from './axios.config';
+
+export { api };
 
 export interface AuthProvider {
   getToken?: () => string | null | undefined;
@@ -20,17 +22,6 @@ export const setAuthProvider = (provider: AuthProvider): void => {
   store.refreshPromise = null;
   store.provider = { ...store.provider, ...provider };
 };
-
-export const api = axios.create({
-  baseURL: getApiUrl(),
-  timeout: 15_000,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-});
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
