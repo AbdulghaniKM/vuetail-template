@@ -1,8 +1,2 @@
 export type { PaginatedResponse, PaginationMeta, QueryParams } from './resource.types';
-
-export interface Product {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-}
+export type { Product } from './product.types';

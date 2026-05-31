@@ -8,38 +8,20 @@ export {}
 declare global {
   const API_PATHS: typeof import('./config/api-paths').API_PATHS
   const AxiosError: typeof import('axios').AxiosError
-  const AxiosProgressEvent: typeof import('axios').AxiosProgressEvent
-  const AxiosRequestConfig: typeof import('axios').AxiosRequestConfig
-  const AxiosResponse: typeof import('axios').AxiosResponse
-  const BaseApiService: typeof import('./services/BaseApiService').BaseApiService
-  const CancelTokenSource: typeof import('axios').CancelTokenSource
-  const CreateDto: typeof import('./services/BaseApiService').CreateDto
   const EffectScope: typeof import('vue').EffectScope
-  const FieldValidation: typeof import('./utils/validation').FieldValidation
-  const MultipartUpload: typeof import('./services/upload.service').MultipartUpload
-  const ProductService: typeof import('./services/product.service').ProductService
-  const UpdateDto: typeof import('./services/BaseApiService').UpdateDto
-  const UploadController: typeof import('./services/upload.service').UploadController
   const VARIANT_MAP: typeof import('./types/text.types').VARIANT_MAP
   const VariantConfig: typeof import('./types/text.types').VariantConfig
   const acceptHMRUpdate: typeof import('pinia').acceptHMRUpdate
-  const addMonth: typeof import('./utils/datepicker').addMonth
   const api: typeof import('@/plugins/axios').api
   const apiDelete: typeof import('@/plugins/axios').apiDelete
   const apiGet: typeof import('@/plugins/axios').apiGet
   const apiPatch: typeof import('@/plugins/axios').apiPatch
   const apiPost: typeof import('@/plugins/axios').apiPost
   const apiPut: typeof import('@/plugins/axios').apiPut
-  const appConfig: typeof import('./config/index').appConfig
-  const applyFontFamily: typeof import('./utils/fonts').applyFontFamily
-  const applyTheme: typeof import('./utils/theme').applyTheme
-  const applyThemeToDOM: typeof import('./utils/theme').applyThemeToDOM
-  const as: typeof import('./utils/fonts').as
+  const appConfig: typeof import('./config/app.config').appConfig
   const asyncComputed: typeof import('@vueuse/core').asyncComputed
   const autoResetRef: typeof import('@vueuse/core').autoResetRef
   const axios: typeof import('axios').default
-  const buildModelValue: typeof import('./utils/datepicker').buildModelValue
-  const clearSeo: typeof import('./utils/seo').clearSeo
   const computed: typeof import('vue').computed
   const computedAsync: typeof import('@vueuse/core').computedAsync
   const computedEager: typeof import('@vueuse/core').computedEager
@@ -66,56 +48,33 @@ declare global {
   const defineAsyncComponent: typeof import('vue').defineAsyncComponent
   const defineComponent: typeof import('vue').defineComponent
   const defineStore: typeof import('pinia').defineStore
-  const display: typeof import('./utils/display').display
   const eagerComputed: typeof import('@vueuse/core').eagerComputed
   const effectScope: typeof import('vue').effectScope
-  const email: typeof import('./utils/validation').email
   const env: typeof import('./config/env').env
   const envConfig: typeof import('./config/env').envConfig
   const extendRef: typeof import('@vueuse/core').extendRef
-  const extractApiErrorMessage: typeof import('./utils/error').extractApiErrorMessage
-  const fontName: typeof import('./utils/fonts').fontName
-  const formatDate: typeof import('./utils/date').formatDate
-  const formatDateRange: typeof import('./utils/date').formatDateRange
-  const formatFileSize: typeof import('./utils/file').formatFileSize
-  const generateCSSVariables: typeof import('./utils/theme').generateCSSVariables
-  const generateTailwindTheme: typeof import('./utils/theme').generateTailwindTheme
   const getActivePinia: typeof import('pinia').getActivePinia
   const getApiUrl: typeof import('./config/env').getApiUrl
   const getAppUrl: typeof import('./config/env').getAppUrl
-  const getCalendarDays: typeof import('./utils/datepicker').getCalendarDays
-  const getColorValue: typeof import('./utils/theme').getColorValue
   const getCurrentInstance: typeof import('vue').getCurrentInstance
   const getCurrentScope: typeof import('vue').getCurrentScope
   const getCurrentWatcher: typeof import('vue').getCurrentWatcher
   const getEnv: typeof import('./config/env').getEnv
   const getEnvBoolean: typeof import('./config/env').getEnvBoolean
   const getEnvNumber: typeof import('./config/env').getEnvNumber
-  const getFileCategory: typeof import('./utils/file').getFileCategory
-  const getFileExtension: typeof import('./utils/file').getFileExtension
-  const getFontVariable: typeof import('./utils/fonts').getFontVariable
-  const getSystemTheme: typeof import('./utils/theme').getSystemTheme
-  const getWeekdayLabels: typeof import('./utils/datepicker').getWeekdayLabels
   const h: typeof import('vue').h
   const ignorableWatch: typeof import('@vueuse/core').ignorableWatch
-  const initializeConfig: typeof import('./config/index').initializeConfig
   const inject: typeof import('vue').inject
   const injectLocal: typeof import('@vueuse/core').injectLocal
-  const isAudio: typeof import('./utils/file').isAudio
   const isAxiosError: typeof import('axios').isAxiosError
-  const isDateValid: typeof import('./utils/date').isDateValid
   const isDefined: typeof import('@vueuse/core').isDefined
   const isDev: typeof import('./config/env').isDev
-  const isDocument: typeof import('./utils/file').isDocument
-  const isImage: typeof import('./utils/file').isImage
   const isProd: typeof import('./config/env').isProd
   const isProxy: typeof import('vue').isProxy
   const isReactive: typeof import('vue').isReactive
   const isReadonly: typeof import('vue').isReadonly
   const isRef: typeof import('vue').isRef
   const isShallow: typeof import('vue').isShallow
-  const isVideo: typeof import('./utils/file').isVideo
-  const loadFont: typeof import('./utils/fonts').loadFont
   const makeDestructurable: typeof import('@vueuse/core').makeDestructurable
   const mapActions: typeof import('pinia').mapActions
   const mapGetters: typeof import('pinia').mapGetters
@@ -123,13 +82,7 @@ declare global {
   const mapStores: typeof import('pinia').mapStores
   const mapWritableState: typeof import('pinia').mapWritableState
   const markRaw: typeof import('vue').markRaw
-  const max: typeof import('./utils/validation').max
-  const maxLength: typeof import('./utils/validation').maxLength
-  const message: typeof import('./utils/validation').message
-  const min: typeof import('./utils/validation').min
-  const minLength: typeof import('./utils/validation').minLength
   const nextTick: typeof import('vue').nextTick
-  const number: typeof import('./utils/validation').number
   const onActivated: typeof import('vue').onActivated
   const onBeforeMount: typeof import('vue').onBeforeMount
   const onBeforeRouteLeave: typeof import('vue-router').onBeforeRouteLeave
@@ -151,11 +104,8 @@ declare global {
   const onUnmounted: typeof import('vue').onUnmounted
   const onUpdated: typeof import('vue').onUpdated
   const onWatcherCleanup: typeof import('vue').onWatcherCleanup
-  const parseModelValue: typeof import('./utils/datepicker').parseModelValue
-  const pattern: typeof import('./utils/validation').pattern
   const pausableWatch: typeof import('@vueuse/core').pausableWatch
-  const preloadFont: typeof import('./utils/fonts').preloadFont
-  const productService: typeof import('./services/product.service').productService
+  const productService: typeof import('./stores/product.store').productService
   const provide: typeof import('vue').provide
   const provideLocal: typeof import('@vueuse/core').provideLocal
   const reactify: typeof import('@vueuse/core').reactify
@@ -164,7 +114,6 @@ declare global {
   const reactiveComputed: typeof import('@vueuse/core').reactiveComputed
   const reactiveOmit: typeof import('@vueuse/core').reactiveOmit
   const reactivePick: typeof import('@vueuse/core').reactivePick
-  const readStoredTheme: typeof import('./config/index').readStoredTheme
   const readonly: typeof import('vue').readonly
   const ref: typeof import('vue').ref
   const refAutoReset: typeof import('@vueuse/core').refAutoReset
@@ -172,9 +121,6 @@ declare global {
   const refDefault: typeof import('@vueuse/core').refDefault
   const refThrottled: typeof import('@vueuse/core').refThrottled
   const refWithControl: typeof import('@vueuse/core').refWithControl
-  const registerErrorToasts: typeof import('@/plugins/axios').registerErrorToasts
-  const registerFontFamily: typeof import('./utils/fonts').registerFontFamily
-  const required: typeof import('./utils/validation').required
   const resolveComponent: typeof import('vue').resolveComponent
   const resolveRef: typeof import('@vueuse/core').resolveRef
   const resolveUnref: typeof import('@vueuse/core').resolveUnref
@@ -184,15 +130,11 @@ declare global {
   const shallowReadonly: typeof import('vue').shallowReadonly
   const shallowRef: typeof import('vue').shallowRef
   const storeToRefs: typeof import('pinia').storeToRefs
-  const subMonth: typeof import('./utils/datepicker').subMonth
   const syncRef: typeof import('@vueuse/core').syncRef
   const syncRefs: typeof import('@vueuse/core').syncRefs
   const templateRef: typeof import('@vueuse/core').templateRef
-  const theme: typeof import('./utils/theme').theme
   const throttledRef: typeof import('@vueuse/core').throttledRef
   const throttledWatch: typeof import('@vueuse/core').throttledWatch
-  const toDateInputValue: typeof import('./utils/datepicker').toDateInputValue
-  const toDisplayValue: typeof import('./utils/datepicker').toDisplayValue
   const toRaw: typeof import('vue').toRaw
   const toReactive: typeof import('@vueuse/core').toReactive
   const toRef: typeof import('vue').toRef
@@ -204,14 +146,9 @@ declare global {
   const tryOnMounted: typeof import('@vueuse/core').tryOnMounted
   const tryOnScopeDispose: typeof import('@vueuse/core').tryOnScopeDispose
   const tryOnUnmounted: typeof import('@vueuse/core').tryOnUnmounted
-  const type: typeof import('./utils/fonts').type
   const unref: typeof import('vue').unref
   const unrefElement: typeof import('@vueuse/core').unrefElement
-  const unregisterErrorToasts: typeof import('@/plugins/axios').unregisterErrorToasts
   const until: typeof import('@vueuse/core').until
-  const uploadFile: typeof import('./services/upload.service').uploadFile
-  const uploadMultipleFiles: typeof import('./services/upload.service').uploadMultipleFiles
-  const url: typeof import('./utils/validation').url
   const useActiveElement: typeof import('@vueuse/core').useActiveElement
   const useAnimate: typeof import('@vueuse/core').useAnimate
   const useAppConfig: typeof import('./composables/useAppConfig').useAppConfig
@@ -328,7 +265,6 @@ declare global {
   const usePrevious: typeof import('@vueuse/core').usePrevious
   const useProductStore: typeof import('./stores/product.store').useProductStore
   const useRafFn: typeof import('@vueuse/core').useRafFn
-  const useRedirect: typeof import('./utils/index').useRedirect
   const useRefHistory: typeof import('@vueuse/core').useRefHistory
   const useResizeObserver: typeof import('@vueuse/core').useResizeObserver
   const useRoute: typeof import('vue-router').useRoute
@@ -339,7 +275,6 @@ declare global {
   const useScriptTag: typeof import('@vueuse/core').useScriptTag
   const useScroll: typeof import('@vueuse/core').useScroll
   const useScrollLock: typeof import('@vueuse/core').useScrollLock
-  const useSeo: typeof import('./utils/seo').useSeo
   const useSessionStorage: typeof import('@vueuse/core').useSessionStorage
   const useShare: typeof import('@vueuse/core').useShare
   const useSidebar: typeof import('./composables/useSidebar').useSidebar
@@ -387,9 +322,6 @@ declare global {
   const useWindowFocus: typeof import('@vueuse/core').useWindowFocus
   const useWindowScroll: typeof import('@vueuse/core').useWindowScroll
   const useWindowSize: typeof import('@vueuse/core').useWindowSize
-  const validateField: typeof import('./utils/validation').validateField
-  const validateFile: typeof import('./services/upload.service').validateFile
-  const validateForm: typeof import('./utils/validation').validateForm
   const watch: typeof import('vue').watch
   const watchArray: typeof import('@vueuse/core').watchArray
   const watchAtMost: typeof import('@vueuse/core').watchAtMost
@@ -406,7 +338,6 @@ declare global {
   const watchTriggerable: typeof import('@vueuse/core').watchTriggerable
   const watchWithFilter: typeof import('@vueuse/core').watchWithFilter
   const whenever: typeof import('@vueuse/core').whenever
-  const withApiErrorHandler: typeof import('./utils/error').withApiErrorHandler
 }
 // for type re-export
 declare global {
@@ -420,20 +351,11 @@ declare global {
   export type { ResourceCollectionClient, ResourceStoreBindings } from './stores/factory'
   import('./stores/factory')
   // @ts-ignore
-  export type { BaseApiService, CreateDto, UpdateDto } from './services/BaseApiService'
-  import('./services/BaseApiService')
-  // @ts-ignore
-  export type { ProductService } from './services/product.service'
-  import('./services/product.service')
-  // @ts-ignore
-  export type { MultipartUpload, UploadOptions, UploadResult, FileValidationResult } from './services/upload.service'
-  import('./services/upload.service')
-  // @ts-ignore
   export type { FormField, FormFieldRow } from './types/form.types'
   import('./types/form.types')
   // @ts-ignore
-  export type { Product } from './types/index'
-  import('./types/index')
+  export type { Product } from './types/product.types'
+  import('./types/product.types')
   // @ts-ignore
   export type { PaginationMeta, PaginatedResponse, QueryParams } from './types/resource.types'
   import('./types/resource.types')
@@ -452,13 +374,7 @@ declare module 'vue' {
   interface ComponentCustomProperties {
     readonly API_PATHS: UnwrapRef<typeof import('./config/api-paths')['API_PATHS']>
     readonly AxiosError: UnwrapRef<typeof import('axios')['AxiosError']>
-    readonly BaseApiService: UnwrapRef<typeof import('./services/BaseApiService')['BaseApiService']>
-    readonly CreateDto: UnwrapRef<typeof import('./services/BaseApiService')['CreateDto']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
-    readonly MultipartUpload: UnwrapRef<typeof import('./services/upload.service')['MultipartUpload']>
-    readonly ProductService: UnwrapRef<typeof import('./services/product.service')['ProductService']>
-    readonly UpdateDto: UnwrapRef<typeof import('./services/BaseApiService')['UpdateDto']>
-    readonly UploadController: UnwrapRef<typeof import('./services/upload.service')['UploadController']>
     readonly VARIANT_MAP: UnwrapRef<typeof import('./types/text.types')['VARIANT_MAP']>
     readonly VariantConfig: UnwrapRef<typeof import('./types/text.types')['VariantConfig']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
@@ -468,7 +384,7 @@ declare module 'vue' {
     readonly apiPatch: UnwrapRef<typeof import('@/plugins/axios')['apiPatch']>
     readonly apiPost: UnwrapRef<typeof import('@/plugins/axios')['apiPost']>
     readonly apiPut: UnwrapRef<typeof import('@/plugins/axios')['apiPut']>
-    readonly appConfig: UnwrapRef<typeof import('./config/index')['appConfig']>
+    readonly appConfig: UnwrapRef<typeof import('./config/app.config')['appConfig']>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
     readonly autoResetRef: UnwrapRef<typeof import('@vueuse/core')['autoResetRef']>
     readonly axios: UnwrapRef<typeof import('axios')['default']>
@@ -514,7 +430,6 @@ declare module 'vue' {
     readonly getEnvNumber: UnwrapRef<typeof import('./config/env')['getEnvNumber']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
     readonly ignorableWatch: UnwrapRef<typeof import('@vueuse/core')['ignorableWatch']>
-    readonly initializeConfig: UnwrapRef<typeof import('./config/index')['initializeConfig']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
     readonly injectLocal: UnwrapRef<typeof import('@vueuse/core')['injectLocal']>
     readonly isAxiosError: UnwrapRef<typeof import('axios')['isAxiosError']>
@@ -556,7 +471,7 @@ declare module 'vue' {
     readonly onUpdated: UnwrapRef<typeof import('vue')['onUpdated']>
     readonly onWatcherCleanup: UnwrapRef<typeof import('vue')['onWatcherCleanup']>
     readonly pausableWatch: UnwrapRef<typeof import('@vueuse/core')['pausableWatch']>
-    readonly productService: UnwrapRef<typeof import('./services/product.service')['productService']>
+    readonly productService: UnwrapRef<typeof import('./stores/product.store')['productService']>
     readonly provide: UnwrapRef<typeof import('vue')['provide']>
     readonly provideLocal: UnwrapRef<typeof import('@vueuse/core')['provideLocal']>
     readonly reactify: UnwrapRef<typeof import('@vueuse/core')['reactify']>
@@ -565,7 +480,6 @@ declare module 'vue' {
     readonly reactiveComputed: UnwrapRef<typeof import('@vueuse/core')['reactiveComputed']>
     readonly reactiveOmit: UnwrapRef<typeof import('@vueuse/core')['reactiveOmit']>
     readonly reactivePick: UnwrapRef<typeof import('@vueuse/core')['reactivePick']>
-    readonly readStoredTheme: UnwrapRef<typeof import('./config/index')['readStoredTheme']>
     readonly readonly: UnwrapRef<typeof import('vue')['readonly']>
     readonly ref: UnwrapRef<typeof import('vue')['ref']>
     readonly refAutoReset: UnwrapRef<typeof import('@vueuse/core')['refAutoReset']>
@@ -601,8 +515,6 @@ declare module 'vue' {
     readonly unref: UnwrapRef<typeof import('vue')['unref']>
     readonly unrefElement: UnwrapRef<typeof import('@vueuse/core')['unrefElement']>
     readonly until: UnwrapRef<typeof import('@vueuse/core')['until']>
-    readonly uploadFile: UnwrapRef<typeof import('./services/upload.service')['uploadFile']>
-    readonly uploadMultipleFiles: UnwrapRef<typeof import('./services/upload.service')['uploadMultipleFiles']>
     readonly useActiveElement: UnwrapRef<typeof import('@vueuse/core')['useActiveElement']>
     readonly useAnimate: UnwrapRef<typeof import('@vueuse/core')['useAnimate']>
     readonly useAppConfig: UnwrapRef<typeof import('./composables/useAppConfig')['useAppConfig']>
@@ -776,7 +688,6 @@ declare module 'vue' {
     readonly useWindowFocus: UnwrapRef<typeof import('@vueuse/core')['useWindowFocus']>
     readonly useWindowScroll: UnwrapRef<typeof import('@vueuse/core')['useWindowScroll']>
     readonly useWindowSize: UnwrapRef<typeof import('@vueuse/core')['useWindowSize']>
-    readonly validateFile: UnwrapRef<typeof import('./services/upload.service')['validateFile']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
     readonly watchArray: UnwrapRef<typeof import('@vueuse/core')['watchArray']>
     readonly watchAtMost: UnwrapRef<typeof import('@vueuse/core')['watchAtMost']>

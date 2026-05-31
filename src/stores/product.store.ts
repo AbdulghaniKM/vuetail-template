@@ -1,3 +1,5 @@
+import { productService } from '@/services/product.service';
+
 export const useProductStore = createResourceStore<Product>('products', productService, () => {
   const featured = ref<Product[]>([]);
 

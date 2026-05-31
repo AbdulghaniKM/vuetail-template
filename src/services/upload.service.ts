@@ -3,6 +3,7 @@ import axios, {
   type AxiosRequestConfig,
   type CancelTokenSource,
 } from 'axios';
+import { formatFileSize, getFileExtension } from '@/utils/file';
 
 export interface UploadOptions {
   endpoint?: string;

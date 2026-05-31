@@ -34,10 +34,12 @@ export default defineConfig({
       dirs: [
         'src/composables/**',
         'src/stores/**',
-        'src/services/**',
         'src/types/**',
         'src/config/**',
       ],
+      dirsScanOptions: {
+        fileFilter: (file) => !file.endsWith('index.ts'),
+      },
       dts: 'src/auto-imports.d.ts',
       vueTemplate: true,
     }),
