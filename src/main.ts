@@ -6,9 +6,9 @@ import './style.css';
 import { initializeConfig } from './config';
 import { useToast } from './composables/useToast';
 import { registerErrorToasts } from './plugins/axios';
-// Side-effect import — applies `data-brand` / `data-shape` from `theme.ts`
-// and localStorage to <html> at boot. Paired with the pre-boot script in
-// index.html which does the same before Vue mounts to avoid FOUC.
+// Side-effect import — applies `data-shape` from `theme.ts` and localStorage
+// to <html> at boot. Paired with the pre-boot script in index.html which
+// does the same before Vue mounts to avoid FOUC.
 import '@/composables/useAppUi';
 
 // Initialize app configuration (theme, SEO, fonts, etc.)

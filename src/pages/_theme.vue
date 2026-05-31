@@ -3,31 +3,13 @@
     <header class="mb-8">
       <h1 class="text-text text-2xl font-semibold">Theme studio</h1>
       <p class="text-text-secondary mt-1 text-sm">
-        Dev-only. Live-preview brand / shape / theme combinations. Pick what you like, then write the
-        result into <code class="bg-muted rounded px-1.5 py-0.5 text-xs">src/theme.ts</code>.
+        Dev-only. Live-preview shape / theme mode. Colors come from
+        <code class="bg-muted rounded px-1.5 py-0.5 text-xs">src/config/app.config.ts</code>.
       </p>
     </header>
 
     <!-- Controls -->
-    <section class="bg-surface border-border grid gap-6 rounded-2xl border p-5 sm:grid-cols-3">
-      <div>
-        <h2 class="text-text mb-3 text-sm font-semibold">Brand</h2>
-        <div class="flex flex-wrap gap-2">
-          <button
-            v-for="b in brands"
-            :key="b"
-            type="button"
-            class="rounded-lg border px-3 py-1.5 text-xs font-medium capitalize transition-colors"
-            :class="brand === b
-              ? 'border-primary bg-primary/10 text-primary'
-              : 'border-border text-text-secondary hover:bg-muted'"
-            @click="setBrand(b)"
-          >
-            {{ b }}
-          </button>
-        </div>
-      </div>
-
+    <section class="bg-surface border-border grid gap-6 rounded-2xl border p-5 sm:grid-cols-2">
       <div>
         <h2 class="text-text mb-3 text-sm font-semibold">Shape</h2>
         <div class="flex flex-wrap gap-2">
@@ -68,8 +50,7 @@
     <!-- Snippet -->
     <section class="mt-6">
       <h2 class="text-text mb-2 text-sm font-semibold">Paste into <code>src/theme.ts</code></h2>
-      <pre class="bg-muted overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"><code>export const theme: ThemeConfig = {
-  brand: '{{ brand }}',
+      <pre class="bg-muted overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"><code>export const theme: UiThemeConfig = {
   shape: '{{ shape }}',
 };</code></pre>
       <div class="mt-2 flex gap-2">
@@ -149,12 +130,12 @@ import { ref } from 'vue';
 import { useAppUi } from '@/composables/useAppUi';
 import { useTheme } from '@/composables/useTheme';
 
-const { brand, shape, brands, shapes, setBrand, setShape, reset: resetUi } = useAppUi();
+const { shape, shapes, setShape, reset: resetUi } = useAppUi();
 const { mode, setTheme } = useTheme();
 
 const copied = ref(false);
 const copy = async () => {
-  const snippet = `export const theme: ThemeConfig = {\n  brand: '${brand.value}',\n  shape: '${shape.value}',\n};`;
+  const snippet = `export const theme: UiThemeConfig = {\n  shape: '${shape.value}',\n};`;
   try {
     await navigator.clipboard.writeText(snippet);
     copied.value = true;
