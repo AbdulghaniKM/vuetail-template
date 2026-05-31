@@ -5,9 +5,8 @@
     "ignoreDeprecations": "6.0",
 
     /* Path alias — anchor for template↔registry contract */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
 
     /* Linting */
