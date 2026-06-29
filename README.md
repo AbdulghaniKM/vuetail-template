@@ -4,6 +4,7 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 
 ## Stack
 
+
 | Layer      | Technology                                                                  |
 | ---------- | --------------------------------------------------------------------------- |
 | Framework  | Vue 3.5 with `<script setup>` + Composition API                             |
@@ -11,7 +12,7 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 | Language   | TypeScript 6 (strict)                                                       |
 | Build      | Vite 8 (Rolldown)                                                           |
 | State      | Pinia 3                                                                     |
-| Routing    | Vue Router 5 with custom Vite plugin + native glob auto-registry           |
+| Routing    | Vue Router 5 with custom Vite plugin + native glob auto-registry            |
 | Validation | Zod 4                                                                       |
 | HTTP       | Axios (interceptors, CSRF, auth token plumbing)                             |
 | Icons      | Iconify (200k+ icons via `@iconify/tailwind4`)                              |
@@ -21,10 +22,15 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 | Formatting | [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) (Tailwind class sorting) |
 | DevTools   | [Vite DevTools](https://devtools.vite.dev/) (embedded panel)                |
 
+
+
+
 ## Prerequisites
 
 - **Node.js** 20.19+ or 22.12+ (required by Vite 8)
 - **pnpm** (recommended)
+
+
 
 ## Quick Start
 
@@ -41,20 +47,21 @@ Copy `.env.example` to `.env` and set your values:
 cp .env.example .env
 ```
 
+
+
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── ui/                  # Registry-installed UI components (shadcn-style)
-│   │   ├── AppEmptyState.vue # Empty state placeholders and illustration containers
-│   │   ├── AppIcon.vue       # Scalable Iconify SVG loader
-│   │   ├── AppPageLoader.vue # Absolute layout overlay spinner for route loading
-│   │   ├── AppSkeleton.vue   # Dynamic skeleton shimmer loading placeholders
-│   │   ├── AppToast.vue      # Floating notification toasts with progress timelines
-│   │   └── ThemeToggle.vue   # Sun/moon hover-animated dark mode toggle
-│   ├── AppHeader.vue         # Main layout header with theme toggle and mobile navigation
-│   └── FeatureCard.vue       # Feature showcase cards
+│   └── ui/                  # UI components — shadcn-style on-demand registry
+│       ├── AppEmptyState.vue # Empty state placeholders and illustration containers
+│       ├── AppIcon.vue       # Scalable Iconify SVG loader
+│       ├── AppPageLoader.vue # Route-loading overlay spinner
+│       ├── AppSkeleton.vue   # Skeleton shimmer loading placeholders
+│       ├── AppToast.vue      # Floating notification toasts with progress timelines
+│       └── ThemeToggle.vue   # Light/dark mode toggle
+│       #  ↑ these ship by default · add more with `pnpm add-component <Name>`
 ├── composables/
 │   ├── useAppConfig.ts      # Access to centralized Vite layout settings
 │   ├── useAppUi.ts          # Page-level shape overrides and layout configs
@@ -101,6 +108,8 @@ src/
 └── main.ts                  # App entry point
 ```
 
+
+
 ## Configuration
 
 All app settings live in `src/config/app.config.ts`:
@@ -144,12 +153,14 @@ const { theme, setTheme, isDark } = useTheme();
 setTheme('dark'); // 'light' | 'dark' | 'system'
 ```
 
-Customize colors at runtime:
+Customize colors at runtime (add the composable first: `pnpm add-composable useColorCustomizer`):
 
 ```ts
 const { updateColor, resetColors } = useColorCustomizer();
 updateColor('primary', '#e11d48');
 ```
+
+
 
 ## Routing
 
@@ -169,9 +180,11 @@ You can configure custom route paths, page titles, and layout overrides directly
 </script>
 ```
 
-- **`route`**: The target URL path (e.g. `account/logout/` resolves to `/account/logout/`). If omitted, the router automatically falls back to file-system-based path names.
-- **`head`**: Page title automatically managed at route changes.
-- **`layout`**: Page layout overrides (`'default'`, `'auth'`, `'dashboard'`).
+- `route`: The target URL path (e.g. `account/logout/` resolves to `/account/logout/`). If omitted, the router automatically falls back to file-system-based path names.
+- `head`: Page title automatically managed at route changes.
+- `layout`: Page layout overrides (`'default'`, `'auth'`, `'dashboard'`).
+
+
 
 ### File-System Mapping Fallbacks
 
@@ -182,7 +195,23 @@ If a page does not specify an explicit `route`, the router maps it automatically
 - `src/pages/Offline.vue` → `/offline`
 - `src/pages/Login.vue` → `/login`
 
+
+
 ## Components
+
+VueTail ships as a lean starter with an **on-demand component registry** (shadcn-style). Only
+a small default set lives in `src/components/ui/` out of the box — **AppEmptyState, AppIcon,
+AppPageLoader, AppSkeleton, AppToast, ThemeToggle**. Everything documented below is **not
+pre-installed**; it lives in the [component registry](https://github.com/AbdulghaniKM/vuetail-components)
+and is copied into your project only when you ask for it:
+
+```bash
+pnpm add-component AppButton      # add a component (resolves + installs its deps)
+pnpm add-component list           # list everything available in the registry
+pnpm vuetail:verify               # check installed files still match the registry
+```
+
+The sections below are the **API reference for each component once you've added it**.
 
 ### AppButton
 
@@ -252,6 +281,8 @@ success('Changes saved!');
 error('Something went wrong', { title: 'Error', duration: 8000 });
 ```
 
+
+
 ### AppText
 
 ```vue
@@ -264,6 +295,12 @@ error('Something went wrong', { title: 'Error', duration: 8000 });
 Variants: `h1`-`h6`, `p`, `span`, `label`, `caption`, `overline`.
 
 ## Composables
+
+Same model as components — a default set ships in `src/composables/`, the rest are added on
+demand. **Shipped by default:** `useAppConfig`, `useAppUi`, `useSidebar`, `useTheme`,
+`useToast`. **Add from the registry** with `pnpm add-composable <name>` — every composable
+documented below (`useAuth`, `useKeyboard`, `useLocalStorage`, `useConfirm`, `usePagination`,
+`useBreakpoint`, `useClipboard`, `useDebounce`) is a registry add-on, not pre-installed.
 
 ### useAuth
 
@@ -286,12 +323,16 @@ useKeyboard({
 useKeyboard({ escape: () => close() }, isOpen);
 ```
 
+
+
 ### useLocalStorage
 
 ```ts
 const settings = useLocalStorage('app-settings', { sidebar: true }, zodSchema);
 settings.value.sidebar = false; // auto-persisted, validated on read
 ```
+
+
 
 ### useConfirm
 
@@ -300,6 +341,8 @@ const { confirm } = useConfirm();
 const ok = await confirm({ title: 'Delete item?', message: 'This cannot be undone.' });
 if (ok) deleteItem();
 ```
+
+
 
 ### usePagination
 
@@ -311,12 +354,16 @@ const { page, totalPages, next, prev, visiblePages, paginate } = usePagination({
 const pageItems = paginate(items);
 ```
 
+
+
 ### useBreakpoint
 
 ```ts
 const { isMobile, isDesktop, current, greaterThan } = useBreakpoint();
 // current.value → 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 ```
+
+
 
 ### useClipboard
 
@@ -325,19 +372,29 @@ const { copy, copied } = useClipboard();
 await copy('text to copy', true); // true = show toast
 ```
 
-### useDebounce / useThrottle
+
+
+### useDebounce
+
+Registry add-on — `pnpm add-composable useDebounce`:
 
 ```ts
 const debouncedSearch = useDebounce(searchQuery, 300);
-const throttledScroll = useThrottle(scrollPosition, 100);
 ```
 
+> Need throttling? VueUse is auto-imported, so `refThrottled` / `useThrottleFn` are available
+> globally with no install — no registry composable required.
+
+
+
 ## Environment Variables
+
 
 | Variable       | Description                           | Default                  |
 | -------------- | ------------------------------------- | ------------------------ |
 | `VITE_API_URL` | API base URL (required in production) | `/api`                   |
 | `VITE_APP_URL` | Public app URL (used for SEO)         | `window.location.origin` |
+
 
 See `.env.example` for reference.
 
@@ -345,10 +402,12 @@ See `.env.example` for reference.
 
 Linting and formatting use the Oxc toolchain — fast, no ESLint/Prettier dependency tree.
 
+
 | File                               | Purpose                                                     |
 | ---------------------------------- | ----------------------------------------------------------- |
-| [`.oxlintrc.json`](.oxlintrc.json) | Lint rules (TypeScript, Vue, recommended presets)           |
-| [`.oxfmtrc.json`](.oxfmtrc.json)   | Format options + Tailwind class sorting via `src/style.css` |
+| `[.oxlintrc.json](.oxlintrc.json)` | Lint rules (TypeScript, Vue, recommended presets)           |
+| `[.oxfmtrc.json](.oxfmtrc.json)`   | Format options + Tailwind class sorting via `src/style.css` |
+
 
 **Editor:** install the [Oxc VS Code extension](https://marketplace.visualstudio.com/items?itemName=oxc.oxc-vscode) and set it as the default formatter for JS/TS/Vue.
 
@@ -391,6 +450,8 @@ pnpm add-component    # Scaffold a UI component
 pnpm add-composable   # Scaffold a composable
 pnpm vuetail:verify   # Verify registry / install integrity
 ```
+
+
 
 ## License
 

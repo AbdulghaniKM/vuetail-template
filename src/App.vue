@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+  import AppPageLoader from '@/components/ui/AppPageLoader.vue';
   import DefaultLayout from '@/layouts/DefaultLayout.vue';
   import AuthLayout from '@/layouts/AuthLayout.vue';
   import DashboardLayout from '@/layouts/DashboardLayout.vue';
