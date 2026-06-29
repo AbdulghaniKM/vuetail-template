@@ -24,7 +24,7 @@
   const router = useRouter();
 
   const Layout = computed(() => {
-    const name = route.meta.layout as LayoutName | 'blank' | undefined;
+    const name = route.meta.layout;
     if (name === 'blank') return null; // render the page with no layout chrome
     return layouts[name ?? 'default'] ?? DefaultLayout;
   });

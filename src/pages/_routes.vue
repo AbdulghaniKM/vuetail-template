@@ -129,8 +129,8 @@
       .map((r) => ({
         path: r.path,
         name: typeof r.name === 'string' ? r.name : '',
-        layout: (r.meta.layout as string) || 'default',
-        title: (r.meta.title as string) || '',
+        layout: r.meta.layout || 'default',
+        title: r.meta.title || '',
         requiresAuth: Boolean(r.meta.requiresAuth),
         dynamic: r.path.includes(':'),
         devOnly: r.path.includes('/_'),
