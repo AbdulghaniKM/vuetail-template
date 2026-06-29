@@ -6,40 +6,47 @@ import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { defineConfig } from 'vite';
 
-// Tiny, highly optimized custom Vite plugin to compile-time parse definePage macro
+// Compile-time parser for the `definePage` macro. When a page calls
+// `definePage({ ... })`, this extracts the known fields and re-emits them as a
+// plain `<script>` default export so the route registry (src/config/router.ts)
+// can read them off the component at build time.
 function customRoutePlugin() {
   return {
     name: 'custom-route-plugin',
     transform(code: string, id: string) {
-      if (!id.endsWith('.vue')) return;
-      
+      // Cheap guard: skip every file that can't contain the macro.
+      if (!id.endsWith('.vue') || !code.includes('definePage(')) return;
+
       const match = code.match(/definePage\(\s*(\{[\s\S]*?\})\s*\)/);
-      if (match) {
-        const configStr = match[1];
-        
-        const routeMatch = configStr.match(/route:\s*["']([^"']+)["']/);
-        const headMatch = configStr.match(/head:\s*["']([^"']+)["']/);
-        const layoutMatch = configStr.match(/layout:\s*["']([^"']+)["']/);
-        
-        const route = routeMatch ? routeMatch[1] : null;
-        const head = headMatch ? headMatch[1] : null;
-        const layout = layoutMatch ? layoutMatch[1] : null;
-        
-        console.log(`\n[customRoutePlugin] File matched: ${id}`);
-        console.log(`  Extracted => route: ${route}, head: ${head}, layout: ${layout}\n`);
-        
-        let injectScript = `\n<script lang="ts">\nexport default {\n`;
-        if (route) injectScript += `  route: ${JSON.stringify(route)},\n`;
-        if (head) injectScript += `  head: ${JSON.stringify(head)},\n`;
-        if (layout) injectScript += `  layout: ${JSON.stringify(layout)},\n`;
-        injectScript += `};\n</script>\n`;
-        
-        return {
-          code: code + injectScript,
-          map: null
-        };
-      }
-    }
+      if (!match) return;
+      const cfg = match[1];
+
+      const str = (key: string) =>
+        cfg.match(new RegExp(`${key}\\s*:\\s*["']([^"']+)["']`))?.[1];
+      const bool = (key: string) => {
+        const m = cfg.match(new RegExp(`${key}\\s*:\\s*(true|false)`));
+        return m ? m[1] === 'true' : undefined;
+      };
+
+      const fields: Record<string, string | boolean> = {};
+      const route = str('route');
+      const head = str('head');
+      const layout = str('layout');
+      const requiresAuth = bool('requiresAuth');
+      if (route !== undefined) fields.route = route;
+      if (head !== undefined) fields.head = head;
+      if (layout !== undefined) fields.layout = layout;
+      if (requiresAuth !== undefined) fields.requiresAuth = requiresAuth;
+
+      const opts = Object.entries(fields)
+        .map(([k, v]) => `  ${k}: ${JSON.stringify(v)},`)
+        .join('\n');
+
+      return {
+        code: `${code}\n<script lang="ts">\nexport default {\n${opts}\n};\n</script>\n`,
+        map: null,
+      };
+    },
   };
 }
 

@@ -175,7 +175,8 @@ You can configure custom route paths, page titles, and layout overrides directly
   definePage({
     route: "account/logout/",
     head: "Logout",
-    layout: "default"
+    layout: "default",
+    requiresAuth: true
   });
 </script>
 ```
@@ -183,17 +184,19 @@ You can configure custom route paths, page titles, and layout overrides directly
 - `route`: The target URL path (e.g. `account/logout/` resolves to `/account/logout/`). If omitted, the router automatically falls back to file-system-based path names.
 - `head`: Page title automatically managed at route changes.
 - `layout`: Page layout overrides (`'default'`, `'auth'`, `'dashboard'`).
-
-
+- `requiresAuth`: Guard the route — visitors without an auth token are redirected to the Login route (with a `?redirect=` back to the original URL).
 
 ### File-System Mapping Fallbacks
 
-If a page does not specify an explicit `route`, the router maps it automatically based on its filename:
+If a page does not specify an explicit `route`, the router derives one from its path under `src/pages/`. The mapping is **directory-aware** — nested folders become nested paths, a trailing `index` collapses to its parent, and bracketed segments become route params:
 
 - `src/pages/index.vue` → `/` (Home page)
-- `src/pages/[...pathMatch].vue` → `/:pathMatch(.*)*` (Catch-all 404 handler page)
+- `src/pages/dashboard/index.vue` → `/dashboard`
+- `src/pages/users/[id].vue` → `/users/:id` (dynamic param)
+- `src/pages/[...pathMatch].vue` → `/:pathMatch(.*)*` (catch-all 404 handler)
 - `src/pages/Offline.vue` → `/offline`
-- `src/pages/Login.vue` → `/login`
+
+Route **names** are derived from the full relative path (`dashboard/index.vue` → `dashboard-index`), so same-named files in different folders never collide. Files whose name starts with `_` (e.g. `_theme.vue`) are **dev-only** and excluded from production builds.
 
 
 

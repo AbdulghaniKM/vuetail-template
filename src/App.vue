@@ -1,8 +1,9 @@
 <template>
   <UiAppPageLoader ref="pageLoaderRef" />
-  <component :is="Layout">
+  <component :is="Layout" v-if="Layout">
     <RouterView />
   </component>
+  <RouterView v-else />
   <UiAppToast :toasts="toasts" @remove="remove" @pause="pause" @resume="resume" />
 </template>
 
@@ -23,8 +24,9 @@
   const router = useRouter();
 
   const Layout = computed(() => {
-    const name = (route.meta.layout as LayoutName) ?? 'default';
-    return layouts[name] ?? DefaultLayout;
+    const name = route.meta.layout as LayoutName | 'blank' | undefined;
+    if (name === 'blank') return null; // render the page with no layout chrome
+    return layouts[name ?? 'default'] ?? DefaultLayout;
   });
 
   const { toasts, remove, pause, resume } = useToast();
