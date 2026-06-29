@@ -1,7 +1,8 @@
 {
-  "name": "vue-template",
+  "name": "vuetail",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "A modern Vue 3 starter with Tailwind CSS v4, TypeScript, and an on-demand component registry.",
   "type": "module",
   "scripts": {
     "dev": "vite",

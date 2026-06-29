@@ -16,6 +16,7 @@ dist-ssr
 # Auto-generated type declarations
 auto-imports.d.ts
 components.d.ts
+src/types/routes.gen.d.ts
 
 # IDE-specific folders
 .claude/

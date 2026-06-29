@@ -29,8 +29,8 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 ## Quick Start
 
 ```bash
-git clone https://github.com/your-username/vuetail-template.git
-cd vuetail-template
+pnpm dlx degit AbdulghaniKM/vuetail-template my-app
+cd my-app
 pnpm install
 pnpm dev
 ```
@@ -40,6 +40,15 @@ Copy `.env.example` to `.env` and set your values:
 ```bash
 cp .env.example .env
 ```
+
+## Make it yours
+
+After cloning, a few edits turn this template into your own app:
+
+1. **Identity** — edit `src/config/identity.ts` (name, title, description, url). This drives the `<title>`, meta description, and SEO tags everywhere.
+2. **Theme** — tweak the `light` / `dark` color palettes in `src/config/app.config.ts`.
+3. **Favicon** — drop your icon into `public/` and point `icons.favicon` in `src/config/app.config.ts` at it.
+4. **API** — set `VITE_API_URL` in `.env` (defaults to `/api` in dev; production must be an absolute `https://` URL).
 
 ## Project Structure
 

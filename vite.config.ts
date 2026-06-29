@@ -5,9 +5,11 @@ import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { defineConfig } from 'vite';
 import { definePagePlugin } from './vite/define-page-plugin';
+import { htmlConfigPlugin } from './vite/html-config-plugin';
 
 export default defineConfig({
   plugins: [
+    htmlConfigPlugin(),
     definePagePlugin(),
     vue(),
     tailwindcss(),

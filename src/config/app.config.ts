@@ -1,5 +1,6 @@
 import type { AppConfig } from './types';
 import { getApiUrl } from './env';
+import { appIdentity } from './identity';
 
 export const appConfig: AppConfig = {
   api: {
@@ -8,12 +9,12 @@ export const appConfig: AppConfig = {
   },
 
   app: {
-    name: 'Vue Template',
-    title: 'Vue Template - Modern Vue 3 Application',
-    description: 'A modern Vue 3 application built with TypeScript, Tailwind CSS, and Vite',
+    name: appIdentity.name,
+    title: appIdentity.title,
+    description: appIdentity.description,
     version: '1.0.0',
     author: 'Your Name',
-    url: 'https://example.com',
+    url: appIdentity.url,
     language: 'en',
   },
 
@@ -98,12 +99,12 @@ export const appConfig: AppConfig = {
   },
 
   seo: {
-    title: 'Vue Template - Modern Vue 3 Application',
-    description: 'A modern Vue 3 application built with TypeScript, Tailwind CSS, and Vite',
+    title: appIdentity.title,
+    description: appIdentity.description,
     keywords: ['vue', 'vue3', 'typescript', 'tailwind', 'vite'],
     robots: 'index, follow',
     openGraph: {
-      siteName: 'Vue Template',
+      siteName: appIdentity.name,
       type: 'website',
       locale: 'en_US',
     },
