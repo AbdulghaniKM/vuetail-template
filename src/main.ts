@@ -52,14 +52,16 @@ registerErrorToasts({
 app.use(pinia);
 app.use(router);
 
-// Debug-print the exact routes registered in the browser console
-console.log(
-  "[Router Registry]:",
-  router.getRoutes().map((r) => ({
-    path: r.path,
-    name: r.name,
-    meta: r.meta,
-  })),
-);
+// Debug-print the registered routes — dev only (stripped from production builds).
+if (import.meta.env.DEV) {
+  console.log(
+    "[Router Registry]:",
+    router.getRoutes().map((r) => ({
+      path: r.path,
+      name: r.name,
+      meta: r.meta,
+    })),
+  );
+}
 
 app.mount("#app");
