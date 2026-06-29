@@ -9,8 +9,10 @@
         </span>
       </div>
       <p class="mt-1 text-sm text-text-secondary">
-        Every route registered by the compile-time registry — like a Swagger index for your
-        pages. Excluded from production builds (the <code>_</code> filename prefix).
+        Every route registered by the compile-time registry — like a Swagger index for your pages.
+        Excluded from production builds (the
+        <code>_</code>
+        filename prefix).
       </p>
     </header>
 
@@ -40,7 +42,10 @@
 
     <!-- Auth status -->
     <div class="mb-4 flex items-center gap-2 text-xs text-text-secondary">
-      <span class="inline-block size-2 rounded-full" :class="hasToken ? 'bg-success' : 'bg-border'" />
+      <span
+        class="inline-block size-2 rounded-full"
+        :class="hasToken ? 'bg-success' : 'bg-border'"
+      />
       Auth token {{ hasToken ? 'present' : 'absent' }} — guarded routes
       {{ hasToken ? 'are reachable' : 'redirect to Login' }}.
     </div>

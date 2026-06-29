@@ -34,8 +34,8 @@
   </div>
 </template>
 <script setup lang="ts">
-definePage({
-  route: "/",
-  head: "Home",
-});
+  definePage({
+    route: '/',
+    head: 'Home',
+  });
 </script>

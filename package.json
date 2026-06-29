@@ -6,11 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
+    "typecheck": "vue-tsc -b",
     "preview": "vite preview",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck",
+    "fix": "oxlint --fix && oxfmt",
     "add-component": "node scripts/add.js",
     "add-composable": "node scripts/add.js --composable",
     "vuetail:verify": "node scripts/add.js verify"

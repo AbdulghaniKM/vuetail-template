@@ -158,27 +158,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useAppUi } from "@/composables/useAppUi";
-import { useTheme } from "@/composables/useTheme";
+  import { ref } from 'vue';
+  import { useAppUi } from '@/composables/useAppUi';
+  import { useTheme } from '@/composables/useTheme';
 
-const { shape, shapes, setShape, reset: resetUi } = useAppUi();
-const { mode, setTheme } = useTheme();
+  const { shape, shapes, setShape, reset: resetUi } = useAppUi();
+  const { mode, setTheme } = useTheme();
 
-const copied = ref(false);
-const copy = async () => {
-  const snippet = `export const theme: UiThemeConfig = {\n  shape: '${shape.value}',\n};`;
-  try {
-    await navigator.clipboard.writeText(snippet);
-    copied.value = true;
-    setTimeout(() => (copied.value = false), 1500);
-  } catch {
-    /* ignore */
-  }
-};
+  const copied = ref(false);
+  const copy = async () => {
+    const snippet = `export const theme: UiThemeConfig = {\n  shape: '${shape.value}',\n};`;
+    try {
+      await navigator.clipboard.writeText(snippet);
+      copied.value = true;
+      setTimeout(() => (copied.value = false), 1500);
+    } catch {
+      /* ignore */
+    }
+  };
 
-const reset = () => {
-  resetUi();
-  setTheme("system");
-};
+  const reset = () => {
+    resetUi();
+    setTheme('system');
+  };
 </script>

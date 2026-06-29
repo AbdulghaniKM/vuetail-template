@@ -1,20 +1,20 @@
-import { createPinia } from "pinia";
-import { createApp } from "vue";
+import { createPinia } from 'pinia';
+import { createApp } from 'vue';
 
 // Define definePage globally at runtime as a no-op to prevent ReferenceError in pages
 (window as any).definePage = () => {};
 
-import App from "./App.vue";
-import router from "./router";
-import "./style.css";
-import { initializeConfig } from "./config";
-import { useToast } from "./composables/useToast";
-import { registerErrorToasts, setAuthProvider } from "./plugins/axios";
-import { clearAuthToken, getAuthToken } from "./lib/authToken";
+import App from './App.vue';
+import router from './router';
+import './style.css';
+import { initializeConfig } from './config';
+import { useToast } from './composables/useToast';
+import { registerErrorToasts, setAuthProvider } from './plugins/axios';
+import { clearAuthToken, getAuthToken } from './lib/authToken';
 // Side-effect import — applies `data-shape` from `theme.ts` and localStorage
 // to <html> at boot. Paired with the pre-boot script in index.html which
 // does the same before Vue mounts to avoid FOUC.
-import "@/composables/useAppUi";
+import '@/composables/useAppUi';
 
 // Initialize app configuration (theme, SEO, fonts, etc.)
 initializeConfig();
@@ -28,19 +28,19 @@ const app = createApp(App);
 const toast = useToast();
 
 app.config.errorHandler = (err, _instance, info) => {
-  console.error("[vue:error]", info, err);
+  console.error('[vue:error]', info, err);
   if (import.meta.env.DEV) {
     const message = err instanceof Error ? err.message : String(err);
-    toast.error(message, { title: "Render error" });
+    toast.error(message, { title: 'Render error' });
   }
 };
 
-window.addEventListener("unhandledrejection", (event) => {
-  console.error("[unhandledrejection]", event.reason);
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('[unhandledrejection]', event.reason);
   if (import.meta.env.DEV) {
     const reason = event.reason;
     const message = reason instanceof Error ? reason.message : String(reason);
-    toast.error(message, { title: "Unhandled promise rejection" });
+    toast.error(message, { title: 'Unhandled promise rejection' });
   }
 });
 
@@ -60,7 +60,7 @@ setAuthProvider({
     clearAuthToken();
     const current = router.currentRoute.value;
     if (current.meta.requiresAuth) {
-      router.push({ name: "Login", query: { redirect: current.fullPath } });
+      router.push({ name: 'Login', query: { redirect: current.fullPath } });
     }
   },
 });
@@ -71,7 +71,7 @@ app.use(router);
 // Debug-print the registered routes — dev only (stripped from production builds).
 if (import.meta.env.DEV) {
   console.log(
-    "[Router Registry]:",
+    '[Router Registry]:',
     router.getRoutes().map((r) => ({
       path: r.path,
       name: r.name,
@@ -80,4 +80,4 @@ if (import.meta.env.DEV) {
   );
 }
 
-app.mount("#app");
+app.mount('#app');

@@ -4,7 +4,6 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 
 ## Stack
 
-
 | Layer      | Technology                                                                  |
 | ---------- | --------------------------------------------------------------------------- |
 | Framework  | Vue 3.5 with `<script setup>` + Composition API                             |
@@ -22,15 +21,10 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 | Formatting | [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) (Tailwind class sorting) |
 | DevTools   | [Vite DevTools](https://devtools.vite.dev/) (embedded panel)                |
 
-
-
-
 ## Prerequisites
 
 - **Node.js** 20.19+ or 22.12+ (required by Vite 8)
 - **pnpm** (recommended)
-
-
 
 ## Quick Start
 
@@ -46,8 +40,6 @@ Copy `.env.example` to `.env` and set your values:
 ```bash
 cp .env.example .env
 ```
-
-
 
 ## Project Structure
 
@@ -108,8 +100,6 @@ src/
 └── main.ts                  # App entry point
 ```
 
-
-
 ## Configuration
 
 All app settings live in `src/config/app.config.ts`:
@@ -160,8 +150,6 @@ const { updateColor, resetColors } = useColorCustomizer();
 updateColor('primary', '#e11d48');
 ```
 
-
-
 ## Routing
 
 The template features a **custom, lightweight compile-time route registry** that automates route mapping directly from `src/pages/` using a tailored Vite macro parser and native glob scanning.
@@ -173,10 +161,10 @@ You can configure custom route paths, page titles, and layout overrides directly
 ```vue
 <script setup lang="ts">
   definePage({
-    route: "account/logout/",
-    head: "Logout",
-    layout: "default",
-    requiresAuth: true
+    route: 'account/logout/',
+    head: 'Logout',
+    layout: 'default',
+    requiresAuth: true,
   });
 </script>
 ```
@@ -197,8 +185,6 @@ If a page does not specify an explicit `route`, the router derives one from its 
 - `src/pages/Offline.vue` → `/offline`
 
 Route **names** are derived from the full relative path (`dashboard/index.vue` → `dashboard-index`), so same-named files in different folders never collide. Files whose name starts with `_` (e.g. `_theme.vue`) are **dev-only** and excluded from production builds.
-
-
 
 ## Components
 
@@ -284,8 +270,6 @@ success('Changes saved!');
 error('Something went wrong', { title: 'Error', duration: 8000 });
 ```
 
-
-
 ### AppText
 
 ```vue
@@ -326,16 +310,12 @@ useKeyboard({
 useKeyboard({ escape: () => close() }, isOpen);
 ```
 
-
-
 ### useLocalStorage
 
 ```ts
 const settings = useLocalStorage('app-settings', { sidebar: true }, zodSchema);
 settings.value.sidebar = false; // auto-persisted, validated on read
 ```
-
-
 
 ### useConfirm
 
@@ -344,8 +324,6 @@ const { confirm } = useConfirm();
 const ok = await confirm({ title: 'Delete item?', message: 'This cannot be undone.' });
 if (ok) deleteItem();
 ```
-
-
 
 ### usePagination
 
@@ -357,8 +335,6 @@ const { page, totalPages, next, prev, visiblePages, paginate } = usePagination({
 const pageItems = paginate(items);
 ```
 
-
-
 ### useBreakpoint
 
 ```ts
@@ -366,16 +342,12 @@ const { isMobile, isDesktop, current, greaterThan } = useBreakpoint();
 // current.value → 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 ```
 
-
-
 ### useClipboard
 
 ```ts
 const { copy, copied } = useClipboard();
 await copy('text to copy', true); // true = show toast
 ```
-
-
 
 ### useDebounce
 
@@ -388,16 +360,12 @@ const debouncedSearch = useDebounce(searchQuery, 300);
 > Need throttling? VueUse is auto-imported, so `refThrottled` / `useThrottleFn` are available
 > globally with no install — no registry composable required.
 
-
-
 ## Environment Variables
-
 
 | Variable       | Description                           | Default                  |
 | -------------- | ------------------------------------- | ------------------------ |
 | `VITE_API_URL` | API base URL (required in production) | `/api`                   |
 | `VITE_APP_URL` | Public app URL (used for SEO)         | `window.location.origin` |
-
 
 See `.env.example` for reference.
 
@@ -407,7 +375,7 @@ The auth **access token** is the single source of truth in [`src/lib/authToken.t
 
 **Why in-memory?** A token in `localStorage` is readable by any script on the page, so a single XSS (a compromised dependency, a third-party widget, a stray `v-html`) can exfiltrate the whole session. An in-memory token can't be read that way.
 
-**The tradeoff:** a full page reload drops the token, so the user appears logged out on refresh. The production-grade pattern is to pair this with a **silent refresh** — keep the long-lived *refresh* token in an `httpOnly` + `SameSite` cookie set by your backend, and on load exchange it for a fresh access token:
+**The tradeoff:** a full page reload drops the token, so the user appears logged out on refresh. The production-grade pattern is to pair this with a **silent refresh** — keep the long-lived _refresh_ token in an `httpOnly` + `SameSite` cookie set by your backend, and on load exchange it for a fresh access token:
 
 ```ts
 // src/main.ts — extend the AuthProvider with a refresh handler
@@ -432,12 +400,10 @@ The axios interceptor (`src/plugins/axios.ts`) de-duplicates concurrent refreshe
 
 Linting and formatting use the Oxc toolchain — fast, no ESLint/Prettier dependency tree.
 
-
 | File                               | Purpose                                                     |
 | ---------------------------------- | ----------------------------------------------------------- |
 | `[.oxlintrc.json](.oxlintrc.json)` | Lint rules (TypeScript, Vue, recommended presets)           |
 | `[.oxfmtrc.json](.oxfmtrc.json)`   | Format options + Tailwind class sorting via `src/style.css` |
-
 
 **Editor:** install the [Oxc VS Code extension](https://marketplace.visualstudio.com/items?itemName=oxc.oxc-vscode) and set it as the default formatter for JS/TS/Vue.
 
@@ -480,8 +446,6 @@ pnpm add-component    # Scaffold a UI component
 pnpm add-composable   # Scaffold a composable
 pnpm vuetail:verify   # Verify registry / install integrity
 ```
-
-
 
 ## License
 

@@ -47,7 +47,10 @@ function fileToRoutePath(rel: string): string {
 //   Login.vue            -> 'Login'
 //   dashboard/index.vue  -> 'dashboard-index'
 function fileToRouteName(rel: string): string {
-  return rel.replace(/\.vue$/, '').split('/').join('-');
+  return rel
+    .replace(/\.vue$/, '')
+    .split('/')
+    .join('-');
 }
 
 export const routes: RouteRecordRaw[] = [];
