@@ -9,7 +9,8 @@ import router from "./router";
 import "./style.css";
 import { initializeConfig } from "./config";
 import { useToast } from "./composables/useToast";
-import { registerErrorToasts } from "./plugins/axios";
+import { registerErrorToasts, setAuthProvider } from "./plugins/axios";
+import { clearAuthToken, getAuthToken } from "./lib/authToken";
 // Side-effect import — applies `data-shape` from `theme.ts` and localStorage
 // to <html> at boot. Paired with the pre-boot script in index.html which
 // does the same before Vue mounts to avoid FOUC.
@@ -47,6 +48,21 @@ window.addEventListener("unhandledrejection", (event) => {
 // this call or replacing with your own reporter.
 registerErrorToasts({
   onError: (message, opts) => toast.error(message, opts),
+});
+
+// Wire the in-memory auth token (src/lib/authToken.ts) into axios: attach it as
+// a Bearer token on every request, and on an unrecoverable 401 clear it and —
+// only when the user is on a guarded route — bounce to Login. To enable silent
+// refresh, add `refreshToken: async () => { ...; return newAccessToken; }`.
+setAuthProvider({
+  getToken: getAuthToken,
+  onUnauthorized: () => {
+    clearAuthToken();
+    const current = router.currentRoute.value;
+    if (current.meta.requiresAuth) {
+      router.push({ name: "Login", query: { redirect: current.fullPath } });
+    }
+  },
 });
 
 app.use(pinia);

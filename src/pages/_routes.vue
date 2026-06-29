@@ -94,6 +94,8 @@
 </template>
 
 <script setup lang="ts">
+  import { isAuthenticated } from '@/lib/authToken';
+
   definePage({
     head: 'Route Explorer',
     layout: 'blank',
@@ -114,8 +116,7 @@
   const route = useRoute();
   const query = ref('');
 
-  const hasToken =
-    typeof localStorage !== 'undefined' && !!localStorage.getItem('auth-token');
+  const hasToken = isAuthenticated();
 
   const rows = computed<Row[]>(() =>
     router

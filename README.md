@@ -312,7 +312,7 @@ const { user, isAuthenticated, login, logout, fetchUser } = useAuth();
 await login({ email: 'user@example.com', password: '...' });
 ```
 
-Token is stored in localStorage and automatically attached to every Axios request via the interceptor. 401 responses clear the session.
+The access token is held **in memory** via `src/lib/authToken.ts` and automatically attached as a Bearer token to every Axios request. On an unrecoverable 401 the session is cleared and guarded routes redirect to Login. See [Authentication & token storage](#authentication--token-storage) for the rationale and how to change it.
 
 ### useKeyboard
 
@@ -400,6 +400,33 @@ const debouncedSearch = useDebounce(searchQuery, 300);
 
 
 See `.env.example` for reference.
+
+## Authentication & token storage
+
+The auth **access token** is the single source of truth in [`src/lib/authToken.ts`](src/lib/authToken.ts) and is held **in memory by default** — never in `localStorage` or a JS-readable cookie.
+
+**Why in-memory?** A token in `localStorage` is readable by any script on the page, so a single XSS (a compromised dependency, a third-party widget, a stray `v-html`) can exfiltrate the whole session. An in-memory token can't be read that way.
+
+**The tradeoff:** a full page reload drops the token, so the user appears logged out on refresh. The production-grade pattern is to pair this with a **silent refresh** — keep the long-lived *refresh* token in an `httpOnly` + `SameSite` cookie set by your backend, and on load exchange it for a fresh access token:
+
+```ts
+// src/main.ts — extend the AuthProvider with a refresh handler
+setAuthProvider({
+  getToken: getAuthToken,
+  refreshToken: async () => {
+    const { token } = await apiPost<{ token: string }>('/auth/refresh'); // sends the httpOnly cookie
+    setAuthToken(token);
+    return token;
+  },
+  onUnauthorized: () => {
+    /* clear + redirect (already wired) */
+  },
+});
+```
+
+The axios interceptor (`src/plugins/axios.ts`) de-duplicates concurrent refreshes and retries the original request automatically once a new token arrives.
+
+**Everything goes through `authToken.ts`** — the router guard, the axios request interceptor, and `useAuth`. To switch strategies (e.g. persist to `localStorage` for convenience over security), change only that one file; a commented `localStorage` example is included there.
 
 ## Code quality
 

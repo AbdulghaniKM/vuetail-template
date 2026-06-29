@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { routes } from "@/config/router";
+import { isAuthenticated } from "@/lib/authToken";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -11,8 +12,7 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   if (!to.meta.requiresAuth) return true;
-  const token = typeof localStorage !== "undefined" ? localStorage.getItem("auth-token") : null;
-  if (token) return true;
+  if (isAuthenticated()) return true;
   return { name: "Login", query: { redirect: to.fullPath } };
 });
 
