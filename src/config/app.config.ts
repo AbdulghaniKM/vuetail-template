@@ -4,9 +4,7 @@ import { getApiUrl } from './env';
 export const appConfig: AppConfig = {
   api: {
     baseUrl: getApiUrl(),
-    version: 'v1',
     timeout: 15000,
-    retryAttempts: 3,
   },
 
   app: {
@@ -92,23 +90,6 @@ export const appConfig: AppConfig = {
       fallbacks: ['Courier New', 'Courier', 'monospace'],
       cssVariable: 'font-mono',
     },
-    sizes: {
-      xs: '0.75rem',
-      sm: '0.875rem',
-      base: '1rem',
-      lg: '1.125rem',
-      xl: '1.25rem',
-      '2xl': '1.5rem',
-      '3xl': '1.875rem',
-      '4xl': '2.25rem',
-    },
-    weights: {
-      light: 300,
-      normal: 400,
-      medium: 500,
-      semibold: 600,
-      bold: 700,
-    },
   },
 
   icons: {
@@ -133,13 +114,5 @@ export const appConfig: AppConfig = {
 
   layout: {
     containerMaxWidth: '1280px',
-    spacing: {
-      xs: '0.5rem',
-      sm: '1rem',
-      md: '1.5rem',
-      lg: '2rem',
-      xl: '3rem',
-      '2xl': '4rem',
-    },
   },
 };

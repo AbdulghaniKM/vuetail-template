@@ -8,6 +8,8 @@ export interface Toast {
   message: string;
   title?: string;
   duration?: number;
+  /** True while the dismissal timer is paused (hover/focus) — freezes the progress bar. */
+  paused?: boolean;
 }
 
 interface TimerRecord {
@@ -35,6 +37,8 @@ const pauseToast = (id: string): void => {
   if (!t) return;
   clearTimeout(t.timeoutId);
   t.remaining = Math.max(0, t.remaining - (Date.now() - t.startedAt));
+  const toast = toasts.value.find((x) => x.id === id);
+  if (toast) toast.paused = true;
 };
 
 const resumeToast = (id: string): void => {
@@ -42,6 +46,8 @@ const resumeToast = (id: string): void => {
   if (!t || t.remaining <= 0) return;
   const timeoutId = setTimeout(() => removeToast(id), t.remaining);
   timers.set(id, { timeoutId, remaining: t.remaining, startedAt: Date.now() });
+  const toast = toasts.value.find((x) => x.id === id);
+  if (toast) toast.paused = false;
 };
 
 const addToast = (toast: Omit<Toast, 'id'>): string => {

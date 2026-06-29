@@ -49,23 +49,6 @@ export interface TypographyConfig {
     fallbacks?: string[];
     cssVariable?: string;
   };
-  sizes?: {
-    xs?: string;
-    sm?: string;
-    base?: string;
-    lg?: string;
-    xl?: string;
-    '2xl'?: string;
-    '3xl'?: string;
-    '4xl'?: string;
-  };
-  weights?: {
-    light?: number;
-    normal?: number;
-    medium?: number;
-    semibold?: number;
-    bold?: number;
-  };
 }
 
 export interface AppMetadata {
@@ -104,21 +87,11 @@ export interface SeoDefaults {
 
 export interface LayoutConfig {
   containerMaxWidth?: string;
-  spacing?: {
-    xs?: string;
-    sm?: string;
-    md?: string;
-    lg?: string;
-    xl?: string;
-    '2xl'?: string;
-  };
 }
 
 export interface ApiConfig {
   baseUrl: string;
-  version?: string;
   timeout?: number;
-  retryAttempts?: number;
 }
 
 export interface AppConfig {

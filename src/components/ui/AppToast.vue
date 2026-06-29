@@ -49,7 +49,10 @@
             v-if="toast.duration && toast.duration > 0"
             class="h-0.5 origin-left"
             :class="progressClass(toast.type)"
-            :style="{ animation: `toast-progress ${toast.duration}ms linear forwards` }"
+            :style="{
+              animation: `toast-progress ${toast.duration}ms linear forwards`,
+              animationPlayState: toast.paused ? 'paused' : 'running',
+            }"
           />
         </motion.div>
       </AnimatePresence>
@@ -88,7 +91,7 @@
         return 'inset-x-0 top-0 items-end sm:inset-x-auto sm:end-4 sm:top-4';
       case 'bottom-left':
         return 'inset-x-0 bottom-0 items-start sm:inset-x-auto sm:start-4 sm:bottom-4';
-      case 'bottom-right':
+      default:
         return 'inset-x-0 bottom-0 items-end sm:inset-x-auto sm:end-4 sm:bottom-4';
     }
   });
