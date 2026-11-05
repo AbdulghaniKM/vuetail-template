@@ -19,12 +19,18 @@
     "vuetail:verify": "node scripts/add.js verify"
   },
   "dependencies": {
+    "@tresjs/cientos": "^5.10.1",
+    "@tresjs/core": "^5.10.1",
+    "@tresjs/post-processing": "^3.11.1",
     "@vueuse/core": "^14.3.0",
     "axios": "^1.16.1",
     "date-fns": "^4.4.0",
+    "lenis": "^1.3.27",
     "motion-v": "^2.2.1",
     "pinia": "^3.0.4",
+    "postprocessing": "^6.39.6",
     "tailwindcss": "^4.3.0",
+    "three": "^0.187.0",
     "vue": "^3.5.35",
     "vue-router": "^5.1.0",
     "zod": "^4.4.3"
@@ -33,6 +39,7 @@
     "@iconify/json": "^2.2.481",
     "@iconify/tailwind4": "^1.2.3",
     "@tailwindcss/vite": "^4.3.0",
+    "@types/three": "^0.187.0",
     "@vitejs/devtools": "^0.3.1",
     "@vitejs/plugin-vue": "^6.0.7",
     "@vue/tsconfig": "^0.9.1",
