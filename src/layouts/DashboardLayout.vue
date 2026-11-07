@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen bg-background">
+  <div class="flex min-h-screen bg-bg">
     <aside
       class="sticky top-0 hidden h-screen shrink-0 border-e border-border bg-surface transition-[width] duration-200 md:block"
       :class="collapsed ? 'w-16' : 'w-64'"
@@ -10,7 +10,7 @@
         </span>
         <button
           type="button"
-          class="ms-auto flex size-8 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-muted hover:text-text"
+          class="ms-auto flex size-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-muted hover:text-text"
           :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
           @click="toggle"
         >
@@ -40,7 +40,7 @@
       </header>
       <a
         href="#main"
-        class="sr-only focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-white"
+        class="sr-only focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-fg"
       >
         Skip to content
       </a>

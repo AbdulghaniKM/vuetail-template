@@ -6,14 +6,16 @@ import { createApp } from 'vue';
 
 import App from './App.vue';
 import router from './router';
+// Ink's faces ship with the app; Pine and Console load theirs on first use (src/theme.ts).
+import '@fontsource-variable/schibsted-grotesk';
+import '@fontsource-variable/spline-sans-mono';
 import './style.css';
 import { initializeConfig } from './config';
 import { useToast } from './composables/useToast';
 import { registerErrorToasts, setAuthProvider } from './plugins/axios';
 import { clearAuthToken, getAuthToken } from './lib/authToken';
-// Side-effect import — applies `data-shape` from `theme.ts` and localStorage
-// to <html> at boot. Paired with the pre-boot script in index.html which
-// does the same before Vue mounts to avoid FOUC.
+// Side-effect import — applies the stored or default preset (`data-vt-preset`) to <html> at boot.
+// Paired with the pre-boot script in index.html, which does the same before first paint.
 import '@/composables/useAppUi';
 
 // Initialize app configuration (theme, SEO, fonts, etc.)

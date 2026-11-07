@@ -1,5 +1,6 @@
 import { ref, computed, watch } from 'vue';
 
+// NOTE: Module-scope ref() state. SPA-only — not safe under SSR.
 const STORAGE_KEY = 'app-sidebar-collapsed';
 
 const readStored = (): boolean => {

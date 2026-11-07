@@ -1,92 +1,9 @@
 @import 'tailwindcss';
 @plugin '@iconify/tailwind4';
 
-/* Tailwind Theme Definitions */
-/* Fallback values for build-time; runtime colors come from app.config.ts via applyTheme() */
-@theme {
-  --color-primary: #3b82f6;
-  --color-secondary: #8b5cf6;
-  --color-accent: #f59e0b;
-  --color-background: #ffffff;
-  --color-surface: #f9fafb;
-  --color-text: #111827;
-  --color-text-secondary: #6b7280;
-  --color-border: #e5e7eb;
-  --color-muted: #f3f4f6;
-  --color-link: #3b82f6;
-  --color-link-hover: #2563eb;
-  --color-emphasis: #1e40af;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
-
-  /* Font variables */
-  --font-primary: var(--font-primary);
-  --font-secondary: var(--font-secondary);
-  --font-mono: var(--font-mono);
-}
-
-/* Font Family Registration */
-/* Use this section to register local fonts */
-/* Example:
-@font-face {
-  font-family: 'CustomFont';
-  src: url('/fonts/custom-font.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-:root {
-  --font-custom: 'CustomFont', sans-serif;
-}
-*/
-
-/* Default font families - will be overridden by app.config.ts */
-:root {
-  --font-sans:
-    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
-  --font-mono: 'Courier New', Courier, monospace;
-}
-
-/* Theme CSS variables will be injected automatically by the config system */
-/* Colors are available as CSS variables: --color-primary, --color-secondary, etc. */
-/* Use them in your components like: color: var(--color-primary); */
-
-/* Base theme-aware styles */
-:root {
-  color-scheme: light dark;
-}
-
-[data-theme='dark'] {
-  color-scheme: dark;
-}
-
-[data-theme='light'] {
-  color-scheme: light;
-}
-
-/* ─── Shape knob (overrides Tailwind's --radius-* scale) ───────────────── */
-html[data-shape='square'] {
-  --radius-sm: 0;
-  --radius-md: 0;
-  --radius-lg: 0;
-  --radius-xl: 0;
-  --radius-2xl: 0;
-  --radius-3xl: 0;
-}
-
-html[data-shape='pill'] {
-  --radius-sm: 9999px;
-  --radius-md: 9999px;
-  --radius-lg: 9999px;
-  --radius-xl: 9999px;
-  --radius-2xl: 9999px;
-  --radius-3xl: 9999px;
-}
+/* VueTail tokens: Ink by default, Pine and Console via <html data-vt-preset>. Pick the starting
+   preset in src/theme.ts; edit colours, radius and fonts in styles/tokens.css. */
+@import './styles/tokens.css';
 
 /* Smooth theme transitions — only applied during an active theme swap.
    The `theme-switching` class is toggled on <html> by applyThemeToDOM
@@ -109,14 +26,27 @@ html.theme-switching *::after {
 }
 
 body {
-  font-family: var(--font-primary);
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Custom scrollbar - theme-aware, slim & smooth.
-   Scoped to html/body (not `*`) to avoid overriding component scrollers. */
-html {
+::selection {
+  background-color: var(--color-accent-subtle);
+  color: var(--color-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+/* Scrollbars: slim and theme-aware. */
+* {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-primary) transparent;
+  scrollbar-color: var(--color-border-strong) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -124,29 +54,18 @@ html {
   height: 0.5rem;
 }
 
-*::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
   background: transparent;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--color-primary);
+  background: var(--color-border-strong);
   border-radius: 9999px;
-  border: 0.125rem solid transparent;
-  background-clip: padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent);
-  background-clip: padding-box;
-}
-
-*::-webkit-scrollbar-thumb:active {
-  background: var(--color-secondary);
-  background-clip: padding-box;
-}
-
-*::-webkit-scrollbar-corner {
-  background: transparent;
+  background: var(--color-text-muted);
 }
 
 button {

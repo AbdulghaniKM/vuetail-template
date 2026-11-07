@@ -6,12 +6,12 @@
         class="mb-4 flex size-16 items-center justify-center rounded-2xl"
         :class="iconContainerClass"
       >
-        <UiAppIcon :name="icon" :size="2" :class="iconColorClass" />
+        <AppIcon :name="icon" :size="2" :class="iconColorClass" />
       </div>
     </slot>
 
     <h2 v-if="title" class="mb-1 text-lg font-semibold text-text">{{ title }}</h2>
-    <p v-if="description" class="mb-6 max-w-md text-sm text-text-secondary">{{ description }}</p>
+    <p v-if="description" class="mb-6 max-w-md text-sm text-text-muted">{{ description }}</p>
 
     <div v-if="$slots.default" class="flex items-center gap-2">
       <slot />
@@ -20,6 +20,9 @@
 </template>
 
 <script setup lang="ts">
+  import { computed } from 'vue';
+  import AppIcon from './AppIcon.vue';
+
   interface Props {
     icon?: string;
     title?: string;
@@ -35,8 +38,8 @@
     () =>
       ({
         neutral: 'bg-muted',
-        primary: 'bg-primary/10',
-        danger: 'bg-error/10',
+        primary: 'bg-accent-subtle',
+        danger: 'bg-danger-subtle',
         warning: 'bg-warning/10',
         success: 'bg-success/10',
         info: 'bg-info/10',
@@ -46,9 +49,9 @@
   const iconColorClass = computed(
     () =>
       ({
-        neutral: 'text-text-secondary',
-        primary: 'text-primary',
-        danger: 'text-error',
+        neutral: 'text-text-muted',
+        primary: 'text-accent-text',
+        danger: 'text-danger-text',
         warning: 'text-warning',
         success: 'text-success',
         info: 'text-info',

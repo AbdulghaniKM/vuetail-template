@@ -1,19 +1,17 @@
 <template>
-  <div
-    class="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-4 text-center"
-  >
-    <div class="flex size-16 items-center justify-center rounded-2xl bg-primary/10">
+  <div class="flex min-h-screen flex-col items-center justify-center gap-6 bg-bg px-4 text-center">
+    <div class="flex size-16 items-center justify-center rounded-2xl bg-accent-subtle">
       <UiAppIcon name="icon-[logos--vue]" class="size-8" />
     </div>
 
     <div class="space-y-2">
       <h1 class="text-4xl font-extrabold tracking-tight text-text sm:text-5xl">VueTail</h1>
-      <p class="mx-auto max-w-sm text-base text-text-secondary">
+      <p class="mx-auto max-w-sm text-base text-text-muted">
         Vue 3 + Tailwind v4 + TypeScript. Clean and ready to build.
       </p>
     </div>
 
-    <div class="flex flex-wrap justify-center gap-2 text-xs text-text-secondary">
+    <div class="flex flex-wrap justify-center gap-2 text-xs text-text-muted">
       <span class="rounded-full bg-muted px-3 py-1.5 font-medium">Vue 3</span>
       <span class="rounded-full bg-muted px-3 py-1.5 font-medium">Tailwind v4</span>
       <span class="rounded-full bg-muted px-3 py-1.5 font-medium">TypeScript</span>
@@ -22,7 +20,7 @@
     </div>
 
     <div class="rounded-2xl border border-border bg-surface p-5 text-left">
-      <p class="mb-3 text-xs font-semibold tracking-wider text-text-secondary uppercase">
+      <p class="mb-3 text-xs font-semibold tracking-wider text-text-muted uppercase">
         Add components on demand
       </p>
       <pre

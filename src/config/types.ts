@@ -1,25 +1,5 @@
-export interface ColorPalette {
-  primary: string;
-  secondary: string;
-  accent: string;
-  background: string;
-  surface: string;
-  text: string;
-  textSecondary: string;
-  border: string;
-  muted?: string;
-  link?: string;
-  linkHover?: string;
-  emphasis?: string;
-  success?: string;
-  warning?: string;
-  error?: string;
-  info?: string;
-}
-
+/** Light and dark only. Colours, radius and fonts live in styles/tokens.css; the preset in src/theme.ts. */
 export interface ThemeConfig {
-  light: ColorPalette;
-  dark: ColorPalette;
   defaultTheme?: 'light' | 'dark' | 'system';
 }
 
@@ -33,22 +13,8 @@ export interface FontConfig {
 }
 
 export interface TypographyConfig {
+  /** Extra faces to load at boot. The preset fonts come from the tokens and src/theme.ts. */
   fonts?: FontConfig[];
-  primary: {
-    family: string;
-    fallbacks?: string[];
-    cssVariable?: string;
-  };
-  secondary?: {
-    family: string;
-    fallbacks?: string[];
-    cssVariable?: string;
-  };
-  mono?: {
-    family: string;
-    fallbacks?: string[];
-    cssVariable?: string;
-  };
 }
 
 export interface AppMetadata {

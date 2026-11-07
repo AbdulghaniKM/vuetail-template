@@ -3,14 +3,18 @@
     type="button"
     :aria-label="`Switch to ${nextMode} theme`"
     :title="`Theme: ${mode}`"
-    class="inline-flex size-10 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-muted hover:text-text focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none"
+    class="inline-flex size-10 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-muted hover:text-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
     @click="cycle"
   >
-    <UiAppIcon :name="iconName" :size="1.125" />
+    <AppIcon :name="iconName" :size="1.125" />
   </button>
 </template>
 
 <script setup lang="ts">
+  import { computed } from 'vue';
+  import AppIcon from './AppIcon.vue';
+  import { useTheme } from '@/composables/useTheme';
+
   type ThemeMode = 'light' | 'dark';
 
   const { mode, setTheme } = useTheme();

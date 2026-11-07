@@ -1,10 +1,10 @@
 <template>
-  <div class="flex min-h-screen flex-col bg-background">
+  <div class="flex min-h-screen flex-col bg-bg">
     <div class="flex flex-1 items-center justify-center px-4 py-10">
       <div class="w-full max-w-md">
         <div class="mb-8 text-center">
           <RouterLink to="/" class="text-xl font-semibold text-text">{{ appName }}</RouterLink>
-          <p v-if="$slots.tagline" class="mt-1 text-sm text-text-secondary">
+          <p v-if="$slots.tagline" class="mt-1 text-sm text-text-muted">
             <slot name="tagline" />
           </p>
         </div>

@@ -17,10 +17,6 @@ export const useAppConfig = () => {
   const appDescription = computed(() => appConfig.app.description);
   const appUrl = computed(() => appConfig.app.url);
 
-  const primaryFont = computed(() => appConfig.typography.primary.family);
-  const secondaryFont = computed(() => appConfig.typography.secondary?.family);
-  const monoFont = computed(() => appConfig.typography.mono?.family);
-
   const containerMaxWidth = computed(() => appConfig.layout?.containerMaxWidth || '1280px');
 
   return {
@@ -35,9 +31,6 @@ export const useAppConfig = () => {
     appTitle,
     appDescription,
     appUrl,
-    primaryFont,
-    secondaryFont,
-    monoFont,
     containerMaxWidth,
   };
 };

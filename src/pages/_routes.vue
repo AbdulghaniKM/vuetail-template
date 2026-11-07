@@ -2,13 +2,13 @@
   <div class="mx-auto max-w-4xl p-6">
     <header class="mb-6">
       <div class="flex flex-wrap items-center gap-2">
-        <UiAppIcon name="icon-[solar--routing-2-linear]" class="size-6 text-primary" />
+        <UiAppIcon name="icon-[solar--routing-2-linear]" class="size-6 text-accent-text" />
         <h1 class="text-2xl font-semibold text-text">Route Explorer</h1>
         <span class="rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">
           dev only
         </span>
       </div>
-      <p class="mt-1 text-sm text-text-secondary">
+      <p class="mt-1 text-sm text-text-muted">
         Every route registered by the compile-time registry — like a Swagger index for your pages.
         Excluded from production builds (the
         <code>_</code>
@@ -20,15 +20,15 @@
     <div class="mb-4 grid grid-cols-3 gap-3">
       <div class="rounded-xl border border-border bg-surface p-3">
         <p class="text-2xl font-bold text-text">{{ stats.total }}</p>
-        <p class="text-xs text-text-secondary">routes</p>
+        <p class="text-xs text-text-muted">routes</p>
       </div>
       <div class="rounded-xl border border-border bg-surface p-3">
         <p class="text-2xl font-bold text-text">{{ stats.guarded }}</p>
-        <p class="text-xs text-text-secondary">guarded</p>
+        <p class="text-xs text-text-muted">guarded</p>
       </div>
       <div class="rounded-xl border border-border bg-surface p-3">
         <p class="text-2xl font-bold text-text">{{ stats.dynamic }}</p>
-        <p class="text-xs text-text-secondary">dynamic</p>
+        <p class="text-xs text-text-muted">dynamic</p>
       </div>
     </div>
 
@@ -37,11 +37,11 @@
       v-model="query"
       type="text"
       placeholder="Filter by path or name…"
-      class="mb-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary"
+      class="mb-3 w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text outline-none focus:border-ring"
     />
 
     <!-- Auth status -->
-    <div class="mb-4 flex items-center gap-2 text-xs text-text-secondary">
+    <div class="mb-4 flex items-center gap-2 text-xs text-text-muted">
       <span
         class="inline-block size-2 rounded-full"
         :class="hasToken ? 'bg-success' : 'bg-border'"
@@ -56,7 +56,7 @@
         v-for="r in rows"
         :key="r.path + r.name"
         class="flex items-center gap-2 px-3 py-1.5 text-sm transition-colors"
-        :class="r.active ? 'bg-primary/5' : 'bg-surface'"
+        :class="r.active ? 'bg-accent-subtle' : 'bg-surface'"
       >
         <span
           class="size-1.5 shrink-0 rounded-full"
@@ -64,35 +64,35 @@
           :title="r.active ? 'active route' : 'inactive'"
         />
         <code class="shrink-0 font-mono text-text">{{ r.path }}</code>
-        <span class="min-w-0 flex-1 truncate text-xs text-text-secondary">{{ r.name }}</span>
+        <span class="min-w-0 flex-1 truncate text-xs text-text-muted">{{ r.name }}</span>
 
         <UiAppIcon
           v-if="r.requiresAuth"
           name="icon-[heroicons-outline--lock-closed]"
-          class="size-3.5 shrink-0 text-error"
+          class="size-3.5 shrink-0 text-danger-text"
           title="requires auth"
         />
         <span
           v-if="r.dynamic"
-          class="shrink-0 text-[10px] font-medium text-primary"
+          class="shrink-0 text-[10px] font-medium text-accent-text"
           title="dynamic — needs params"
         >
           :param
         </span>
         <span v-if="r.devOnly" class="shrink-0 text-[10px] font-medium text-warning">dev</span>
-        <span class="shrink-0 text-[10px] text-text-secondary">{{ r.layout }}</span>
+        <span class="shrink-0 text-[10px] text-text-muted">{{ r.layout }}</span>
 
         <RouterLink
           v-if="!r.dynamic"
           :to="r.path"
-          class="shrink-0 text-xs font-medium text-primary hover:underline"
+          class="shrink-0 text-xs font-medium text-accent-text hover:underline"
         >
           visit →
         </RouterLink>
       </li>
 
       <li v-if="rows.length === 0" class="bg-surface px-3 py-6 text-center">
-        <p class="text-sm text-text-secondary">No routes match “{{ query }}”.</p>
+        <p class="text-sm text-text-muted">No routes match “{{ query }}”.</p>
       </li>
     </ul>
   </div>

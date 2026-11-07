@@ -18,10 +18,10 @@
           } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.setAttribute('data-theme', 'dark');
           }
-          var pairs = [['app-shape', 'data-shape']];
-          for (var i = 0; i < pairs.length; i++) {
-            var v = localStorage.getItem(pairs[i][0]);
-            if (v) document.documentElement.setAttribute(pairs[i][1], v);
+          // VueTail preset: Ink carries no attribute; Pine and Console are set before first paint.
+          var preset = localStorage.getItem('app-preset');
+          if (preset === 'pine' || preset === 'console') {
+            document.documentElement.setAttribute('data-vt-preset', preset);
           }
         } catch (_) {}
       })();

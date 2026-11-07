@@ -11,13 +11,13 @@
         <motion.div
           v-for="toast in toasts"
           :key="toast.id"
-          class="pointer-events-auto relative w-full overflow-hidden rounded-xl shadow-lg sm:max-w-sm"
+          class="pointer-events-auto relative w-full overflow-hidden rounded-lg border border-border bg-surface-raised text-text shadow-lg sm:max-w-sm"
           :class="containerClass(toast.type)"
           role="alert"
           :initial="motionConfig.initial"
           :animate="motionConfig.animate"
           :exit="motionConfig.exit"
-          :transition="{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }"
+          :transition="enter()"
           @mouseenter="emit('pause', toast.id)"
           @mouseleave="emit('resume', toast.id)"
           @focusin="emit('pause', toast.id)"
@@ -31,14 +31,19 @@
               <AppIcon :name="toastIcon(toast.type)" :size="0.75" />
             </span>
             <div class="min-w-0 flex-1">
-              <p v-if="toast.title" class="text-sm leading-snug font-semibold">{{ toast.title }}</p>
-              <p class="text-sm leading-relaxed" :class="toast.title ? 'opacity-80' : ''">
+              <p v-if="toast.title" class="text-[0.875rem] leading-snug font-semibold">
+                {{ toast.title }}
+              </p>
+              <p
+                class="text-[0.875rem] leading-relaxed"
+                :class="toast.title ? 'text-text-muted' : ''"
+              >
                 {{ toast.message }}
               </p>
             </div>
             <button
               type="button"
-              class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-lg opacity-60 transition-opacity hover:opacity-100"
+              class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-sm text-text-muted transition-colors hover:bg-muted hover:text-text"
               aria-label="Dismiss notification"
               @click="removeToast(toast.id)"
             >
@@ -65,6 +70,8 @@
   import { AnimatePresence, motion } from 'motion-v';
   import type { Toast } from '@/composables/useToast';
   import AppIcon from './AppIcon.vue';
+  import { useMotionTokens } from '@/composables/useMotionTokens';
+  import { useReducedMotion } from '@/composables/useReducedMotion';
 
   export interface AppToastProps {
     toasts: Toast[];
@@ -83,6 +90,9 @@
 
   const removeToast = (id: string) => emit('remove', id);
 
+  const { enter, exit } = useMotionTokens();
+  const reduced = useReducedMotion();
+
   const positionClass = computed(() => {
     switch (props.position) {
       case 'top-left':
@@ -98,36 +108,46 @@
 
   const motionConfig = computed(() => {
     const isTop = props.position.startsWith('top');
+    // Reduced motion keeps the fade (it aids comprehension) and drops the slide/scale.
+    if (reduced.value) {
+      return {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0, transition: exit() },
+      };
+    }
     const yOffset = isTop ? -12 : 12;
+    const exitOffset = isTop ? -8 : 8;
     return {
       initial: { opacity: 0, y: yOffset, scale: 0.95 },
       animate: { opacity: 1, y: 0, scale: 1 },
-      exit: { opacity: 0, y: isTop ? -8 : 8, scale: 0.95 },
+      exit: { opacity: 0, y: exitOffset, scale: 0.95, transition: exit() },
     };
   });
 
   const containerClass = (type: Toast['type']) =>
     ({
-      success: 'bg-surface border border-success/20 text-text',
-      error: 'bg-surface border border-error/20 text-text',
-      warning: 'bg-surface border border-warning/20 text-text',
-      info: 'bg-surface border border-info/20 text-text',
+      // Status shows in the icon and the progress bar; the card itself stays neutral.
+      success: '',
+      error: '',
+      warning: '',
+      info: '',
     })[type];
 
   const iconBgClass = (type: Toast['type']) =>
     ({
-      success: 'bg-success/15 text-success',
-      error: 'bg-error/15 text-error',
-      warning: 'bg-warning/15 text-warning',
-      info: 'bg-info/15 text-info',
+      success: 'bg-success-subtle text-success-text',
+      error: 'bg-danger-subtle text-danger-text',
+      warning: 'bg-warning-subtle text-warning-text',
+      info: 'bg-info-subtle text-info-text',
     })[type];
 
   const progressClass = (type: Toast['type']) =>
     ({
-      success: 'bg-success/40',
-      error: 'bg-error/40',
-      warning: 'bg-warning/40',
-      info: 'bg-info/40',
+      success: 'bg-success',
+      error: 'bg-danger',
+      warning: 'bg-warning',
+      info: 'bg-info',
     })[type];
 
   const toastIcon = (type: Toast['type']) =>

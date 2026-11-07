@@ -1,67 +1,74 @@
 import { ref, watch, type Ref } from 'vue';
-import { theme as defaultTheme, type Shape } from '@/theme';
+import { theme as defaultTheme, presetFonts, type Preset } from '@/theme';
 
-const SHAPE_KEY = 'app-shape';
+/**
+ * Switches the app between the VueTail presets defined in styles/tokens.css.
+ *
+ * Ink is the default and carries no attribute, so a page with no `data-vt-preset` is Ink and
+ * nothing flashes before this module runs. Pine and Console set `<html data-vt-preset="…">`,
+ * which swaps colours, radius, density and fonts in one step. Light and dark stay with
+ * useTheme: they are a separate axis.
+ */
 
-const SHAPES: readonly Shape[] = ['square', 'rounded', 'pill'] as const;
+const PRESET_KEY = 'app-preset';
+const ATTR = 'data-vt-preset';
+const PRESETS: readonly Preset[] = ['ink', 'pine', 'console'] as const;
 
-const isShape = (v: string | null): v is Shape =>
-  v !== null && (SHAPES as readonly string[]).includes(v);
+const isPreset = (v: string | null): v is Preset =>
+  v !== null && (PRESETS as readonly string[]).includes(v);
 
-const readStored = <T extends string>(
-  key: string,
-  guard: (v: string | null) => v is T,
-): T | null => {
+const readStored = (): Preset | null => {
   if (typeof localStorage === 'undefined') return null;
   try {
-    const raw = localStorage.getItem(key);
-    return guard(raw) ? raw : null;
+    const raw = localStorage.getItem(PRESET_KEY);
+    return isPreset(raw) ? raw : null;
   } catch {
     return null;
   }
 };
 
-const writeStored = (key: string, value: string | null): void => {
+const writeStored = (value: Preset | null): void => {
   if (typeof localStorage === 'undefined') return;
   try {
-    if (value === null) localStorage.removeItem(key);
-    else localStorage.setItem(key, value);
+    if (value === null) localStorage.removeItem(PRESET_KEY);
+    else localStorage.setItem(PRESET_KEY, value);
   } catch {
-    /* ignore */
+    /* storage unavailable: the choice lasts for this page only */
   }
 };
 
-const applyAttr = (attr: string, value: string | null): void => {
+const applyPreset = (value: Preset): void => {
   if (typeof document === 'undefined') return;
-  if (value === null) document.documentElement.removeAttribute(attr);
-  else document.documentElement.setAttribute(attr, value);
+  if (value === 'ink') document.documentElement.removeAttribute(ATTR);
+  else document.documentElement.setAttribute(ATTR, value);
+  // A preset's faces load on first use; the default preset's ship with the app.
+  void presetFonts[value]?.();
 };
 
-const initialShape: Shape = readStored(SHAPE_KEY, isShape) ?? defaultTheme.shape;
+const preset: Ref<Preset> = ref(readStored() ?? defaultTheme.preset);
+applyPreset(preset.value);
 
-const shape: Ref<Shape> = ref(initialShape);
-
-applyAttr('data-shape', shape.value === 'rounded' ? null : shape.value);
-
-watch(shape, (v) => {
-  applyAttr('data-shape', v === 'rounded' ? null : v);
-  writeStored(SHAPE_KEY, v === 'rounded' ? null : v);
-});
+watch(
+  preset,
+  (v) => {
+    applyPreset(v);
+    writeStored(v === defaultTheme.preset ? null : v);
+  },
+  { flush: 'sync' },
+);
 
 export const useAppUi = () => {
-  const setShape = (value: Shape) => {
-    shape.value = value;
+  const setPreset = (value: Preset) => {
+    preset.value = value;
   };
-
   const reset = () => {
-    shape.value = defaultTheme.shape;
-    writeStored(SHAPE_KEY, null);
+    preset.value = defaultTheme.preset;
   };
 
   return {
-    shape,
-    shapes: SHAPES,
-    setShape,
+    preset,
+    presets: PRESETS,
+    setPreset,
     reset,
   };
 };

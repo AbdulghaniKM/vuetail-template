@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="active"
-    class="pointer-events-none fixed inset-x-0 top-0 z-[10001] h-0.5 bg-primary/20"
+    class="pointer-events-none fixed inset-x-0 top-0 z-[10001] h-0.5 bg-accent-subtle"
     role="progressbar"
     aria-label="Loading"
     :aria-valuenow="Math.round(progress * 100)"
@@ -9,13 +9,15 @@
     aria-valuemax="100"
   >
     <div
-      class="h-full bg-primary transition-[width,opacity] duration-200 ease-out"
+      class="h-full bg-accent transition-[width,opacity] duration-200 ease-out"
       :style="{ width: `${progress * 100}%`, opacity: fading ? 0 : 1 }"
     />
   </div>
 </template>
 
 <script setup lang="ts">
+  import { onUnmounted, ref } from 'vue';
+
   const active = ref(false);
   const progress = ref(0);
   const fading = ref(false);

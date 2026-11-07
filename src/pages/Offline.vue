@@ -7,7 +7,7 @@
   >
     <button
       type="button"
-      class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+      class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition-colors hover:bg-accent-hover"
       @click="retry"
     >
       Retry

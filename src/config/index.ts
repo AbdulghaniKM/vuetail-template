@@ -1,7 +1,6 @@
 import { ThemePersistence } from '@/lib/ThemePersistence';
-import { loadFont, registerFontFamily } from '../utils/fonts';
+import { loadFont } from '../utils/fonts';
 import { useSeo } from '../utils/seo';
-import { applyTheme } from '../utils/theme';
 import { appConfig } from './app.config';
 import type { AppConfig } from './types';
 
@@ -10,8 +9,6 @@ export type { AppConfig };
 
 export const initializeConfig = (): void => {
   if (typeof document === 'undefined') return;
-
-  applyTheme(appConfig.theme);
 
   ThemePersistence.synchronizeDocumentWithApplicationConfig();
 
@@ -45,37 +42,11 @@ export const initializeConfig = (): void => {
     });
   }
 
-  if (appConfig.typography.fonts) {
-    appConfig.typography.fonts.forEach((font) => {
-      loadFont(font).catch((error) => {
-        console.error(`Failed to load font: ${font.name}`, error);
-      });
-    });
-  }
-
-  if (appConfig.typography.primary) {
-    registerFontFamily({
-      name: appConfig.typography.primary.family,
-      fallbacks: appConfig.typography.primary.fallbacks,
-      cssVariable: appConfig.typography.primary.cssVariable,
-    });
-  }
-
-  if (appConfig.typography.secondary) {
-    registerFontFamily({
-      name: appConfig.typography.secondary.family,
-      fallbacks: appConfig.typography.secondary.fallbacks,
-      cssVariable: appConfig.typography.secondary.cssVariable,
-    });
-  }
-
-  if (appConfig.typography.mono) {
-    registerFontFamily({
-      name: appConfig.typography.mono.family,
-      fallbacks: appConfig.typography.mono.fallbacks,
-      cssVariable: appConfig.typography.mono.cssVariable,
-    });
-  }
+  // Fonts come from the VueTail tokens (--font-sans, --font-display, --font-mono), per preset.
+  // Registering them here would write inline variables on <html> and override every preset.
+  appConfig.typography.fonts?.forEach((font) => {
+    loadFont(font).catch((error) => console.error(`Failed to load font: ${font.name}`, error));
+  });
 
   if (appConfig.app.language) {
     document.documentElement.lang = appConfig.app.language;
