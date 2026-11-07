@@ -46,7 +46,7 @@ cp .env.example .env
 After cloning, a few edits turn this template into your own app:
 
 1. **Identity** — edit `src/config/identity.ts` (name, title, description, url). This drives the `<title>`, meta description, and SEO tags everywhere.
-2. **Theme** — tweak the `light` / `dark` color palettes in `src/config/app.config.ts`.
+2. **Theme** — pick a preset (Ink, Pine or Console) in `src/theme.ts`; adjust colours, radius and fonts in `src/styles/tokens.css`. See [Theming](#theming).
 3. **Favicon** — drop your icon into `public/` and point `icons.favicon` in `src/config/app.config.ts` at it.
 4. **API** — set `VITE_API_URL` in `.env` (defaults to `/api` in dev; production must be an absolute `https://` URL).
 
@@ -65,9 +65,11 @@ src/
 │       #  ↑ these ship by default · add more with `pnpm add-component <Name>`
 ├── composables/
 │   ├── useAppConfig.ts      # Access to centralized Vite layout settings
-│   ├── useAppUi.ts          # Page-level shape overrides and layout configs
+│   ├── useAppUi.ts          # Switch presets (Ink, Pine, Console) at runtime
+│   ├── useMotionTokens.ts   # Reads the motion tokens for JS animations (used by AppToast)
+│   ├── useReducedMotion.ts  # prefers-reduced-motion as a ref (used by AppToast)
 │   ├── useSidebar.ts        # Drawer navigation panel state
-│   ├── useTheme.ts          # Syncs light/dark/system mode class mappings
+│   ├── useTheme.ts          # Light/dark/system mode
 │   └── useToast.ts          # Queue manager for toast notifications
 ├── config/
 │   ├── app.config.ts        # Centralized app configuration
@@ -82,9 +84,9 @@ src/
 │   ├── display.ts           # Safe value-to-string with fallback
 │   ├── error.ts             # Axios error message extraction
 │   ├── file.ts              # File size formatting, type detection
-│   ├── fonts.ts             # Font loading and CSS variable registration
+│   ├── fonts.ts             # Loads extra faces listed in app.config.ts
 │   ├── seo.ts               # DOM meta tag manipulation
-│   ├── theme.ts             # CSS variable generation, theme application
+│   ├── theme.ts             # Applies light/dark to <html>
 │   └── validation.ts        # Pure validation rule functions
 ├── services/
 │   ├── BaseApiService.ts    # Generic REST CRUD base class
@@ -104,7 +106,10 @@ src/
 │   └── [...pathMatch].vue   # Catch-all 404 route handler
 ├── router/                  # Runtime router instantiation & navigation guards
 ├── types/                   # Shared TypeScript types
-├── style.css                # Tailwind imports, CSS variables, scrollbar styles
+├── styles/
+│   └── tokens.css           # VueTail design tokens (colours, radius, fonts, motion, presets)
+├── style.css                # Tailwind imports, tokens import, base styles
+├── theme.ts                 # Starting preset and how each preset loads its fonts
 ├── App.vue                  # Root component
 └── main.ts                  # App entry point
 ```
@@ -116,48 +121,51 @@ All app settings live in `src/config/app.config.ts`:
 ```ts
 export const appConfig = {
   app: { name, title, description, version, author, url, language },
-  theme: {
-    defaultTheme: 'system', // 'light' | 'dark' | 'system'
-    light: { primary, secondary, accent, background, surface, ... },
-    dark:  { primary, secondary, accent, background, surface, ... },
-  },
-  typography: { primary, secondary, mono, fonts },
+  theme: { defaultTheme: 'system' }, // 'light' | 'dark' | 'system'
+  typography: { fonts }, // extra faces to load at boot
   icons: { favicon },
   seo: { title, description, keywords, openGraph, twitter },
   layout: { containerMaxWidth },
 }
 ```
 
-Changes to this file automatically update the theme, fonts, SEO tags, and layout on app initialization.
+Changes to this file update the SEO tags, extra fonts and layout on app initialization. Colours
+and fonts are not set here: see [Theming](#theming).
 
 ## Theming
 
-The theme system uses CSS variables defined in `style.css` and overridden at runtime by `app.config.ts`:
+The look comes from the VueTail tokens in `src/styles/tokens.css`, the same file every registry
+component is built against. It has two independent settings:
 
-```css
-@theme {
-  --color-primary: #3b82f6;
-  --color-secondary: #8b5cf6;
-  --color-surface: #f9fafb;
-  /* ... */
-}
-```
+- **Preset**: Ink (the default: near-black actions, signal blue, borders over shadows), Pine (soft,
+  pine green, rounder) or Console (dense, 32px controls). It sets colours, radius, density and
+  fonts in one step.
+- **Theme**: light or dark, or follow the OS.
 
-Use theme colors directly in Tailwind classes: `bg-primary`, `text-secondary`, `border-border`.
-
-Switch themes programmatically:
+Pick the preset a first-time visitor sees in `src/theme.ts`:
 
 ```ts
+export const theme: ThemeConfig = {
+  preset: 'ink', // 'ink' | 'pine' | 'console'
+};
+```
+
+Switch either one at runtime. Both choices are saved and restored before first paint:
+
+```ts
+const { preset, setPreset } = useAppUi();
+setPreset('console');
+
 const { theme, setTheme, isDark } = useTheme();
 setTheme('dark'); // 'light' | 'dark' | 'system'
 ```
 
-Customize colors at runtime (add the composable first: `pnpm add-composable useColorCustomizer`):
+Use the tokens as Tailwind classes: `bg-bg`, `bg-surface`, `text-text`, `text-text-muted`,
+`border-border`, `bg-accent text-accent-fg`, `text-accent-text`, `bg-danger-subtle text-danger-text`.
+Open `/_theme` in dev to see every token in each preset and theme.
 
-```ts
-const { updateColor, resetColors } = useColorCustomizer();
-updateColor('primary', '#e11d48');
-```
+To restyle, edit the values in `src/styles/tokens.css`. `pnpm add-component styles` updates
+the file from the registry and asks before overwriting your edits.
 
 ## Routing
 
@@ -453,6 +461,7 @@ pnpm format           # Format with Oxfmt
 pnpm format:check     # Check formatting (CI)
 pnpm add-component    # Scaffold a UI component
 pnpm add-composable   # Scaffold a composable
+pnpm add-component styles  # Add or update the design tokens (src/styles/tokens.css)
 pnpm vuetail:verify   # Verify registry / install integrity
 ```
 
