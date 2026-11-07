@@ -30,8 +30,12 @@ const REGISTRY_INDEX = `${REGISTRY_BASE}/registry.json`;
 // ─── paths ───────────────────────────────────────────────────────────────────
 
 const isComposableName = (name) => /^use[A-Z]/.test(name);
+// Stylesheets are keyed `styles/<name>` in vuetail.json, so they never collide with components.
+const STYLE_PREFIX = 'styles/';
+const isStyleName = (name) => name.startsWith(STYLE_PREFIX);
 
 const localFilePath = (name) => {
+  if (isStyleName(name)) return path.join(process.cwd(), 'src', `${name}.css`);
   if (isComposableName(name)) {
     return path.join(process.cwd(), 'src', 'composables', `${name}.ts`);
   }
@@ -39,11 +43,14 @@ const localFilePath = (name) => {
 };
 
 const registryFilePath = (name) => {
+  if (isStyleName(name)) return `${name}.css`;
   if (isComposableName(name)) return `composables/${name}.ts`;
   return `components/ui/${name}.vue`;
 };
 
 const isInstalled = (name) => fs.existsSync(localFilePath(name));
+
+const relativeLabel = (p) => path.relative(process.cwd(), p).replace(/\\/g, '/');
 
 // ─── lockfile (vuetail.json) ─────────────────────────────────────────────────
 
@@ -61,7 +68,9 @@ const writeLockfile = (lock) => {
   fs.writeFileSync(lockfilePath(), JSON.stringify(lock, null, 2) + '\n', 'utf8');
 };
 
-const sha256 = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
+// Line endings are normalised first: a CRLF checkout of an untouched file is not an edit.
+const sha256 = (text) =>
+  crypto.createHash('sha256').update(text.replace(/\r\n/g, '\n')).digest('hex');
 
 // ─── fetch with timeout + retry ──────────────────────────────────────────────
 
@@ -146,12 +155,12 @@ const installItem = async (name, lock) => {
   const dest = localFilePath(name);
   const record = lock.installed[name];
 
-  // Overwrite protection: if the file on disk doesn't match the last-installed
-  // SHA, the user has edited it. Require --force or an interactive y/N.
-  if (!force && fs.existsSync(dest) && record) {
-    const current = fs.readFileSync(dest, 'utf8');
-    const currentSha = sha256(current);
-    if (currentSha !== record.sha) {
+  // Overwrite protection: a file on disk that matches neither the incoming version nor the
+  // last-installed SHA has local edits (or came with the template, unrecorded). Require
+  // --force or an interactive y/N.
+  if (!force && fs.existsSync(dest)) {
+    const currentSha = sha256(fs.readFileSync(dest, 'utf8'));
+    if (currentSha !== newSha && currentSha !== record?.sha) {
       console.log(`  ! ${name} — local file differs from last-installed version.`);
       const ok = await promptYesNo(`    Overwrite local changes to ${name}?`);
       if (!ok) {
@@ -173,10 +182,7 @@ const installItem = async (name, lock) => {
     installedAt: new Date().toISOString(),
   };
 
-  const label = isComposableName(name)
-    ? `src/composables/${name}.ts`
-    : `src/components/ui/${name}.vue`;
-  console.log(`  ✓ ${label}`);
+  console.log(`  ✓ ${relativeLabel(dest)}`);
   return true;
 };
 
@@ -191,6 +197,7 @@ const showHelp = () => {
     pnpm add-composable <name>         Add a composable (+ its deps)
     pnpm add-component list            List available components
     pnpm add-composable list           List available composables
+    pnpm add-component styles          Add or update the design tokens (src/styles/tokens.css)
     pnpm add-component verify          Verify installed files match recorded SHAs
 
   Flags:
@@ -258,21 +265,80 @@ const verifyCommand = async () => {
   return drift === 0 ? 0 : 1;
 };
 
-const addCommand = async (name) => {
+const warnMainRef = () => {
   if (ref === 'main') {
     console.log(`  ! Using ref 'main' — output is not reproducible. Pin with --ref <tag|sha>.\n`);
   }
+};
 
+const fetchIndex = async () => {
   let res;
   try {
     res = await fetchWithRetry(REGISTRY_INDEX);
   } catch (err) {
     throw new Error(`Registry unreachable: ${err.message}`);
   }
-  const index = res.ok ? await res.json() : {};
+  return { ok: res.ok, index: res.ok ? await res.json() : {} };
+};
+
+const styleNames = (index) => (index.styles ?? []).map((s) => `${STYLE_PREFIX}${s}`);
+
+const stylesCommand = async () => {
+  warnMainRef();
+  const { ok, index } = await fetchIndex();
+  if (!ok) throw new Error('Registry index unavailable.');
+  const names = styleNames(index);
+  if (!names.length) {
+    console.log('No styles in registry.');
+    return 0;
+  }
+  const lock = readLockfile();
+  lock.version = LOCKFILE_VERSION;
+  lock.ref = ref;
+  lock.installed = lock.installed ?? {};
+  console.log('');
+  let failed = 0;
+  for (const name of names) if (!(await installItem(name, lock))) failed++;
+  writeLockfile(lock);
+  console.log('');
+  return failed ? 1 : 0;
+};
+
+// Components are written against the tokens of the same ref. Say so when the local tokens are
+// missing or differ, so a class that resolves to nothing is not a silent surprise.
+const checkStyles = async (index, lock) => {
+  for (const name of styleNames(index)) {
+    const dest = localFilePath(name);
+    const label = relativeLabel(dest);
+    if (!fs.existsSync(dest)) {
+      console.log(`  ! ${label} is missing; components need it. Run: pnpm add-component styles`);
+      continue;
+    }
+    let res;
+    try {
+      res = await fetchWithRetry(`${REGISTRY_BASE}/${registryFilePath(name)}`);
+    } catch {
+      continue;
+    }
+    if (!res.ok) continue;
+    const remoteSha = sha256(await res.text());
+    const localSha = sha256(fs.readFileSync(dest, 'utf8'));
+    if (localSha === remoteSha) continue;
+    const untouched = lock.installed?.[name]?.sha === localSha;
+    console.log(
+      untouched
+        ? `  ! ${label} is older than '${ref}'. Update: pnpm add-component styles --ref ${ref}`
+        : `  ! ${label} differs from '${ref}' (local edits?). Review: pnpm add-component styles --ref ${ref}`,
+    );
+  }
+};
+
+const addCommand = async (name) => {
+  warnMainRef();
+  const { ok, index } = await fetchIndex();
   const depMap = index.dependencies ?? {};
   const requiresMap = index.requires ?? {};
-  if (!res.ok) {
+  if (!ok) {
     console.log('  ! Registry index unavailable — skipping dep check.');
   }
 
@@ -309,6 +375,7 @@ const addCommand = async (name) => {
 
   const success = await installItem(name, lock);
   writeLockfile(lock);
+  if (ok) await checkStyles(index, lock);
   console.log('');
   return success ? 0 : 1;
 };
@@ -323,6 +390,8 @@ async function run() {
   let code = 0;
   if (command === 'list') {
     await listCommand();
+  } else if (command === 'styles') {
+    code = await stylesCommand();
   } else if (command === 'verify') {
     code = await verifyCommand();
   } else {
