@@ -126,7 +126,7 @@ export const appConfig = {
   icons: { favicon },
   seo: { title, description, keywords, openGraph, twitter },
   layout: { containerMaxWidth },
-}
+};
 ```
 
 Changes to this file update the SEO tags, extra fonts and layout on app initialization. Colours

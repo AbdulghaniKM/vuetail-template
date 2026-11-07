@@ -12,21 +12,26 @@ export type TextVariant =
   | 'overline';
 export type TextSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
 export type TextWeight = 'light' | 'normal' | 'medium' | 'semibold' | 'bold';
+/** Token colours, as AppText accepts them. The last four are older names, still accepted. */
 export type TextColor =
-  | 'primary'
-  | 'secondary'
-  | 'accent'
   | 'text'
-  | 'text-secondary'
+  | 'text-muted'
+  | 'text-subtle'
+  | 'accent'
   | 'success'
   | 'warning'
-  | 'error'
-  | 'info';
+  | 'danger'
+  | 'info'
+  | 'primary'
+  | 'secondary'
+  | 'text-secondary'
+  | 'error';
 export type TextAlign = 'left' | 'center' | 'right' | 'justify';
 export type TextTransform = 'uppercase' | 'lowercase' | 'capitalize' | 'normal-case';
 export type TextDecoration = 'underline' | 'line-through' | 'no-underline';
 export type TextDecorationStyle = 'solid' | 'double' | 'dotted' | 'dashed' | 'wavy';
-export type TextFont = 'primary' | 'secondary' | 'mono';
+/** `primary` and `secondary` are older names for `sans` and `display`. */
+export type TextFont = 'sans' | 'display' | 'mono' | 'primary' | 'secondary';
 export type TextTracking = 'tighter' | 'tight' | 'normal' | 'wide' | 'wider' | 'widest';
 export type TextLeading = 'none' | 'tight' | 'snug' | 'normal' | 'relaxed' | 'loose';
 export type TextWrap = 'wrap' | 'nowrap' | 'balance' | 'pretty';
