@@ -167,6 +167,17 @@ Open `/_theme` in dev to see every token in each preset and theme.
 To restyle, edit the values in `src/styles/tokens.css`. `pnpm add-component styles` updates
 the file from the registry and asks before overwriting your edits.
 
+To tune a preset without editing the tokens, add `pnpm add-composable useThemeCustomizer`. It
+derives the accent family, neutral greys, radius scale, density and fonts from five settings, in
+light and dark, and keeps derived text at WCAG AA. Its `css` output pastes into a stylesheet loaded
+after `tokens.css`:
+
+```ts
+const { set, css } = useThemeCustomizer();
+set('accent', '#7C3AED');
+set('density', 'compact');
+```
+
 ## Routing
 
 The template features a **custom, lightweight compile-time route registry** that automates route mapping directly from `src/pages/` using a tailored Vite macro parser and native glob scanning.
