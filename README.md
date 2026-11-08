@@ -233,9 +233,9 @@ The sections below are the **API reference for each component once you've added 
 ### AppButton
 
 ```vue
-<AppButton variant="primary" label="Save" icon="icon-[heroicons-outline--check]" />
+<AppButton variant="primary" label="Save" icon="icon-[heroicons--check]" />
 <AppButton variant="danger" label="Delete" :loading="isDeleting" loading-label="Deleting..." />
-<AppButton icon="icon-[heroicons-outline--pencil]" tooltip="Edit" icon-only />
+<AppButton icon="icon-[heroicons--pencil]" tooltip="Edit" icon-only />
 ```
 
 Variants: `primary`, `secondary`, `ghost`, `muted`, `danger`, `success`, `surface`, `outline`
@@ -248,7 +248,7 @@ Sizes: `xs`, `sm`, `md`, `lg`
   :is-open="showModal"
   title="Edit Profile"
   description="Update your account details."
-  icon="icon-[heroicons-outline--user]"
+  icon="icon-[heroicons--user]"
   icon-variant="primary"
   @close="showModal = false"
   @confirm="handleSave"
@@ -275,7 +275,7 @@ Features: Escape/Enter key support, body scroll lock, loading overlay, persisten
 >
   <template #cell-price="{ value }">${{ value }}</template>
   <template #cell-actions="{ row }">
-    <AppButton icon="icon-[heroicons-outline--pencil]" icon-only tooltip="Edit" />
+    <AppButton icon="icon-[heroicons--pencil]" icon-only tooltip="Edit" />
   </template>
 </AppTable>
 ```

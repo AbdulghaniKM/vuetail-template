@@ -1,6 +1,6 @@
 <template>
   <AppEmptyState
-    icon="icon-[solar--wi-fi-router-minimalistic-linear]"
+    icon="icon-[heroicons--wifi]"
     title="You're offline"
     description="Check your connection and try again."
     variant="warning"

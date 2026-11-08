@@ -1,6 +1,6 @@
 <template>
   <AppEmptyState
-    icon="icon-[solar--shield-warning-linear]"
+    icon="icon-[heroicons--shield-exclamation]"
     title="Something went wrong"
     description="An unexpected error occurred on our end. Please try again in a moment."
     variant="danger"

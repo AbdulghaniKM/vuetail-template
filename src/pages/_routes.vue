@@ -2,7 +2,7 @@
   <div class="mx-auto max-w-4xl p-6">
     <header class="mb-6">
       <div class="flex flex-wrap items-center gap-2">
-        <UiAppIcon name="icon-[solar--routing-2-linear]" class="size-6 text-accent-text" />
+        <UiAppIcon name="icon-[heroicons--map]" class="size-6 text-accent-text" />
         <h1 class="text-2xl font-semibold text-text">Route Explorer</h1>
         <span class="rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">
           dev only
@@ -68,7 +68,7 @@
 
         <UiAppIcon
           v-if="r.requiresAuth"
-          name="icon-[heroicons-outline--lock-closed]"
+          name="icon-[heroicons--lock-closed]"
           class="size-3.5 shrink-0 text-danger-text"
           title="requires auth"
         />

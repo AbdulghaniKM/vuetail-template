@@ -28,9 +28,9 @@
   const iconName = computed(() => {
     switch (mode.value) {
       case 'light':
-        return 'icon-[solar--sun-linear]';
+        return 'icon-[heroicons--sun]';
       default:
-        return 'icon-[solar--moon-linear]';
+        return 'icon-[heroicons--moon]';
     }
   });
 

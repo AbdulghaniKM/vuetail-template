@@ -48,7 +48,7 @@
               aria-label="Dismiss notification"
               @click="removeToast(toast.id)"
             >
-              <AppIcon name="icon-[heroicons-outline--x-mark]" :size="0.875" />
+              <AppIcon name="icon-[heroicons--x-mark]" :size="0.875" />
             </button>
           </div>
           <div
@@ -180,10 +180,10 @@
 
   const toastIcon = (type: Toast['type']) =>
     ({
-      success: 'icon-[heroicons-outline--check-circle]',
-      error: 'icon-[heroicons-outline--x-circle]',
+      success: 'icon-[heroicons--check-circle]',
+      error: 'icon-[heroicons--x-circle]',
       warning: 'icon-[heroicons--exclamation-triangle]',
-      info: 'icon-[heroicons-outline--information-circle]',
+      info: 'icon-[heroicons--information-circle]',
     })[type];
 </script>
 

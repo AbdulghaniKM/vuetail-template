@@ -17,8 +17,8 @@
           <UiAppIcon
             :name="
               collapsed
-                ? 'icon-[solar--alt-arrow-right-linear]'
-                : 'icon-[solar--alt-arrow-left-linear]'
+                ? 'icon-[heroicons--chevron-right]'
+                : 'icon-[heroicons--chevron-left]'
             "
             :size="1"
           />
