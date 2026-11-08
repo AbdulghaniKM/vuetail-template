@@ -3,8 +3,7 @@
     <div
       class="pointer-events-none fixed z-[10000] flex flex-col gap-2.5 p-4 sm:max-w-sm"
       :class="positionClass"
-      role="log"
-      aria-live="polite"
+      role="region"
       aria-label="Notifications"
     >
       <AnimatePresence>
@@ -13,7 +12,6 @@
           :key="toast.id"
           class="pointer-events-auto relative w-full overflow-hidden rounded-lg border border-border bg-surface-raised text-text shadow-lg sm:max-w-sm"
           :class="containerClass(toast.type)"
-          role="alert"
           :initial="motionConfig.initial"
           :animate="motionConfig.animate"
           :exit="motionConfig.exit"
@@ -69,12 +67,13 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, watch } from 'vue';
   import { AnimatePresence, motion } from 'motion-v';
   import type { Toast } from '@/composables/useToast';
   import AppIcon from './AppIcon.vue';
   import { useMotionTokens } from '@/composables/useMotionTokens';
   import { useReducedMotion } from '@/composables/useReducedMotion';
+  import { useAnnouncer } from '@/composables/useAnnouncer';
 
   export interface AppToastProps {
     toasts: Toast[];
@@ -92,6 +91,27 @@
   }>();
 
   const removeToast = (id: string) => emit('remove', id);
+
+  // Toasts are announced through the shared live regions, not by making the stack live: a toast
+  // that closes cannot cut its own message short, and nothing is read twice. Errors interrupt;
+  // everything else waits. A changed toast (promise() turning into its outcome) is read again.
+  const { announce } = useAnnouncer();
+  const spoken = new Map<string, string>();
+  watch(
+    () => props.toasts.map((t) => [t.id, t.type, t.title ?? '', t.message] as const),
+    (list) => {
+      const live = new Set<string>();
+      for (const [id, type, title, message] of list) {
+        live.add(id);
+        const text = title ? `${title}. ${message}` : message;
+        if (spoken.get(id) === `${type}|${text}`) continue;
+        spoken.set(id, `${type}|${text}`);
+        announce(text, type === 'error' ? 'assertive' : 'polite');
+      }
+      for (const id of spoken.keys()) if (!live.has(id)) spoken.delete(id);
+    },
+    { immediate: true },
+  );
   // The action runs, then the toast closes: an Undo that leaves "Deleted" on screen reads as failed.
   const runAction = (toast: Toast) => {
     toast.action?.onClick();
