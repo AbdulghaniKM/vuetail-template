@@ -82,13 +82,6 @@
   --vt-ease-exit: cubic-bezier(.2, 0, 0, 1);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --vt-press-y: 0px;
-    --vt-press-scale: 1;
-  }
-}
-
 @layer base {
   :where(:focus-visible) {
     outline: 2px solid var(--color-ring);
@@ -336,5 +329,16 @@
     --vt-shadow-1: 0 1px 2px rgb(0 0 0 / .3);
     --vt-shadow-2: 0 6px 16px rgb(0 0 0 / .4);
     --vt-shadow-3: 0 16px 40px rgb(0 0 0 / .55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  :root[data-vt-preset] {
+    --vt-duration: 80ms;
+    --vt-duration-enter: 100ms;
+    --vt-duration-exit: 70ms;
+    --vt-press-y: 0px;
+    --vt-press-scale: 1;
   }
 }
