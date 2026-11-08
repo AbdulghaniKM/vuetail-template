@@ -2,14 +2,31 @@ import { ref } from 'vue';
 
 // NOTE: Module-scope ref() state. SPA-only — not safe under SSR.
 
+export type ToastType = 'success' | 'error' | 'warning' | 'info';
+
+export interface ToastAction {
+  label: string;
+  /** Runs, then the toast closes. */
+  onClick: () => void;
+}
+
 export interface Toast {
   id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
+  type: ToastType;
   message: string;
   title?: string;
+  /** ms until it closes; 0 keeps it until dismissed. */
   duration?: number;
+  /** One button beside the message: Undo, Retry, View. */
+  action?: ToastAction;
   /** True while the dismissal timer is paused (hover/focus) — freezes the progress bar. */
   paused?: boolean;
+}
+
+export interface ToastOptions {
+  title?: string;
+  duration?: number;
+  action?: ToastAction;
 }
 
 interface TimerRecord {
@@ -17,6 +34,14 @@ interface TimerRecord {
   remaining: number;
   startedAt: number;
 }
+
+const config = { max: 5, duration: 5000 };
+
+/** App-wide toast settings. `max` toasts are shown at once (the oldest goes first). */
+export const configureToasts = (options: { max?: number; duration?: number }): void => {
+  if (options.max !== undefined) config.max = Math.max(1, options.max);
+  if (options.duration !== undefined) config.duration = options.duration;
+};
 
 const toasts = ref<Toast[]>([]);
 const timers = new Map<string, TimerRecord>();
@@ -27,7 +52,15 @@ const generateId = (): string => {
   return `toast-${Date.now()}-${toastIdCounter++}`;
 };
 
+const clearTimer = (id: string) => {
+  const t = timers.get(id);
+  if (t) clearTimeout(t.timeoutId);
+  timers.delete(id);
+};
+
 const startTimer = (id: string, duration: number) => {
+  clearTimer(id);
+  if (!(duration > 0)) return;
   const timeoutId = setTimeout(() => removeToast(id), duration);
   timers.set(id, { timeoutId, remaining: duration, startedAt: Date.now() });
 };
@@ -50,33 +83,28 @@ const resumeToast = (id: string): void => {
   if (toast) toast.paused = false;
 };
 
+const removeToast = (id: string): void => {
+  clearTimer(id);
+  const index = toasts.value.findIndex((t) => t.id === id);
+  if (index > -1) toasts.value.splice(index, 1);
+};
+
 const addToast = (toast: Omit<Toast, 'id'>): string => {
   const id = generateId();
-  const newToast: Toast = {
-    ...toast,
-    id,
-    duration: toast.duration ?? 5000,
-  };
-
+  const newToast: Toast = { ...toast, id, duration: toast.duration ?? config.duration };
   toasts.value.push(newToast);
-
-  if (newToast.duration && newToast.duration > 0) {
-    startTimer(id, newToast.duration);
-  }
-
+  // A wall of toasts is unreadable and covers the page: past the limit, the oldest goes.
+  while (toasts.value.length > config.max) removeToast(toasts.value[0].id);
+  startTimer(id, newToast.duration!);
   return id;
 };
 
-const removeToast = (id: string): void => {
-  const t = timers.get(id);
-  if (t) {
-    clearTimeout(t.timeoutId);
-    timers.delete(id);
-  }
-  const index = toasts.value.findIndex((t) => t.id === id);
-  if (index > -1) {
-    toasts.value.splice(index, 1);
-  }
+/** Change a toast in place (message, type, duration…). A new duration restarts its timer. */
+const updateToast = (id: string, patch: Partial<Omit<Toast, 'id'>>): void => {
+  const toast = toasts.value.find((x) => x.id === id);
+  if (!toast) return;
+  Object.assign(toast, patch, { paused: false });
+  if (patch.duration !== undefined) startTimer(id, patch.duration);
 };
 
 const clearToasts = (): void => {
@@ -85,22 +113,42 @@ const clearToasts = (): void => {
   toasts.value = [];
 };
 
+type Outcome<T> = string | ((value: T) => string);
+
+/**
+ * A sticky "loading" toast that turns into the outcome. Resolves or rejects with the promise,
+ * so `await toast.promise(save(), {...})` still sees the error.
+ */
+const promiseToast = async <T>(
+  promise: Promise<T>,
+  messages: { loading: string; success: Outcome<T>; error: Outcome<unknown> },
+  options: Omit<ToastOptions, 'duration'> = {},
+): Promise<T> => {
+  const id = addToast({ type: 'info', message: messages.loading, ...options, duration: 0 });
+  const text = <V>(m: Outcome<V>, v: V) => (typeof m === 'function' ? m(v) : m);
+  try {
+    const value = await promise;
+    updateToast(id, {
+      type: 'success',
+      message: text(messages.success, value),
+      duration: config.duration,
+    });
+    return value;
+  } catch (e) {
+    updateToast(id, { type: 'error', message: text(messages.error, e), duration: config.duration });
+    throw e;
+  }
+};
+
 export const useToast = () => {
-  const success = (message: string, options?: { title?: string; duration?: number }) => {
-    return addToast({ type: 'success', message, ...options });
-  };
-
-  const error = (message: string, options?: { title?: string; duration?: number }) => {
-    return addToast({ type: 'error', message, ...options });
-  };
-
-  const warning = (message: string, options?: { title?: string; duration?: number }) => {
-    return addToast({ type: 'warning', message, ...options });
-  };
-
-  const info = (message: string, options?: { title?: string; duration?: number }) => {
-    return addToast({ type: 'info', message, ...options });
-  };
+  const success = (message: string, options?: ToastOptions) =>
+    addToast({ type: 'success', message, ...options });
+  const error = (message: string, options?: ToastOptions) =>
+    addToast({ type: 'error', message, ...options });
+  const warning = (message: string, options?: ToastOptions) =>
+    addToast({ type: 'warning', message, ...options });
+  const info = (message: string, options?: ToastOptions) =>
+    addToast({ type: 'info', message, ...options });
 
   return {
     toasts,
@@ -108,6 +156,8 @@ export const useToast = () => {
     error,
     warning,
     info,
+    update: updateToast,
+    promise: promiseToast,
     remove: removeToast,
     clear: clearToasts,
     pause: pauseToast,

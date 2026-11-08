@@ -24,7 +24,16 @@ const seconds = (name: string, fallbackMs: number): number => {
   );
 };
 
+/**
+ * Each call reads the live token, so a preset switch or `prefers-reduced-motion` (which shortens
+ * every duration in tokens.css) reaches the next animation. Under reduced motion, drop movement
+ * (y, scale) and keep the fade; the duration is already short.
+ */
 export const useMotionTokens = () => ({
+  /** Something moving between two states: a pill sliding, a panel resizing. `--vt-duration`. */
+  state: () => ({ duration: seconds('--vt-duration', 160), ease: EASE }),
+  /** Something appearing. `--vt-duration-enter`. */
   enter: () => ({ duration: seconds('--vt-duration-enter', 200), ease: EASE }),
+  /** Something leaving, shorter than its entrance. `--vt-duration-exit`. */
   exit: () => ({ duration: seconds('--vt-duration-exit', 130), ease: EASE }),
 });

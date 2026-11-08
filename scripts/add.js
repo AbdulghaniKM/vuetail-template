@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import readline from 'readline';
+import { fileURLToPath } from 'url';
 
 const REGISTRY_REPO = 'AbdulghaniKM/vuetail-components';
 const DEFAULT_REF = 'main';
@@ -132,6 +133,37 @@ const collectMissingFiles = (names, requiresMap) => {
     for (const f of requiresMap[n]?.files ?? []) required.add(f);
   }
   return [...required].filter((f) => !fs.existsSync(path.join(process.cwd(), f)));
+};
+
+// ─── npm package requirements ────────────────────────────────────────────────
+// `requires.packages` entries are a name, or `name@range` when a version matters
+// (`motion-v@^2.2.1`: 1.x flashes motion elements at the end of an animation).
+// The CLI does not install packages; it names the ones package.json lacks.
+export const parsePackageSpec = (spec) => {
+  const at = spec.lastIndexOf('@');
+  return at > 0
+    ? { name: spec.slice(0, at), range: spec.slice(at + 1) }
+    : { name: spec, range: null };
+};
+
+export const collectMissingPackages = (names, requiresMap, pkg) => {
+  const have = { ...(pkg?.dependencies ?? {}), ...(pkg?.devDependencies ?? {}) };
+  const specs = new Map();
+  for (const n of names) {
+    for (const spec of requiresMap[n]?.packages ?? []) {
+      const { name } = parsePackageSpec(spec);
+      if (!(name in have)) specs.set(name, spec);
+    }
+  }
+  return [...specs.values()];
+};
+
+const readPackageJson = () => {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
+  } catch {
+    return null;
+  }
 };
 
 // ─── install ─────────────────────────────────────────────────────────────────
@@ -375,6 +407,14 @@ const addCommand = async (name) => {
 
   const success = await installItem(name, lock);
   writeLockfile(lock);
+  const missingPackages = collectMissingPackages(allToInstall, requiresMap, readPackageJson());
+  if (missingPackages.length > 0) {
+    console.log(`
+  ! ${name} needs packages this project does not list:
+`);
+    console.log(`      pnpm add ${missingPackages.join(' ')}
+`);
+  }
   if (ok) await checkStyles(index, lock);
   console.log('');
   return success ? 0 : 1;
@@ -400,7 +440,10 @@ async function run() {
   if (code !== 0) process.exit(code);
 }
 
-run().catch((err) => {
-  console.error(`\n  ✗ Fatal error: ${err.message}`);
-  process.exit(1);
-});
+// Only when run as a script (`pnpm add-component …`), so tests can import the helpers above.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  run().catch((err) => {
+    console.error(`\n  ✗ Fatal error: ${err.message}`);
+    process.exit(1);
+  });
+}

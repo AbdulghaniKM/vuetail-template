@@ -9,8 +9,8 @@
     aria-valuemax="100"
   >
     <div
-      class="h-full bg-accent transition-[width,opacity] duration-200 ease-out"
-      :style="{ width: `${progress * 100}%`, opacity: fading ? 0 : 1 }"
+      class="h-full origin-left bg-accent transition-[transform,opacity] duration-(--vt-duration) ease-standard motion-reduce:transition-opacity"
+      :style="{ transform: `scaleX(${progress})`, opacity: fading ? 0 : 1 }"
     />
   </div>
 </template>
