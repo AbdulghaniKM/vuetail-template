@@ -38,11 +38,6 @@ body {
   color: var(--color-text);
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-ring);
-  outline-offset: 2px;
-}
-
 /* Scrollbars: slim and theme-aware. */
 * {
   scrollbar-width: thin;
