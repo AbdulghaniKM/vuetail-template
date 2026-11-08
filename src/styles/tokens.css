@@ -96,6 +96,12 @@
   }
 }
 
+@layer base {
+  :where(html) {
+    scrollbar-gutter: stable;
+  }
+}
+
 :root[data-theme="dark"] {
   color-scheme: dark;
   --color-bg: #0C0D10;
