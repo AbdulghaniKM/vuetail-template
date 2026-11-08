@@ -64,6 +64,8 @@
   --text-control: 0.875rem;
   --ease-standard: cubic-bezier(.2, 0, 0, 1);
   --ease-exit: cubic-bezier(.2, 0, 0, 1);
+  --default-transition-duration: var(--vt-duration);
+  --default-transition-timing-function: var(--vt-ease);
 }
 
 :root {
