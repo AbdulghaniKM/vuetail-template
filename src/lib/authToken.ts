@@ -17,28 +17,31 @@
 // this is the ONLY file you need to change.
 //
 //   const KEY = 'auth-token';
-//   export const getAuthToken = () => localStorage.getItem(KEY);
-//   export const setAuthToken = (t: string | null) =>
-//     t ? localStorage.setItem(KEY, t) : localStorage.removeItem(KEY);
+//   const accessToken = shallowRef<string | null>(localStorage.getItem(KEY));
+//   watch(accessToken, (t) => (t ? localStorage.setItem(KEY, t) : localStorage.removeItem(KEY)));
 //
 // For production, prefer keeping only this short-lived ACCESS token in memory
 // and the long-lived REFRESH token in an httpOnly + SameSite cookie set by your
 // server. See README → "Authentication & token storage".
 
-let accessToken: string | null = null;
+import { shallowRef } from 'vue';
 
-/** The current access token, or null when unauthenticated. */
-export const getAuthToken = (): string | null => accessToken;
+// A shallowRef rather than a plain variable, so a computed that calls getAuthToken() (useAuth's
+// isAuthenticated, a header showing "Sign out") updates when any caller clears the token.
+const accessToken = shallowRef<string | null>(null);
+
+/** The current access token, or null when unauthenticated. Reactive inside computed/watch. */
+export const getAuthToken = (): string | null => accessToken.value;
 
 /** Set (on login / refresh) or clear (pass null) the access token. */
 export const setAuthToken = (token: string | null): void => {
-  accessToken = token;
+  accessToken.value = token;
 };
 
 /** Clear the access token (on logout / failed refresh). */
 export const clearAuthToken = (): void => {
-  accessToken = null;
+  accessToken.value = null;
 };
 
-/** Whether an access token is currently held. */
-export const isAuthenticated = (): boolean => accessToken !== null;
+/** Whether an access token is currently held. Reactive inside computed/watch. */
+export const isAuthenticated = (): boolean => accessToken.value !== null;
