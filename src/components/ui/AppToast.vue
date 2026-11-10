@@ -4,7 +4,7 @@
       class="pointer-events-none fixed z-[10000] flex flex-col gap-2.5 p-4 sm:max-w-sm"
       :class="positionClass"
       role="region"
-      aria-label="Notifications"
+      :aria-label="label"
     >
       <AnimatePresence>
         <motion.div
@@ -78,10 +78,13 @@
   export interface AppToastProps {
     toasts: Toast[];
     position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+    /** Name of the toast region. Give a second AppToast on the same page its own. */
+    label?: string;
   }
 
   const props = withDefaults(defineProps<AppToastProps>(), {
     position: 'top-right',
+    label: 'Notifications',
   });
 
   const emit = defineEmits<{
