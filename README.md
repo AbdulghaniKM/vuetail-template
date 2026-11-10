@@ -226,7 +226,12 @@ and is copied into your project only when you ask for it:
 pnpm add-component AppButton      # add a component (resolves + installs its deps)
 pnpm add-component list           # list everything available in the registry
 pnpm vuetail:verify               # check installed files still match the registry
+pnpm add-component icons lucide   # switch every installed file to Lucide (or ph, heroicons)
 ```
+
+Components use **Heroicons v2**. `pnpm add-component icons` lists the other sets (Lucide,
+Phosphor). Picking one rewrites the icons in every installed file, saves the choice in
+`vuetail.json`, and later installs follow it. Icons you write yourself are not touched.
 
 The sections below are the **API reference for each component once you've added it**.
 
@@ -473,6 +478,7 @@ pnpm format:check     # Check formatting (CI)
 pnpm add-component    # Scaffold a UI component
 pnpm add-composable   # Scaffold a composable
 pnpm add-component styles  # Add or update the design tokens (src/styles/tokens.css)
+pnpm add-component icons   # List icon sets; `icons <set>` switches every installed file
 pnpm vuetail:verify   # Verify registry / install integrity
 ```
 

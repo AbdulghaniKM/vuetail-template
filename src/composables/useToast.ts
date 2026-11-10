@@ -128,11 +128,7 @@ const promiseToast = async <T>(
   const text = <V>(m: Outcome<V>, v: V) => (typeof m === 'function' ? m(v) : m);
   try {
     const value = await promise;
-    updateToast(id, {
-      type: 'success',
-      message: text(messages.success, value),
-      duration: config.duration,
-    });
+    updateToast(id, { type: 'success', message: text(messages.success, value), duration: config.duration });
     return value;
   } catch (e) {
     updateToast(id, { type: 'error', message: text(messages.error, e), duration: config.duration });
@@ -141,14 +137,10 @@ const promiseToast = async <T>(
 };
 
 export const useToast = () => {
-  const success = (message: string, options?: ToastOptions) =>
-    addToast({ type: 'success', message, ...options });
-  const error = (message: string, options?: ToastOptions) =>
-    addToast({ type: 'error', message, ...options });
-  const warning = (message: string, options?: ToastOptions) =>
-    addToast({ type: 'warning', message, ...options });
-  const info = (message: string, options?: ToastOptions) =>
-    addToast({ type: 'info', message, ...options });
+  const success = (message: string, options?: ToastOptions) => addToast({ type: 'success', message, ...options });
+  const error = (message: string, options?: ToastOptions) => addToast({ type: 'error', message, ...options });
+  const warning = (message: string, options?: ToastOptions) => addToast({ type: 'warning', message, ...options });
+  const info = (message: string, options?: ToastOptions) => addToast({ type: 'info', message, ...options });
 
   return {
     toasts,

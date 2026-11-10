@@ -31,9 +31,7 @@ const region = (politeness: Politeness): HTMLElement | null => {
   if (typeof document === 'undefined') return null;
   let el = regions.get(politeness);
   if (el?.isConnected) return el;
-  el =
-    document.querySelector<HTMLElement>(`[data-vt-announcer="${politeness}"]`) ??
-    document.createElement('div');
+  el = document.querySelector<HTMLElement>(`[data-vt-announcer="${politeness}"]`) ?? document.createElement('div');
   el.setAttribute('data-vt-announcer', politeness);
   el.setAttribute('aria-live', politeness);
   el.setAttribute('aria-atomic', 'true');

@@ -10,8 +10,8 @@
       </div>
     </slot>
 
-    <h2 v-if="title" class="mb-1 text-lg font-semibold text-text">{{ title }}</h2>
-    <p v-if="description" class="mb-6 max-w-md text-sm text-text-muted">{{ description }}</p>
+    <h2 v-if="title" class="text-text mb-1 text-lg font-semibold">{{ title }}</h2>
+    <p v-if="description" class="text-text-muted mb-6 max-w-md text-sm">{{ description }}</p>
 
     <div v-if="$slots.default" class="flex items-center gap-2">
       <slot />

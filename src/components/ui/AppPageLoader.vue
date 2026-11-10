@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="active"
-    class="pointer-events-none fixed inset-x-0 top-0 z-[10001] h-0.5 bg-accent-subtle"
+    class="bg-accent-subtle pointer-events-none fixed inset-x-0 top-0 z-[10001] h-0.5"
     role="progressbar"
     aria-label="Loading"
     :aria-valuenow="Math.round(progress * 100)"
@@ -9,7 +9,7 @@
     aria-valuemax="100"
   >
     <div
-      class="h-full origin-left bg-accent transition-[transform,opacity] duration-(--vt-duration) ease-standard motion-reduce:transition-opacity"
+      class="bg-accent h-full origin-left transition-[transform,opacity] duration-(--vt-duration) ease-standard motion-reduce:transition-opacity"
       :style="{ transform: `scaleX(${progress})`, opacity: fading ? 0 : 1 }"
     />
   </div>

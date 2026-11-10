@@ -18,10 +18,7 @@ export const parseCssTime = (raw: string, fallbackMs: number): number => {
 
 const seconds = (name: string, fallbackMs: number): number => {
   if (typeof document === 'undefined') return fallbackMs / 1000;
-  return parseCssTime(
-    getComputedStyle(document.documentElement).getPropertyValue(name),
-    fallbackMs,
-  );
+  return parseCssTime(getComputedStyle(document.documentElement).getPropertyValue(name), fallbackMs);
 };
 
 /**

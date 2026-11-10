@@ -27,6 +27,7 @@ const command = positional[0];
 
 const REGISTRY_BASE = `https://raw.githubusercontent.com/${REGISTRY_REPO}/${ref}`;
 const REGISTRY_INDEX = `${REGISTRY_BASE}/registry.json`;
+const ICON_MAP = `${REGISTRY_BASE}/icons.map.json`;
 
 // ─── paths ───────────────────────────────────────────────────────────────────
 
@@ -158,6 +159,49 @@ export const collectMissingPackages = (names, requiresMap, pkg) => {
   return [...specs.values()];
 };
 
+// ─── icon sets ───────────────────────────────────────────────────────────────
+// The registry is written in Heroicons v2 (`heroicons--x-mark`, `heroicons--x-mark-solid`).
+// A project may pick one other set from `icons.map.json`; every fetched file is rewritten to it
+// before it is hashed, so `verify` and overwrite protection compare like with like. One set per
+// project: the choice is saved in vuetail.json and reused by every later install.
+export const DEFAULT_ICONS = 'heroicons';
+
+// Names not in the map are left as Heroicons (they still render) and reported.
+export const rewriteIcons = (text, set, map) => {
+  const unmapped = new Set();
+  if (!set || set === DEFAULT_ICONS) return { text, unmapped: [] };
+  const def = map?.sets?.[set];
+  if (!def) throw new Error(`Unknown icon set '${set}'.`);
+  const out = text.replace(/heroicons--([a-z0-9-]+)/g, (whole, name) => {
+    const solid = name.endsWith('-solid') && def.icons[name.slice(0, -6)] !== undefined;
+    const base = solid ? name.slice(0, -6) : name;
+    const target = def.icons[base];
+    if (target === undefined) {
+      unmapped.add(name);
+      return whole;
+    }
+    return `${set}--${target}${solid && def.solidSuffix ? def.solidSuffix : ''}`;
+  });
+  return { text: out, unmapped: [...unmapped] };
+};
+
+const fetchIconMap = async () => {
+  const res = await fetchWithRetry(ICON_MAP);
+  if (!res.ok) throw new Error(`icons.map.json not found at '${ref}' (${res.status}).`);
+  return res.json();
+};
+
+const iconSetNames = (map) => [DEFAULT_ICONS, ...Object.keys(map?.sets ?? {})];
+
+// The files whose icons follow the project's set: every recorded item but the stylesheets, plus
+// registry files on disk that were never recorded (the ones the template ships with).
+const iconFiles = (lock, index) => {
+  const onDisk = [...(index.components ?? []), ...(index.composables ?? [])].filter(isInstalled);
+  return [
+    ...new Set([...Object.keys(lock.installed ?? {}).filter((n) => !isStyleName(n)), ...onDisk]),
+  ];
+};
+
 const readPackageJson = () => {
   try {
     return JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
@@ -168,7 +212,7 @@ const readPackageJson = () => {
 
 // ─── install ─────────────────────────────────────────────────────────────────
 
-const installItem = async (name, lock) => {
+const installItem = async (name, lock, icons = null) => {
   const url = `${REGISTRY_BASE}/${registryFilePath(name)}`;
   let response;
   try {
@@ -182,17 +226,27 @@ const installItem = async (name, lock) => {
     return false;
   }
 
-  const text = await response.text();
+  const raw = await response.text();
+  let text = raw;
+  if (icons && !isStyleName(name)) {
+    const rewritten = rewriteIcons(text, icons.set, icons.map);
+    text = rewritten.text;
+    if (rewritten.unmapped.length) {
+      console.log(
+        `  ! ${name} — no ${icons.set} match, kept as Heroicons: ${rewritten.unmapped.join(', ')}`,
+      );
+    }
+  }
   const newSha = sha256(text);
   const dest = localFilePath(name);
   const record = lock.installed[name];
 
-  // Overwrite protection: a file on disk that matches neither the incoming version nor the
-  // last-installed SHA has local edits (or came with the template, unrecorded). Require
-  // --force or an interactive y/N.
+  // Overwrite protection: a file on disk that matches neither the incoming version, its
+  // Heroicons original, nor the last-installed SHA has local edits (or came with the template,
+  // unrecorded). Require --force or an interactive y/N.
   if (!force && fs.existsSync(dest)) {
     const currentSha = sha256(fs.readFileSync(dest, 'utf8'));
-    if (currentSha !== newSha && currentSha !== record?.sha) {
+    if (currentSha !== newSha && currentSha !== sha256(raw) && currentSha !== record?.sha) {
       console.log(`  ! ${name} — local file differs from last-installed version.`);
       const ok = await promptYesNo(`    Overwrite local changes to ${name}?`);
       if (!ok) {
@@ -231,6 +285,9 @@ const showHelp = () => {
     pnpm add-composable list           List available composables
     pnpm add-component styles          Add or update the design tokens (src/styles/tokens.css)
     pnpm add-component verify          Verify installed files match recorded SHAs
+    pnpm add-component icons           List icon sets (✓ marks this project's)
+    pnpm add-component icons <set>     Switch every installed file to another icon set;
+                                       later installs use it too
 
   Flags:
     --no-deps          Skip automatic dependency installation
@@ -239,6 +296,7 @@ const showHelp = () => {
 
   Examples:
     pnpm add-component AppButton
+    pnpm add-component icons lucide
     pnpm add-component AppModal --ref v0.3.0
     pnpm add-composable useToast
     pnpm add-component AppButton --force
@@ -379,6 +437,9 @@ const addCommand = async (name) => {
   lock.ref = ref;
   lock.installed = lock.installed ?? {};
 
+  const set = lock.icons ?? DEFAULT_ICONS;
+  const icons = { set, map: set === DEFAULT_ICONS ? null : await fetchIconMap() };
+
   const missing = noDeps ? [] : collectMissing(name, depMap);
 
   // Check that every template file the item(s) need is present BEFORE we
@@ -401,11 +462,11 @@ const addCommand = async (name) => {
     if (components.length) console.log(`  Components : ${components.join(', ')}`);
     if (composables.length) console.log(`  Composables: ${composables.join(', ')}`);
     console.log('');
-    for (const dep of missing) await installItem(dep, lock);
+    for (const dep of missing) await installItem(dep, lock, icons);
     console.log('');
   }
 
-  const success = await installItem(name, lock);
+  const success = await installItem(name, lock, icons);
   writeLockfile(lock);
   const missingPackages = collectMissingPackages(allToInstall, requiresMap, readPackageJson());
   if (missingPackages.length > 0) {
@@ -418,6 +479,45 @@ const addCommand = async (name) => {
   if (ok) await checkStyles(index, lock);
   console.log('');
   return success ? 0 : 1;
+};
+
+// `icons` lists the sets; `icons <set>` reinstalls every recorded file in that set. Local edits
+// still go through overwrite protection, so a skipped file keeps its old set and is named.
+const iconsCommand = async (set) => {
+  const map = await fetchIconMap();
+  const sets = iconSetNames(map);
+  const lock = readLockfile();
+  const current = lock.icons ?? DEFAULT_ICONS;
+  if (!set) {
+    console.log(`\nIcon sets (ref: ${ref}):\n`);
+    for (const s of sets) {
+      const label = s === DEFAULT_ICONS ? 'Heroicons' : map.sets[s].label;
+      console.log(`  ${s === current ? '✓' : '·'} ${s.padEnd(10)} ${label}`);
+    }
+    console.log(`\n  Switch: pnpm add-component icons <set>\n`);
+    return 0;
+  }
+  if (!sets.includes(set))
+    throw new Error(`Unknown icon set '${set}'. Pick one of: ${sets.join(', ')}`);
+  warnMainRef();
+  lock.version = LOCKFILE_VERSION;
+  lock.ref = ref;
+  lock.installed = lock.installed ?? {};
+  const { index } = await fetchIndex();
+  const names = iconFiles(lock, index);
+  console.log(
+    `\n  Switching ${names.length} file${names.length === 1 ? '' : 's'} to ${set} icons:\n`,
+  );
+  const skipped = [];
+  for (const n of names) if (!(await installItem(n, lock, { set, map }))) skipped.push(n);
+  if (set === DEFAULT_ICONS) delete lock.icons;
+  else lock.icons = set;
+  writeLockfile(lock);
+  if (skipped.length) {
+    console.log(`\n  ! Not switched, still on ${current}: ${skipped.join(', ')}`);
+  }
+  console.log('');
+  return skipped.length ? 1 : 0;
 };
 
 // ─── entry ───────────────────────────────────────────────────────────────────
@@ -434,6 +534,8 @@ async function run() {
     code = await stylesCommand();
   } else if (command === 'verify') {
     code = await verifyCommand();
+  } else if (command === 'icons') {
+    code = await iconsCommand(positional[1]);
   } else {
     code = await addCommand(command);
   }

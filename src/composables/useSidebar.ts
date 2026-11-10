@@ -17,9 +17,7 @@ const writeStored = (value: boolean): void => {
   try {
     if (value) localStorage.setItem(STORAGE_KEY, '1');
     else localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    /* ignore */
-  }
+  } catch { /* ignore */ }
 };
 
 const collapsed = ref<boolean>(readStored());

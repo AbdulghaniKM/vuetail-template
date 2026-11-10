@@ -14,8 +14,7 @@ const PRESET_KEY = 'app-preset';
 const ATTR = 'data-vt-preset';
 const PRESETS: readonly Preset[] = ['ink', 'pine', 'console'] as const;
 
-const isPreset = (v: string | null): v is Preset =>
-  v !== null && (PRESETS as readonly string[]).includes(v);
+const isPreset = (v: string | null): v is Preset => v !== null && (PRESETS as readonly string[]).includes(v);
 
 const readStored = (): Preset | null => {
   if (typeof localStorage === 'undefined') return null;
@@ -32,9 +31,7 @@ const writeStored = (value: Preset | null): void => {
   try {
     if (value === null) localStorage.removeItem(PRESET_KEY);
     else localStorage.setItem(PRESET_KEY, value);
-  } catch {
-    /* storage unavailable: the choice lasts for this page only */
-  }
+  } catch { /* storage unavailable: the choice lasts for this page only */ }
 };
 
 const applyPreset = (value: Preset): void => {
@@ -48,22 +45,14 @@ const applyPreset = (value: Preset): void => {
 const preset: Ref<Preset> = ref(readStored() ?? defaultTheme.preset);
 applyPreset(preset.value);
 
-watch(
-  preset,
-  (v) => {
-    applyPreset(v);
-    writeStored(v === defaultTheme.preset ? null : v);
-  },
-  { flush: 'sync' },
-);
+watch(preset, (v) => {
+  applyPreset(v);
+  writeStored(v === defaultTheme.preset ? null : v);
+}, { flush: 'sync' });
 
 export const useAppUi = () => {
-  const setPreset = (value: Preset) => {
-    preset.value = value;
-  };
-  const reset = () => {
-    preset.value = defaultTheme.preset;
-  };
+  const setPreset = (value: Preset) => { preset.value = value; };
+  const reset = () => { preset.value = defaultTheme.preset; };
 
   return {
     preset,

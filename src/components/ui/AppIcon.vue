@@ -1,11 +1,6 @@
 <template>
   <span
-    :class="[
-      'inline-flex shrink-0 items-center justify-center leading-none',
-      iconClass,
-      sizeClass,
-      colorClass,
-    ]"
+    :class="['inline-flex shrink-0 items-center justify-center leading-none', iconClass, sizeClass, colorClass]"
     :style="customStyle"
     v-bind="$attrs"
   />
