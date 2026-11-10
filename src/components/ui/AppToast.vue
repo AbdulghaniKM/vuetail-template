@@ -98,7 +98,9 @@
                   :type="isDisclosure(toast) ? 'button' : undefined"
                   :aria-expanded="isDisclosure(toast) ? isOpen(toast) : undefined"
                   :aria-controls="isDisclosure(toast) ? bodyId(toast.id) : undefined"
-                  class="vt-pill relative flex h-full items-center gap-2 rounded-full p-2 text-start"
+                  class="vt-pill relative flex h-full items-center gap-2 p-2 text-start"
+                  :style="{ borderRadius: `${roundness}px` }"
+                  :ref="track"
                   :data-measure="toast.id"
                   @click="isDisclosure(toast) && togglePinned(toast.id)"
                 >
@@ -123,7 +125,7 @@
                 :data-open="isOpen(toast)"
                 :inert="!isOpen(toast) || undefined"
               >
-                <div class="p-4 text-sm leading-5" :data-body="toast.id">
+                <div :ref="track" class="p-4 text-sm leading-5" :data-body="toast.id">
                   <p v-if="moreText(toast)" class="vt-description">{{ moreText(toast) }}</p>
                   <div class="mt-3 flex items-center gap-2">
                     <button
@@ -170,7 +172,7 @@
    * the VueTail tokens and the useToast store, announces through the shared live regions, gives
    * every control its own real button, and moves the stack on transforms only.
    */
-  import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, useId, watch } from 'vue';
+  import { computed, onBeforeUnmount, onMounted, reactive, ref, useId, watch } from 'vue';
   import { AnimatePresence, motion } from 'motion-v';
   import type { Toast, ToastPosition, ToastType } from '@/composables/useToast';
   import AppIcon from './AppIcon.vue';
@@ -344,16 +346,27 @@
   /* ---------------------------- Measurement ---------------------------- */
 
   let observer: ResizeObserver | null = null;
+  let presetWatch: MutationObserver | null = null;
   const measure = (el: Element) => {
     const html = el as HTMLElement;
+    // A copy leaving the page (the toast moved to another position, or closed) reports 0x0 on
+    // its way out; storing that would shrink the live copy to an empty pill.
+    if (!html.isConnected) {
+      observer?.unobserve(html);
+      return;
+    }
     if (html.dataset.measure) pillWidths.set(html.dataset.measure, Math.ceil(html.scrollWidth));
     if (html.dataset.body) bodyHeights.set(html.dataset.body, Math.ceil(html.scrollHeight));
   };
-  const measureAll = () => {
-    for (const el of document.querySelectorAll(`[data-toaster="${uid}"] :is([data-measure], [data-body])`)) {
-      measure(el);
-      observer?.observe(el);
-    }
+  // Each pill and body is measured as it mounts, through its own ref, and watched from then on.
+  // Searching the DOM when the queue changes is not enough: a toast moved to another position
+  // mounts a new copy in that region without the queue changing, and a copy never measured draws
+  // a 40px pill and a short body that its title and buttons spill out of.
+  const track = (el: unknown) => {
+    if (!(el instanceof HTMLElement)) return;
+    measure(el);
+    observer ??= typeof ResizeObserver === 'undefined' ? null : new ResizeObserver((entries) => entries.forEach((entry) => measure(entry.target)));
+    observer?.observe(el);
   };
 
   /* ------------------------------ Opening ------------------------------ */
@@ -431,7 +444,6 @@
         bodyHeights.delete(id);
         if (held.value === id) held.value = null;
       }
-      nextTick(measureAll);
     },
     { immediate: true },
   );
@@ -491,18 +503,18 @@
   onMounted(() => {
     fitWidth();
     window.addEventListener('resize', fitWidth);
-    observer = new ResizeObserver((entries) => entries.forEach((entry) => measure(entry.target)));
     // A preset switch changes the radius and the bounce.
-    new MutationObserver(() => tokenTick.value++).observe(document.documentElement, {
+    presetWatch = new MutationObserver(() => tokenTick.value++);
+    presetWatch.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-vt-preset', 'data-theme', 'style'],
     });
-    measureAll();
   });
 
   onBeforeUnmount(() => {
     window.removeEventListener('resize', fitWidth);
     observer?.disconnect();
+    presetWatch?.disconnect();
     for (const id of timers.keys()) clearTimers(id);
   });
 </script>
