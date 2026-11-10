@@ -26,12 +26,15 @@
               class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full"
               :class="iconBgClass(toast.type)"
             >
-              <AppIcon :name="toastIcon(toast.type)" :size="0.75" />
+              <AppIcon :name="toast.icon ?? toastIcon(toast.type)" :size="0.75" />
             </span>
             <div class="min-w-0 flex-1">
               <p v-if="toast.title" class="text-sm leading-snug font-semibold">{{ toast.title }}</p>
               <p class="text-sm leading-relaxed" :class="toast.title ? 'text-text-muted' : ''">
                 {{ toast.message }}
+              </p>
+              <p v-if="toast.description" class="mt-0.5 text-sm leading-relaxed text-text-muted">
+                {{ toast.description }}
               </p>
             </div>
             <button
@@ -101,12 +104,11 @@
   const { announce } = useAnnouncer();
   const spoken = new Map<string, string>();
   watch(
-    () => props.toasts.map((t) => [t.id, t.type, t.title ?? '', t.message] as const),
+    () => props.toasts.map((t) => [t.id, t.type, [t.title, t.message, t.description].filter(Boolean).join('. ')] as const),
     (list) => {
       const live = new Set<string>();
-      for (const [id, type, title, message] of list) {
+      for (const [id, type, text] of list) {
         live.add(id);
-        const text = title ? `${title}. ${message}` : message;
         if (spoken.get(id) === `${type}|${text}`) continue;
         spoken.set(id, `${type}|${text}`);
         announce(text, type === 'error' ? 'assertive' : 'polite');
@@ -159,6 +161,7 @@
       error: '',
       warning: '',
       info: '',
+      loading: '',
     })[type];
 
   const iconBgClass = (type: Toast['type']) =>
@@ -167,6 +170,7 @@
       error: 'bg-danger-subtle text-danger-text',
       warning: 'bg-warning-subtle text-warning-text',
       info: 'bg-info-subtle text-info-text',
+      loading: 'bg-muted text-text-muted',
     })[type];
 
   const progressClass = (type: Toast['type']) =>
@@ -175,6 +179,7 @@
       error: 'bg-danger',
       warning: 'bg-warning',
       info: 'bg-info',
+      loading: 'bg-text-subtle',
     })[type];
 
   const toastIcon = (type: Toast['type']) =>
@@ -183,6 +188,7 @@
       error: 'icon-[heroicons--x-circle]',
       warning: 'icon-[heroicons--exclamation-triangle]',
       info: 'icon-[heroicons--information-circle]',
+      loading: 'icon-[heroicons--arrow-path] animate-spin motion-reduce:animate-pulse',
     })[type];
 </script>
 

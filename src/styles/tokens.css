@@ -78,6 +78,7 @@
   --vt-duration-exit: 130ms;
   --vt-press-y: 1px;
   --vt-press-scale: 1;
+  --vt-toast-bounce: 0;
   --vt-ease: cubic-bezier(.2, 0, 0, 1);
   --vt-ease-exit: cubic-bezier(.2, 0, 0, 1);
 }
@@ -174,6 +175,7 @@
   --vt-duration-exit: 140ms;
   --vt-press-y: 0px;
   --vt-press-scale: .98;
+  --vt-toast-bounce: .25;
   --color-bg: #F5F7F6;
   --color-surface: #FFFFFF;
   --color-surface-raised: #FFFFFF;
@@ -264,6 +266,7 @@
   --vt-duration-exit: 90ms;
   --vt-press-y: 0px;
   --vt-press-scale: .98;
+  --vt-toast-bounce: 0;
   --color-bg: #F4F5F8;
   --color-surface: #FFFFFF;
   --color-surface-raised: #FFFFFF;
@@ -340,5 +343,6 @@
     --vt-duration-exit: 70ms;
     --vt-press-y: 0px;
     --vt-press-scale: 1;
+    --vt-toast-bounce: 0;
   }
 }

@@ -2,7 +2,17 @@ import { ref } from 'vue';
 
 // NOTE: Module-scope ref() state. SPA-only — not safe under SSR.
 
-export type ToastType = 'success' | 'error' | 'warning' | 'info';
+/** `loading` is what promise() shows until the promise settles. */
+export type ToastType = 'success' | 'error' | 'warning' | 'info' | 'loading';
+
+export type ToastPosition = 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+
+/**
+ * AppToastMorph only. When a toast with more to say (a description or an action) opens out of
+ * its pill and folds back: `expand` ms after it appears, `collapse` ms before it leaves.
+ * `false` keeps it a pill until hovered or focused.
+ */
+export type ToastAutopilot = false | { expand?: number; collapse?: number };
 
 export interface ToastAction {
   label: string;
@@ -15,6 +25,13 @@ export interface Toast {
   type: ToastType;
   message: string;
   title?: string;
+  /** A second, longer line under the title. AppToastMorph shows it when the toast opens. */
+  description?: string;
+  /** An icon class (`icon-[heroicons--bell]`) in place of the type's own. */
+  icon?: string;
+  /** Overrides the toaster's position for this toast (AppToastMorph). */
+  position?: ToastPosition;
+  autopilot?: ToastAutopilot;
   /** ms until it closes; 0 keeps it until dismissed. */
   duration?: number;
   /** One button beside the message: Undo, Retry, View. */
@@ -25,6 +42,10 @@ export interface Toast {
 
 export interface ToastOptions {
   title?: string;
+  description?: string;
+  icon?: string;
+  position?: ToastPosition;
+  autopilot?: ToastAutopilot;
   duration?: number;
   action?: ToastAction;
 }
@@ -124,7 +145,7 @@ const promiseToast = async <T>(
   messages: { loading: string; success: Outcome<T>; error: Outcome<unknown> },
   options: Omit<ToastOptions, 'duration'> = {},
 ): Promise<T> => {
-  const id = addToast({ type: 'info', message: messages.loading, ...options, duration: 0 });
+  const id = addToast({ type: 'loading', message: messages.loading, ...options, duration: 0 });
   const text = <V>(m: Outcome<V>, v: V) => (typeof m === 'function' ? m(v) : m);
   try {
     const value = await promise;
