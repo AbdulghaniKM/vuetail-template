@@ -8,7 +8,7 @@ export type ToastType = 'success' | 'error' | 'warning' | 'info' | 'loading';
 export type ToastPosition = 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
 
 /**
- * AppToastMorph only. When a toast with more to say (a description or an action) opens out of
+ * AppToast only. When a toast with more to say (a description or an action) opens out of
  * its pill and folds back: `expand` ms after it appears, `collapse` ms before it leaves.
  * `false` keeps it a pill until hovered or focused.
  */
@@ -25,11 +25,11 @@ export interface Toast {
   type: ToastType;
   message: string;
   title?: string;
-  /** A second, longer line under the title. AppToastMorph shows it when the toast opens. */
+  /** A second, longer line under the title. AppToast shows it when the toast opens. */
   description?: string;
   /** An icon class (`icon-[heroicons--bell]`) in place of the type's own. */
   icon?: string;
-  /** Overrides the toaster's position for this toast (AppToastMorph). */
+  /** Overrides the toaster's position for this toast (AppToast). */
   position?: ToastPosition;
   autopilot?: ToastAutopilot;
   /** ms until it closes; 0 keeps it until dismissed. */
