@@ -10,15 +10,21 @@ export interface FormField {
     | 'number'
     | 'datetime-local'
     | 'date'
-    | 'datetime';
+    | 'datetime'
+    | 'radio'
+    | 'slider';
   label?: string;
   placeholder?: string;
-  items?: string[] | { label: string; value: string | number }[];
+  items?: string[] | { label: string; value: string | number; description?: string; disabled?: boolean }[];
   customClass?: string;
   readonly?: boolean;
   rows?: number;
   min?: string;
   max?: string;
+  /** Slider step. */
+  step?: number;
+  /** Radio layout. */
+  orientation?: 'vertical' | 'horizontal';
   searchable?: boolean;
   showCountryCode?: boolean;
 }
