@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
   import AppPageLoader from '@/components/ui/AppPageLoader.vue';
+  import { appIdentity } from '@/config/identity';
   import DefaultLayout from '@/layouts/DefaultLayout.vue';
   import AuthLayout from '@/layouts/AuthLayout.vue';
   import DashboardLayout from '@/layouts/DashboardLayout.vue';
@@ -64,11 +65,13 @@
     window.removeEventListener('online', onOnline);
   });
 
-  // Keep `<html lang>` in sync with future i18n; no-op today.
+  // The tab title follows the route: a page's `head` plus the app name, or the site title when
+  // the page sets none (otherwise the last page's title stayed on every page without one).
   watch(
     () => route.meta.title,
     (title) => {
-      if (typeof title === 'string' && title) document.title = title;
+      document.title =
+        typeof title === 'string' && title ? `${title} — ${appIdentity.name}` : appIdentity.title;
     },
     { immediate: true },
   );

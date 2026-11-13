@@ -1,5 +1,5 @@
 <template>
-  <AppEmptyState
+  <UiAppEmptyState
     icon="icon-[heroicons--wifi]"
     title="You're offline"
     description="Check your connection and try again."
@@ -12,10 +12,14 @@
     >
       Retry
     </button>
-  </AppEmptyState>
+  </UiAppEmptyState>
 </template>
 
 <script setup lang="ts">
+  definePage({
+    head: 'Offline',
+  });
+
   const retry = () => {
     if (navigator.onLine) window.location.reload();
   };

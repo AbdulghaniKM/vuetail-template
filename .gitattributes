@@ -1,0 +1,8 @@
+# Every text file is LF in the repo and in every checkout, Windows included, so oxfmt
+# (endOfLine: lf) and `pnpm check` pass on a fresh clone.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary

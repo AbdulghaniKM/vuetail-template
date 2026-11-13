@@ -27,7 +27,7 @@
         class="text-sm leading-relaxed text-text"
       ><code><span class="text-success">$</span> pnpm add-component AppButton
 <span class="text-success">$</span> pnpm add-component AppModal
-<span class="text-success">$</span> pnpm add-composable useToast</code></pre>
+<span class="text-success">$</span> pnpm add-composable useAuth</code></pre>
     </div>
   </div>
 </template>

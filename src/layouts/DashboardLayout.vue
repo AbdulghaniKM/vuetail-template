@@ -15,11 +15,7 @@
           @click="toggle"
         >
           <UiAppIcon
-            :name="
-              collapsed
-                ? 'icon-[heroicons--chevron-right]'
-                : 'icon-[heroicons--chevron-left]'
-            "
+            :name="collapsed ? 'icon-[heroicons--chevron-right]' : 'icon-[heroicons--chevron-left]'"
             :size="1"
           />
         </button>

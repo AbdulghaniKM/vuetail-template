@@ -18,7 +18,9 @@ export interface FormField {
   label?: string;
   placeholder?: string;
   /** Select and radio options; for `tags`, the suggestions. */
-  items?: string[] | { label: string; value: string | number; description?: string; disabled?: boolean }[];
+  items?:
+    | string[]
+    | { label: string; value: string | number; description?: string; disabled?: boolean }[];
   customClass?: string;
   readonly?: boolean;
   rows?: number;

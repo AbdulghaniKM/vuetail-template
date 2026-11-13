@@ -102,7 +102,7 @@ src/
 ├── layouts/                 # App layouts (default, auth, dashboard)
 ├── pages/                   # File-based typed route page components
 │   ├── index.vue            # Root/Home route (/)
-│   ├── Login.vue            # Login route (/Login, uses auth layout)
+│   ├── Login.vue            # Login route (/login, uses auth layout)
 │   ├── ServerError.vue      # Server error route (/ServerError -> custom /500)
 │   ├── Offline.vue          # Offline route (/Offline)
 │   ├── _theme.vue           # Theme Studio (dev-only route)

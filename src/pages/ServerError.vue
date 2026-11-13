@@ -1,5 +1,5 @@
 <template>
-  <AppEmptyState
+  <UiAppEmptyState
     icon="icon-[heroicons--shield-exclamation]"
     title="Something went wrong"
     description="An unexpected error occurred on our end. Please try again in a moment."
@@ -12,7 +12,7 @@
     >
       Reload page
     </button>
-  </AppEmptyState>
+  </UiAppEmptyState>
 </template>
 
 <script setup lang="ts">

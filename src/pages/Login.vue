@@ -1,6 +1,7 @@
 <script setup lang="ts">
   definePage({
-    route: 'Login',
+    route: 'login',
+    head: 'Sign in',
     layout: 'auth',
   });
 </script>
