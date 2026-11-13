@@ -6,13 +6,17 @@
     class="text-text-muted hover:bg-muted hover:text-text inline-flex size-10 items-center justify-center rounded-md transition-colors"
     @click="cycle"
   >
-    <AppIcon :name="iconName" :size="1.125" />
+    <!-- Sun and moon cross-fade through a blur instead of snapping. -->
+    <AppSwap :swap-key="iconName">
+      <AppIcon :name="iconName" :size="1.125" />
+    </AppSwap>
   </button>
 </template>
 
 <script setup lang="ts">
   import { computed } from 'vue';
   import AppIcon from './AppIcon.vue';
+  import AppSwap from './AppSwap.vue';
   import { useTheme } from '@/composables/useTheme';
 
   type ThemeMode = 'light' | 'dark';
