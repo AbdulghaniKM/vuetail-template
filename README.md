@@ -56,16 +56,19 @@ After cloning, a few edits turn this template into your own app:
 src/
 ├── components/
 │   └── ui/                  # UI components — shadcn-style on-demand registry
+│       ├── AppBlob.vue       # The morph canvas (goo shapes) AppToast draws through
 │       ├── AppEmptyState.vue # Empty state placeholders and illustration containers
 │       ├── AppIcon.vue       # Scalable Iconify SVG loader
 │       ├── AppPageLoader.vue # Route-loading overlay spinner
 │       ├── AppSkeleton.vue   # Skeleton shimmer loading placeholders
+│       ├── AppSwap.vue       # Blur cross-fade for content that changes (used by AppToast)
 │       ├── AppToast.vue      # Floating notification toasts with progress timelines
 │       └── ThemeToggle.vue   # Light/dark mode toggle
 │       #  ↑ these ship by default · add more with `pnpm add-component <Name>`
 ├── composables/
 │   ├── useAppConfig.ts      # Access to centralized Vite layout settings
 │   ├── useAppUi.ts          # Switch presets (Ink, Pine, Console) at runtime
+│   ├── useBlob.ts           # Blob radius, blur and morph spring from the tokens (used by AppBlob)
 │   ├── useMotionTokens.ts   # Reads the motion tokens for JS animations (used by AppToast)
 │   ├── useReducedMotion.ts  # prefers-reduced-motion as a ref (used by AppToast)
 │   ├── useSidebar.ts        # Drawer navigation panel state
@@ -217,8 +220,9 @@ Route **names** are derived from the full relative path (`dashboard/index.vue` �
 ## Components
 
 VueTail ships as a lean starter with an **on-demand component registry** (shadcn-style). Only
-a small default set lives in `src/components/ui/` out of the box — **AppEmptyState, AppIcon,
-AppPageLoader, AppSkeleton, AppToast, ThemeToggle**. Everything documented below is **not
+a small default set lives in `src/components/ui/` out of the box — **AppBlob, AppEmptyState,
+AppIcon, AppPageLoader, AppSkeleton, AppSwap, AppToast, ThemeToggle** (AppBlob and AppSwap
+because AppToast draws through them). Everything documented below is **not
 pre-installed**; it lives in the [component registry](https://github.com/AbdulghaniKM/vuetail-components)
 and is copied into your project only when you ask for it:
 

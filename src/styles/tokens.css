@@ -79,6 +79,8 @@
   --vt-press-y: 1px;
   --vt-press-scale: 1;
   --vt-toast-bounce: 0;
+  --vt-morph-bounce: 0;
+  --vt-morph-duration: 500ms;
   --vt-ease: cubic-bezier(.2, 0, 0, 1);
   --vt-ease-exit: cubic-bezier(.2, 0, 0, 1);
 }
@@ -176,6 +178,8 @@
   --vt-press-y: 0px;
   --vt-press-scale: .98;
   --vt-toast-bounce: .25;
+  --vt-morph-bounce: .25;
+  --vt-morph-duration: 600ms;
   --color-bg: #F5F7F6;
   --color-surface: #FFFFFF;
   --color-surface-raised: #FFFFFF;
@@ -267,6 +271,8 @@
   --vt-press-y: 0px;
   --vt-press-scale: .98;
   --vt-toast-bounce: 0;
+  --vt-morph-bounce: 0;
+  --vt-morph-duration: 320ms;
   --color-bg: #F4F5F8;
   --color-surface: #FFFFFF;
   --color-surface-raised: #FFFFFF;
@@ -344,5 +350,7 @@
     --vt-press-y: 0px;
     --vt-press-scale: 1;
     --vt-toast-bounce: 0;
+    --vt-morph-bounce: 0;
+    --vt-morph-duration: 0ms;
   }
 }

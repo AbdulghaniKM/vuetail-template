@@ -32,53 +32,20 @@
             @pointerdown="onPointerDown($event, toast.id)"
           >
             <div class="vt-swipe relative size-full" :data-swipe="toast.id">
-              <!--
-                The goo: pill and body are two rects under one filter. Blur, then a steep alpha
-                curve, then the source drawn back on top, so where the two meet they fuse
-                instead of overlapping. The canvas has a fixed size; only the shapes move.
-              -->
-              <svg
-                class="vt-canvas pointer-events-none absolute inset-x-0 overflow-visible"
-                :class="edge(toast) === 'bottom' ? 'top-0' : 'bottom-0 -scale-y-100'"
+              <!-- The goo: pill and body are two shapes in one AppBlob, so where they meet they fuse. -->
+              <AppBlob
+                class="vt-canvas absolute inset-x-0"
+                :class="edge(toast) === 'bottom' ? 'top-0' : 'bottom-0'"
                 :width="width"
                 :height="canvasHeight(toast)"
-                :viewBox="`0 0 ${width} ${canvasHeight(toast)}`"
-                aria-hidden="true"
-              >
-                <defs>
-                  <filter
-                    :id="filterId(toast.id)"
-                    filterUnits="userSpaceOnUse"
-                    :x="-blur * 2"
-                    :y="-blur * 2"
-                    :width="width + blur * 4"
-                    :height="canvasHeight(toast) + blur * 4"
-                    color-interpolation-filters="sRGB"
-                  >
-                    <feGaussianBlur in="SourceGraphic" :stdDeviation="blur" result="blur" />
-                    <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" result="goo" />
-                    <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-                  </filter>
-                </defs>
-                <!-- Surface draws the shape twice: the border colour, then the fill 1px inside it. -->
-                <g v-for="layer in layers" :key="layer.cls" :filter="`url(#${filterId(toast.id)})`" :class="layer.cls">
-                  <motion.rect
-                    :rx="Math.max(0, roundness - layer.inset)"
-                    :ry="Math.max(0, roundness - layer.inset)"
-                    :initial="false"
-                    :animate="pillShape(toast, layer.inset)"
-                    :transition="spring(isOpen(toast))"
-                  />
-                  <motion.rect
-                    :y="PILL_H"
-                    :rx="Math.max(0, roundness - layer.inset)"
-                    :ry="Math.max(0, roundness - layer.inset)"
-                    :initial="false"
-                    :animate="bodyShape(toast, layer.inset)"
-                    :transition="spring(isOpen(toast))"
-                  />
-                </g>
-              </svg>
+                :shapes="shapesOf(toast)"
+                fill="var(--toast-fill)"
+                :edge="tone === 'surface' ? 'var(--toast-edge)' : undefined"
+                :radius="roundness"
+                :blur="blur"
+                :flip-y="edge(toast) !== 'bottom'"
+                :transition="spring(isOpen(toast))"
+              />
 
               <!-- The pill's content: badge and title. It opens the toast when there is more. -->
               <motion.div
@@ -104,14 +71,14 @@
                   :data-measure="toast.id"
                   @click="isDisclosure(toast) && togglePinned(toast.id)"
                 >
-                  <Transition name="vt-swap">
-                    <span :key="`${toast.type}|${pillText(toast)}`" class="flex items-center gap-2 whitespace-nowrap">
+                  <AppSwap :swap-key="`${toast.type}|${pillText(toast)}`">
+                    <span class="flex items-center gap-2 whitespace-nowrap">
                       <span class="vt-badge flex size-6 shrink-0 items-center justify-center rounded-full">
                         <AppIcon :name="toast.icon ?? ICONS[toast.type]" :size="0.875" />
                       </span>
                       <span class="vt-title pe-1 text-sm leading-4 font-medium">{{ pillText(toast) }}</span>
                     </span>
-                  </Transition>
+                  </AppSwap>
                 </component>
               </motion.div>
 
@@ -176,6 +143,9 @@
   import { AnimatePresence, motion } from 'motion-v';
   import type { Toast, ToastPosition, ToastType } from '@/composables/useToast';
   import AppIcon from './AppIcon.vue';
+  import AppBlob, { type BlobShape } from './AppBlob.vue';
+  import AppSwap from './AppSwap.vue';
+  import { useBlob } from '@/composables/useBlob';
   import { useAnnouncer } from '@/composables/useAnnouncer';
   import { useMotionTokens } from '@/composables/useMotionTokens';
   import { useReducedMotion } from '@/composables/useReducedMotion';
@@ -218,8 +188,6 @@
   const MAX_WIDTH = 350;
   const GAP = 12;
   const MIN_OPEN = PILL_H * 2.25;
-  // Sileo's spring length. The bounce is the preset's (`--vt-toast-bounce`).
-  const SPRING_S = 0.6;
 
   const ICONS: Record<ToastType, string> = {
     success: 'icon-[heroicons--check]',
@@ -232,33 +200,15 @@
   const { enter, exit } = useMotionTokens();
   const reduced = useReducedMotion();
   const uid = useId();
-
-  /* ------------------------------ Tokens ------------------------------- */
-
-  const readToken = (name: string) =>
-    typeof document === 'undefined' ? '' : getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-
-  // Read when the stack renders, so a preset switch reaches the next toast.
-  const tokenTick = ref(0);
-  const roundness = computed(() => {
-    void tokenTick.value;
-    const px = Number.parseFloat(readToken('--radius-2xl'));
-    return Number.isFinite(px) ? Math.min(px, PILL_H / 2) : 16;
-  });
-  const blur = computed(() => roundness.value * 0.5);
-
-  const spring = (opening: boolean) => {
-    if (reduced.value) return { duration: 0 };
-    const bounce = Number.parseFloat(readToken('--vt-toast-bounce'));
-    return { type: 'spring' as const, duration: SPRING_S, bounce: opening && Number.isFinite(bounce) ? bounce : 0 };
-  };
+  // Radius, goo blur and the morph spring (`--vt-morph-duration`, `--vt-morph-bounce`), shared
+  // with every other blob on the page through one observer on <html>.
+  const { roundness, blur, spring } = useBlob({ cap: PILL_H / 2 });
 
   /* ------------------------------ Geometry ----------------------------- */
 
   const width = ref(MAX_WIDTH);
   const fitWidth = () => {
     width.value = Math.min(MAX_WIDTH, window.innerWidth - 24);
-    tokenTick.value++;
   };
 
   const pillWidths = reactive(new Map<string, number>());
@@ -279,23 +229,12 @@
   const canvasHeight = (t: Toast) => (hasMore(t) ? PILL_H + bodyHeight(t) + blur.value * 3 : PILL_H + blur.value * 3);
   const heightOf = (t: Toast) => (isOpen(t) ? PILL_H + bodyHeight(t) : PILL_H);
 
-  const layers = computed(() =>
-    props.tone === 'surface' ? [{ cls: 'vt-edge', inset: 0 }, { cls: 'vt-fill', inset: 1 }] : [{ cls: 'vt-fill', inset: 0 }],
-  );
-  // The fill layer sits `inset` px inside the edge layer on every outside edge; where the pill
-  // meets the body there is no edge, so nothing is inset there.
-  const pillShape = (t: Toast, inset: number) => ({
-    x: pillX(t) + inset,
-    y: inset,
-    width: Math.max(0, pillWidth(t) - inset * 2),
-    height: isOpen(t) ? PILL_H + blur.value * 3 - inset : PILL_H - inset * 2,
-  });
-  const bodyShape = (t: Toast, inset: number) => ({
-    x: inset,
-    width: width.value - inset * 2,
-    height: isOpen(t) ? Math.max(0, bodyHeight(t) - inset) : 0,
-    opacity: isOpen(t) ? 1 : 0,
-  });
+  // With an edge (surface tone), AppBlob draws the fill 1px inside on every side; the pill runs
+  // into the body while open, so that inset is hidden where they meet.
+  const shapesOf = (t: Toast): BlobShape[] => [
+    { key: 'pill', x: pillX(t), y: 0, width: pillWidth(t), height: isOpen(t) ? PILL_H + blur.value * 3 : PILL_H },
+    { key: 'body', x: 0, y: PILL_H, width: width.value, height: isOpen(t) ? bodyHeight(t) : 0, opacity: isOpen(t) ? 1 : 0 },
+  ];
   // Under the pill while it is a pill (and always for a stack growing upward, whose pill is at
   // the bottom); along the body once it opens downward.
   const countdownBox = (t: Toast) => {
@@ -308,7 +247,6 @@
     };
   };
 
-  const filterId = (id: string) => `${uid}-goo-${id}`;
   const bodyId = (id: string) => `${uid}-body-${id}`;
 
   /* ------------------------------ Content ------------------------------ */
@@ -346,7 +284,6 @@
   /* ---------------------------- Measurement ---------------------------- */
 
   let observer: ResizeObserver | null = null;
-  let presetWatch: MutationObserver | null = null;
   const measure = (el: Element) => {
     const html = el as HTMLElement;
     // A copy leaving the page (the toast moved to another position, or closed) reports 0x0 on
@@ -503,18 +440,11 @@
   onMounted(() => {
     fitWidth();
     window.addEventListener('resize', fitWidth);
-    // A preset switch changes the radius and the bounce.
-    presetWatch = new MutationObserver(() => tokenTick.value++);
-    presetWatch.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-vt-preset', 'data-theme', 'style'],
-    });
   });
 
   onBeforeUnmount(() => {
     window.removeEventListener('resize', fitWidth);
     observer?.disconnect();
-    presetWatch?.disconnect();
     for (const id of timers.keys()) clearTimers(id);
   });
 </script>
@@ -553,13 +483,6 @@
     --toast-ink: var(--color-text);
     --toast-ink-muted: var(--color-text-muted);
   }
-  .vt-fill {
-    fill: var(--toast-fill);
-  }
-  .vt-edge {
-    fill: var(--toast-edge);
-  }
-
   /* Status lives in the badge (and the countdown). */
   .vt-toast {
     --status: var(--color-info);
@@ -656,31 +579,5 @@
 
   .vt-pill {
     color: var(--toast-ink);
-  }
-
-  /* A state change (loading → saved) cross-fades the header through a blur, as in Sileo. */
-  .vt-swap-enter-active {
-    transition:
-      opacity var(--vt-duration-enter) var(--vt-ease),
-      filter var(--vt-duration-enter) var(--vt-ease);
-  }
-  .vt-swap-leave-active {
-    position: absolute;
-    inset-inline-start: 0.5rem;
-    transition:
-      opacity var(--vt-duration-exit) var(--vt-ease-exit),
-      filter var(--vt-duration-exit) var(--vt-ease-exit);
-  }
-  .vt-swap-enter-from,
-  .vt-swap-leave-to {
-    opacity: 0;
-    filter: blur(6px);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .vt-swap-enter-from,
-    .vt-swap-leave-to {
-      filter: none;
-    }
   }
 </style>
