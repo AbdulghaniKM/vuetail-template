@@ -13,3 +13,9 @@
     </RouterLink>
   </UiAppEmptyState>
 </template>
+
+<script setup lang="ts">
+  definePage({
+    head: 'Page not found',
+  });
+</script>
