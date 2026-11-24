@@ -1,4 +1,5 @@
-import { QueryClient } from '@tanstack/vue-query';
+import { MutationCache, QueryCache, QueryClient } from '@tanstack/vue-query';
+import { reportError } from '@/lib/errorReporter';
 
 // One cache for the whole app, installed in main.ts with VueQueryPlugin.
 //
@@ -7,8 +8,17 @@ import { QueryClient } from '@tanstack/vue-query';
 // retry: off. The axios interceptor (registerErrorToasts in main.ts) toasts every failed request,
 //   so each retry would toast again. Queries still recover on their own: they refetch when the
 //   window regains focus and when the network comes back. Turn retry on per query if you need it.
+// Every failed query and mutation goes to reportError (src/lib/errorReporter.ts), which skips
+//   the expected ones (4xx, cancelled, offline).
 export const createQueryClient = () =>
   new QueryClient({
+    queryCache: new QueryCache({
+      onError: (error, query) => reportError(error, { source: 'query', key: query.queryKey }),
+    }),
+    mutationCache: new MutationCache({
+      onError: (error, _variables, _context, mutation) =>
+        reportError(error, { source: 'mutation', key: mutation.options.mutationKey }),
+    }),
     defaultOptions: {
       queries: {
         staleTime: 60_000,

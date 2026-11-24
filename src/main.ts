@@ -15,6 +15,7 @@ import { initializeConfig } from './config';
 import { useToast } from './composables/useToast';
 import { registerErrorToasts, setAuthProvider } from './plugins/axios';
 import { clearAuthToken, getAuthToken, isAuthenticated } from './lib/authToken';
+import { reportError } from './lib/errorReporter';
 import { queryClient } from './queries/client';
 // Side-effect import — applies the stored or default preset (`data-vt-preset`) to <html> at boot.
 // Paired with the pre-boot script in index.html, which does the same before first paint.
@@ -27,12 +28,12 @@ const pinia = createPinia();
 const app = createApp(App);
 
 // ─── Global error handling ──────────────────────────────────────────────────
-// Dev: surface via toast so issues are obvious during development.
-// Prod: log to console (replace with Sentry / your own reporter).
+// Every unexpected error goes to reportError (src/lib/errorReporter.ts): the console by default,
+// your tracker once you call setErrorReporter. Dev also shows it as a toast so it can't be missed.
 const toast = useToast();
 
 app.config.errorHandler = (err, _instance, info) => {
-  console.error('[vue:error]', info, err);
+  reportError(err, { source: 'vue', info });
   if (import.meta.env.DEV) {
     const message = err instanceof Error ? err.message : String(err);
     toast.error(message, { title: 'Render error' });
@@ -40,7 +41,7 @@ app.config.errorHandler = (err, _instance, info) => {
 };
 
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('[unhandledrejection]', event.reason);
+  reportError(event.reason, { source: 'unhandledrejection' });
   if (import.meta.env.DEV) {
     const reason = event.reason;
     const message = reason instanceof Error ? reason.message : String(reason);

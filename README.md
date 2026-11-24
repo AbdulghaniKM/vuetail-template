@@ -507,6 +507,27 @@ The axios interceptor (`src/plugins/axios.ts`) de-duplicates concurrent refreshe
 
 **Everything goes through `authToken.ts`** — the router guard, the axios request interceptor, and `useAuth`. To switch strategies (e.g. persist to `localStorage` for convenience over security), change only that one file; a commented `localStorage` example is included there.
 
+## Error reporting
+
+Every unexpected error leaves through one function, `reportError` in
+[`src/lib/errorReporter.ts`](src/lib/errorReporter.ts): render errors (`app.config.errorHandler`),
+unhandled promise rejections, and every failed query and mutation (the `QueryCache` and
+`MutationCache` in `src/queries/client.ts`). It logs to the console until you point it at your
+tracker, once, in `main.ts`:
+
+```ts
+import * as Sentry from '@sentry/vue';
+import { setErrorReporter } from '@/lib/errorReporter';
+
+Sentry.init({ app, dsn: import.meta.env.VITE_SENTRY_DSN });
+setErrorReporter((error, context) => Sentry.captureException(error, { extra: { ...context } }));
+```
+
+Expected HTTP outcomes are skipped, so the tracker only sees what needs fixing: a 4xx (the API
+answering: validation, auth, not found), a cancelled request, or no response at all (offline). A
+5xx and any error not from axios are reported, with where it was caught (`source`) and the query or
+mutation key. In dev, render errors and unhandled rejections also show as a toast.
+
 ## Code quality
 
 Linting and formatting use the Oxc toolchain — fast, no ESLint/Prettier dependency tree.
