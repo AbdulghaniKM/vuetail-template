@@ -14,8 +14,18 @@ function paginationMetaForBareArrayResponse(
   };
 }
 
+/**
+ * Typed REST CRUD for one resource. HTTP only: no state, no caching (that is the job of
+ * `src/queries/`). Reads take `{ signal }` so a cancelled query aborts its request.
+ */
 export class BaseApiService<T, CreateDto = Partial<T>, UpdateDto = Partial<T>> {
+  /** @param basePath the resource's collection URL, e.g. `API_PATHS.PRODUCTS.ROOT`. */
   constructor(protected readonly basePath: string) {}
+
+  /** The URL of one item: `<basePath>/<id>`. */
+  protected itemPath(id: Id): string {
+    return `${this.basePath}/${encodeURIComponent(String(id))}`;
+  }
 
   protected coerceToPaginatedResponse(
     responseBody: T[] | PaginatedResponse<T>,
@@ -34,15 +44,19 @@ export class BaseApiService<T, CreateDto = Partial<T>, UpdateDto = Partial<T>> {
     return responseBody;
   }
 
-  async findAll(params?: QueryParams): Promise<PaginatedResponse<T>> {
+  async findAll(
+    params?: QueryParams,
+    { signal }: RequestOptions = {},
+  ): Promise<PaginatedResponse<T>> {
     const { data: responseBody } = await api.get<T[] | PaginatedResponse<T>>(this.basePath, {
       params: params as Record<string, unknown> | undefined,
+      signal,
     });
     return this.coerceToPaginatedResponse(responseBody, params);
   }
 
-  async findOne(id: string | number): Promise<T> {
-    const { data: entity } = await api.get<T>(`${this.basePath}/${id}`);
+  async findOne(id: Id, { signal }: RequestOptions = {}): Promise<T> {
+    const { data: entity } = await api.get<T>(this.itemPath(id), { signal });
     return entity;
   }
 
@@ -51,12 +65,12 @@ export class BaseApiService<T, CreateDto = Partial<T>, UpdateDto = Partial<T>> {
     return created;
   }
 
-  async update(id: string | number, patch: UpdateDto): Promise<T> {
-    const { data: updated } = await api.patch<T>(`${this.basePath}/${id}`, patch);
+  async update(id: Id, patch: UpdateDto): Promise<T> {
+    const { data: updated } = await api.patch<T>(this.itemPath(id), patch);
     return updated;
   }
 
-  async remove(id: string | number): Promise<void> {
-    await api.delete(`${this.basePath}/${id}`);
+  async remove(id: Id): Promise<void> {
+    await api.delete(this.itemPath(id));
   }
 }

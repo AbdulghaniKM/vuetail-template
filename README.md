@@ -10,7 +10,8 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 | Styling    | Tailwind CSS v4 with CSS variable theming                                   |
 | Language   | TypeScript 6 (strict)                                                       |
 | Build      | Vite 8 (Rolldown)                                                           |
-| State      | Pinia 3                                                                     |
+| Data       | TanStack Query 5 (server state: cache, refetch, mutations)                  |
+| State      | Pinia 3 (client state only)                                                 |
 | Routing    | Vue Router 5 with custom Vite plugin + native glob auto-registry            |
 | Validation | Zod 4                                                                       |
 | HTTP       | Axios (interceptors, CSRF, auth token plumbing)                             |
@@ -76,7 +77,7 @@ src/
 │   └── useToast.ts          # Queue manager for toast notifications
 ├── config/
 │   ├── app.config.ts        # Centralized app configuration
-│   ├── api-paths.ts         # API endpoint constants
+│   ├── api-paths.ts         # Every endpoint, named once
 │   ├── env.ts               # Environment variable accessors
 │   ├── router.ts            # Bespoke compile-time route scan registry
 │   ├── types.ts             # Config type definitions
@@ -91,14 +92,19 @@ src/
 │   ├── seo.ts               # DOM meta tag manipulation
 │   ├── theme.ts             # Applies light/dark to <html>
 │   └── validation.ts        # Pure validation rule functions
-├── services/
+├── services/                # HTTP only: typed calls, no state
 │   ├── BaseApiService.ts    # Generic REST CRUD base class
-│   ├── product.service.ts   # Product API service
+│   ├── product.service.ts   # Product API service (example)
 │   └── upload.service.ts    # File upload with progress and cancellation
+├── queries/                 # TanStack Query: cache keys, queries, mutations
+│   ├── client.ts            # The QueryClient and its defaults
+│   ├── factory.ts           # createResourceQueries: keys + list/detail/create/update/remove
+│   └── product.queries.ts   # useProducts, useProduct, useCreateProduct… (example)
 ├── plugins/
 │   ├── axios.config.ts      # Pure Axios instance and networking config
 │   └── axios.ts             # Axios interceptors, auth state, error handling
-├── stores/                  # Pinia stores
+├── stores/                  # Pinia, client-only state
+│   └── product.store.ts     # The products list's search, sort and page (example)
 ├── layouts/                 # App layouts (default, auth, dashboard)
 ├── pages/                   # File-based typed route page components
 │   ├── index.vue            # Root/Home route (/)
@@ -216,6 +222,67 @@ If a page does not specify an explicit `route`, the router derives one from its 
 - `src/pages/Offline.vue` → `/offline`
 
 Route **names** are derived from the full relative path (`dashboard/index.vue` → `dashboard-index`), so same-named files in different folders never collide. Files whose name starts with `_` (e.g. `_theme.vue`) are **dev-only** and excluded from production builds.
+
+## Data layer
+
+Data flows one way, and each layer has one job:
+
+```
+config/api-paths.ts  →  types/  →  services/  →  queries/  →  pages/
+   endpoints            shapes     HTTP only     cache        UI
+```
+
+1. **Endpoints**: name every URL once in `src/config/api-paths.ts`. A resource has a `ROOT`; item
+   URLs (`ROOT/:id`) are derived from it.
+2. **Types**: the API shapes in `src/types/<name>.types.ts`. `Id`, `QueryParams` and
+   `PaginatedResponse<T>` live in `resource.types.ts`.
+3. **Services**: extend `BaseApiService<T>` for `findAll`, `findOne`, `create`, `update`, `remove`.
+   Services only make requests. Reads take `{ signal }`, so a cancelled query aborts its request.
+4. **Queries**: `createResourceQueries(name, service)` gives the cache keys, a paged list query, a
+   detail query and three mutations. Add custom queries next to them in `<name>.queries.ts`.
+5. **Pages**: call the query composables. Pages never call axios or a service directly.
+
+```ts
+// src/queries/order.queries.ts
+const orders = createResourceQueries('orders', orderService);
+export const orderKeys = orders.keys;
+export const useOrders = orders.useList;
+export const useOrder = orders.useOne;
+export const useUpdateOrder = orders.useUpdate;
+```
+
+```vue
+<script setup lang="ts">
+  const page = ref(1);
+  const { data, isPending, isPlaceholderData, error } = useOrders(() => ({ page: page.value }));
+  const { mutate: updateOrder, isPending: isSaving } = useUpdateOrder();
+</script>
+```
+
+What you get without writing it:
+
+- A slow response for page 2 never overwrites page 3: changing the params cancels the old request.
+- Each page, filter and item is cached on its own, so going back shows data at once.
+- The list keeps the previous page on screen while the next one loads (`isPlaceholderData`).
+- Data refetches when the window regains focus or the network comes back.
+- `create`, `update` and `remove` refresh every list of that resource when they succeed.
+
+Defaults (`src/queries/client.ts`): data counts as fresh for 60 seconds, and retries are off because
+the axios interceptor already toasts each failed request. Signing out clears the whole cache, so the
+next user on the tab never sees the previous user's data. Show an error with
+`extractApiErrorMessage(error)`.
+
+**Pinia** is for client-only state: open panels, filters you want to keep, preferences. Don't copy
+query data into a store; read it from the query.
+
+`src/stores/product.store.ts` is the example: it keeps the products list's search, sort and page, so
+they survive leaving the list and coming back, and hands them to the query.
+
+```ts
+const productStore = useProductStore();
+const { search } = storeToRefs(productStore); // v-model="search"
+const { data, isPlaceholderData } = useProducts(() => productStore.params);
+```
 
 ## Components
 

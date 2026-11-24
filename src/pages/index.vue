@@ -15,6 +15,7 @@
       <span class="rounded-full bg-muted px-3 py-1.5 font-medium">Vue 3</span>
       <span class="rounded-full bg-muted px-3 py-1.5 font-medium">Tailwind v4</span>
       <span class="rounded-full bg-muted px-3 py-1.5 font-medium">TypeScript</span>
+      <span class="rounded-full bg-muted px-3 py-1.5 font-medium">TanStack Query</span>
       <span class="rounded-full bg-muted px-3 py-1.5 font-medium">Pinia</span>
       <span class="rounded-full bg-muted px-3 py-1.5 font-medium">Vue Router</span>
     </div>

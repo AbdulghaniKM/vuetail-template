@@ -1,5 +1,7 @@
 import { AxiosError } from 'axios';
 
+// A readable message from a failed request, e.g. for a query's `error`:
+//   <p v-if="error">{{ extractApiErrorMessage(error) }}</p>
 export function extractApiErrorMessage(error: unknown): string {
   if (error instanceof AxiosError) {
     const data = error.response?.data;
@@ -12,18 +14,4 @@ export function extractApiErrorMessage(error: unknown): string {
     return data?.msg ?? data?.message ?? data?.title ?? 'An unexpected error occurred';
   }
   return (error as Error).message ?? 'An unexpected error occurred';
-}
-
-export async function withApiErrorHandler<T>(
-  fn: () => Promise<T>,
-  loadingRef?: { value: boolean },
-): Promise<T> {
-  try {
-    if (loadingRef) loadingRef.value = true;
-    return await fn();
-  } catch (error) {
-    throw new Error(extractApiErrorMessage(error));
-  } finally {
-    if (loadingRef) loadingRef.value = false;
-  }
 }

@@ -1,3 +1,6 @@
+/** A resource id as the API sends it. URLs and cache keys use it as-is. */
+export type Id = string | number;
+
 export interface PaginationMeta {
   page: number;
   perPage: number;
@@ -19,4 +22,9 @@ export interface QueryParams {
   sortBy?: string;
   sortDir?: 'asc' | 'desc';
   [key: string]: unknown;
+}
+
+/** Passed by TanStack Query to every queryFn: aborts the request when the query is cancelled. */
+export interface RequestOptions {
+  signal?: AbortSignal;
 }

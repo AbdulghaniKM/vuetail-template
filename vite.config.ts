@@ -22,9 +22,16 @@ export default defineConfig({
         {
           axios: [['default', 'axios'], 'isAxiosError', 'AxiosError'],
           '@/plugins/axios': ['api', 'apiGet', 'apiPost', 'apiPut', 'apiPatch', 'apiDelete'],
+          '@tanstack/vue-query': ['useQuery', 'useMutation', 'useQueryClient', 'keepPreviousData'],
         },
       ],
-      dirs: ['src/composables/**', 'src/stores/**', 'src/types/**', 'src/config/**'],
+      dirs: [
+        'src/composables/**',
+        'src/queries/**',
+        'src/stores/**',
+        'src/types/**',
+        'src/config/**',
+      ],
       dirsScanOptions: {
         fileFilter: (file) => !file.endsWith('index.ts'),
       },

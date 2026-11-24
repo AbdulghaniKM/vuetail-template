@@ -1,5 +1,6 @@
+import { VueQueryPlugin } from '@tanstack/vue-query';
 import { createPinia } from 'pinia';
-import { createApp } from 'vue';
+import { createApp, watch } from 'vue';
 
 // Define definePage globally at runtime as a no-op to prevent ReferenceError in pages
 (window as any).definePage = () => {};
@@ -13,7 +14,8 @@ import './style.css';
 import { initializeConfig } from './config';
 import { useToast } from './composables/useToast';
 import { registerErrorToasts, setAuthProvider } from './plugins/axios';
-import { clearAuthToken, getAuthToken } from './lib/authToken';
+import { clearAuthToken, getAuthToken, isAuthenticated } from './lib/authToken';
+import { queryClient } from './queries/client';
 // Side-effect import — applies the stored or default preset (`data-vt-preset`) to <html> at boot.
 // Paired with the pre-boot script in index.html, which does the same before first paint.
 import '@/composables/useAppUi';
@@ -67,7 +69,14 @@ setAuthProvider({
   },
 });
 
-app.use(pinia);
+// Cached server data belongs to whoever was signed in. Drop all of it the moment the token goes
+// away (sign-out, a failed refresh), so the next person on this tab never sees it.
+watch(isAuthenticated, (signedIn) => {
+  if (!signedIn) queryClient.clear();
+});
+
+app.use(pinia); // client-only state (UI, preferences); server data lives in src/queries/
+app.use(VueQueryPlugin, { queryClient });
 app.use(router);
 
 // Debug-print the registered routes — dev only (stripped from production builds).

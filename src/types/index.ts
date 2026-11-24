@@ -1,2 +1,8 @@
-export type { PaginatedResponse, PaginationMeta, QueryParams } from './resource.types';
+export type {
+  Id,
+  PaginatedResponse,
+  PaginationMeta,
+  QueryParams,
+  RequestOptions,
+} from './resource.types';
 export type { Product } from './product.types';

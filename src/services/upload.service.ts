@@ -1,8 +1,4 @@
-import axios, {
-  type AxiosProgressEvent,
-  type AxiosRequestConfig,
-  type CancelTokenSource,
-} from 'axios';
+import axios, { type AxiosProgressEvent, type AxiosRequestConfig } from 'axios';
 import { formatFileSize, getFileExtension } from '@/utils/file';
 
 export interface UploadOptions {
@@ -125,7 +121,8 @@ export const uploadMultipleFiles = async <T = unknown>(
 };
 
 export class MultipartUpload<TResponsePayload = unknown> {
-  private cancelTokenSource: CancelTokenSource = axios.CancelToken.source();
+  // One controller per upload: cancel() aborts it and makes a fresh one for the next upload.
+  private abortController = new AbortController();
   private latestReportedProgressPercent = 0;
 
   async upload(file: File, options: UploadOptions = {}): Promise<UploadResult<TResponsePayload>> {
@@ -156,7 +153,7 @@ export class MultipartUpload<TResponsePayload = unknown> {
           'Content-Type': 'multipart/form-data',
           ...config.headers,
         },
-        cancelToken: this.cancelTokenSource.token,
+        signal: this.abortController.signal,
         onUploadProgress: (progressEvent: AxiosProgressEvent) => {
           if (progressEvent.total) {
             this.latestReportedProgressPercent = Math.round(
@@ -188,8 +185,8 @@ export class MultipartUpload<TResponsePayload = unknown> {
   }
 
   cancel(): void {
-    this.cancelTokenSource.cancel('Upload cancelled by user');
-    this.cancelTokenSource = axios.CancelToken.source();
+    this.abortController.abort();
+    this.abortController = new AbortController();
   }
 
   getProgress(): number {
