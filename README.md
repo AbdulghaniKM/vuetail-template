@@ -546,21 +546,29 @@ list filters (`src/stores/product.store.test.ts`). To test a component that uses
 with `[VueQueryPlugin, { queryClient: createQueryClient() }]` so it gets the app's defaults and a
 cache of its own.
 
-## Vite DevTools (embedded)
+## Devtools
 
-Per the [official guide](https://devtools.vite.dev/guide/), embedded DevTools needs a production build first so Rolldown metadata exists, then the dev server:
+**TanStack Query Devtools** are on in `pnpm dev`: the floating button in the bottom-right corner
+opens a panel listing every query, its key, status and cached data, so you can see a request
+being shared or a list being refreshed. `src/App.vue` loads them only when `import.meta.env.DEV`
+is true, so production builds don't contain them.
 
-```bash
-pnpm build   # once (or after dependency / config changes)
-pnpm dev
+**Vite DevTools** (`@vitejs/devtools`) is installed but not enabled. To turn it on, add the plugin
+to `vite.config.ts` with `await`, since it returns a `Promise<Plugin[]>`:
+
+```ts
+import { DevTools } from '@vitejs/devtools';
+// plugins: [...(await DevTools()), ...]
 ```
 
-1. Open the app in the browser.
-2. Check the console for `[VITE DEVTOOLS] Client injected` — if missing, restart `pnpm dev` after changing `vite.config.ts`.
-3. Look for a **thin vertical tab on the left edge** of the page (panel starts collapsed). Click it to open the dock.
-4. Rolldown build analysis panels need the `pnpm build` step above.
+Then run `pnpm build` once (the Rolldown analysis panels need its metadata) and `pnpm dev`. A thin
+tab on the left edge of the page opens the dock. See the [guide](https://devtools.vite.dev/guide/).
 
-`vite.config.ts` uses `await DevTools()` because the plugin returns a `Promise<Plugin[]>` — passing `DevTools()` without `await` silently skips all DevTools plugins.
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request: install with the
+locked versions, `pnpm check` (lint, format, typecheck, tests), then `pnpm build`. A newer push
+cancels the run still going for the same branch.
 
 ## Scripts
 

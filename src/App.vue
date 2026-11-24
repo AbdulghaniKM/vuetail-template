@@ -5,6 +5,7 @@
   </component>
   <RouterView v-else />
   <UiAppToast :toasts="toasts" @remove="remove" @pause="pause" @resume="resume" />
+  <component :is="QueryDevtools" v-if="QueryDevtools" />
 </template>
 
 <script setup lang="ts">
@@ -31,6 +32,14 @@
   });
 
   const { toasts, remove, pause, resume } = useToast();
+
+  // TanStack Query Devtools (the floating flower button): every query, its key, status and cached
+  // data. Dev only: `import.meta.env.DEV` is false in a build, so the import is dropped from it.
+  const QueryDevtools = import.meta.env.DEV
+    ? defineAsyncComponent(() =>
+        import('@tanstack/vue-query-devtools').then((m) => m.VueQueryDevtools),
+      )
+    : null;
 
   // Router-wired page loader
   const pageLoaderRef = ref<InstanceType<typeof AppPageLoader> | null>(null);
