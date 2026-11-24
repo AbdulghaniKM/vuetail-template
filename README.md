@@ -274,6 +274,19 @@ What you get without writing it:
   Writes carrying a `File`, `FormData` or `Date` are never dropped, since they can't be compared.
 - Many requests failing with 401 at once trigger one token refresh, and each retries once.
 
+**Optimistic updates.** The factory's mutations wait for the server and then show its answer, since
+the server can refuse or change what it saves. For a small change that almost never fails (a star,
+a checkbox, "mark as done"), `useToggleFavorite` in `src/queries/product.queries.ts` is the pattern
+to copy: it shows the change at once in every cached copy (detail, lists, featured), undoes only
+that change if the server refuses, and refetches once after the last of several quick toggles.
+
+```vue
+<button
+  :aria-pressed="product.favorite"
+  @click="toggleFavorite({ id: product.id, favorite: !product.favorite })"
+>★</button>
+```
+
 Defaults (`src/queries/client.ts`): data counts as fresh for 60 seconds, and retries are off because
 the axios interceptor already toasts each failed request. Signing out clears the whole cache, so the
 next user on the tab never sees the previous user's data. Show an error with
