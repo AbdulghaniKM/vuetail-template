@@ -7,14 +7,17 @@ import { QueryClient } from '@tanstack/vue-query';
 // retry: off. The axios interceptor (registerErrorToasts in main.ts) toasts every failed request,
 //   so each retry would toast again. Queries still recover on their own: they refetch when the
 //   window regains focus and when the network comes back. Turn retry on per query if you need it.
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60_000,
-      retry: false,
+export const createQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60_000,
+        retry: false,
+      },
+      mutations: {
+        retry: false,
+      },
     },
-    mutations: {
-      retry: false,
-    },
-  },
-});
+  });
+
+export const queryClient = createQueryClient();

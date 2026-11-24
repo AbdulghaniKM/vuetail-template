@@ -148,7 +148,7 @@ export const parsePackageSpec = (spec) => {
 };
 
 export const collectMissingPackages = (names, requiresMap, pkg) => {
-  const have = { ...(pkg?.dependencies ?? {}), ...(pkg?.devDependencies ?? {}) };
+  const have = { ...pkg?.dependencies, ...pkg?.devDependencies };
   const specs = new Map();
   for (const n of names) {
     for (const spec of requiresMap[n]?.packages ?? []) {

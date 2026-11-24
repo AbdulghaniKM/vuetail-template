@@ -25,6 +25,9 @@ export const setAuthProvider = (provider: AuthProvider): void => {
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // A header already set wins: the caller's own, or the fresh token a 401 retry carries (below).
+    // Overwriting that with getToken() would resend the expired token and waste the retry.
+    if (config.headers?.Authorization) return config;
     const token = store.provider.getToken?.();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;

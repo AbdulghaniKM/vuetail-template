@@ -15,6 +15,7 @@ A production-ready Vue 3 starter template with Tailwind CSS v4, TypeScript, and 
 | Routing    | Vue Router 5 with custom Vite plugin + native glob auto-registry            |
 | Validation | Zod 4                                                                       |
 | HTTP       | Axios (interceptors, CSRF, auth token plumbing)                             |
+| Testing    | Vitest 4 + Vue Test Utils + happy-dom                                       |
 | Icons      | Iconify (200k+ icons via `@iconify/tailwind4`)                              |
 | Animations | motion-v (spring physics)                                                   |
 | Utilities  | VueUse, date-fns                                                            |
@@ -266,6 +267,12 @@ What you get without writing it:
 - The list keeps the previous page on screen while the next one loads (`isPlaceholderData`).
 - Data refetches when the window regains focus or the network comes back.
 - `create`, `update` and `remove` refresh every list of that resource when they succeed.
+- No duplicate requests. Every component asking for the same list or item shares one request,
+  and keys compare by value (`{ page: 1, search: undefined }` is the same list as `{ page: 1 }`).
+  A create, update or remove that repeats one still in flight (a double-clicked Save, two forms
+  sending the same thing) is dropped; `mutateAsync` hands the repeat the first call's result.
+  Writes carrying a `File`, `FormData` or `Date` are never dropped, since they can't be compared.
+- Many requests failing with 401 at once trigger one token refresh, and each retries once.
 
 Defaults (`src/queries/client.ts`): data counts as fresh for 60 seconds, and retries are off because
 the axios interceptor already toasts each failed request. Signing out clears the whole cache, so the
@@ -520,6 +527,25 @@ pnpm format:check  # Fail CI if anything is unformatted
 
 Generated files (`src/auto-imports.d.ts`, `src/components.d.ts`) are ignored by both tools.
 
+## Testing
+
+[Vitest](https://vitest.dev/) runs through the app's own Vite config (`vitest.config.ts`), so `@/`
+paths and auto-imports work in tests as they do in `src/`. Tests sit next to the file they test as
+`*.test.ts`, in a [happy-dom](https://github.com/capricorn86/happy-dom) environment, with
+[Vue Test Utils](https://test-utils.vuejs.org/) for mounting components.
+
+```bash
+pnpm test         # Run once
+pnpm test:watch   # Re-run on change
+pnpm check        # Lint, format check, typecheck and tests: what CI should run
+```
+
+The shipped tests cover the data layer: shared requests and value-equal keys
+(`src/queries/factory.test.ts`), the single token refresh (`src/plugins/axios.test.ts`) and the
+list filters (`src/stores/product.store.test.ts`). To test a component that uses queries, mount it
+with `[VueQueryPlugin, { queryClient: createQueryClient() }]` so it gets the app's defaults and a
+cache of its own.
+
 ## Vite DevTools (embedded)
 
 Per the [official guide](https://devtools.vite.dev/guide/), embedded DevTools needs a production build first so Rolldown metadata exists, then the dev server:
@@ -546,6 +572,9 @@ pnpm lint             # Run Oxlint
 pnpm lint:fix         # Run Oxlint with auto-fix
 pnpm format           # Format with Oxfmt
 pnpm format:check     # Check formatting (CI)
+pnpm test             # Run the Vitest suite once
+pnpm test:watch       # Vitest in watch mode
+pnpm check            # Lint + format check + typecheck + tests
 pnpm add-component    # Scaffold a UI component
 pnpm add-composable   # Scaffold a composable
 pnpm add-component styles  # Add or update the design tokens (src/styles/tokens.css)

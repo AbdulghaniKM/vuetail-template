@@ -9,6 +9,7 @@ Techinical Rules :
   queries: TanStack Query in `src/queries/<domain>.queries.ts`, built with `createResourceQueries` plus custom queries and mutations
   pages: use query composables only, never axios or a service directly
   stores: Pinia for client-only state (UI, preferences), never a copy of server data
+  tests: Vitest, `*.test.ts` next to the file under test; run `pnpm check` (lint, format, typecheck, tests) before committing
   - check https://vuetail-docs.vercel.app/getting-started for components and composables installation and info, if there's no component/composable matches your need, create a new one
   - always follow DRY principle (DON'T REPEAT YOURSELF)
   - every now and then check DESIGN_SYSTEM.MD to make sure you are designing using the right design system
